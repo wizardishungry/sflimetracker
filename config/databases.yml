@@ -1,0 +1,6 @@
+all:
+  propel:
+    class:          sfPropelDatabase
+    param:
+      encoding:     binary
+      dsn:          mysql://root:mypasswordhere@localhost/limetracker

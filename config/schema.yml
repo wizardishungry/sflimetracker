@@ -1,0 +1,56 @@
+propel:
+
+    torrent:
+        title:          longvarchar
+        description:    longvarchar
+        file_name:      varchar(255)
+        guid_hash:                         # this is a sha1 of the guid
+            type:       varchar(40)
+            index:      unique
+        info_hash:                         # from the .torrent
+            type:       varchar(40)
+        podcast_id:
+            type:       integer
+            foreignTable:   podcast
+            foreignReference: id
+            onDelete:   cascade            # probably want to delete the .torrent too 
+            required:   false
+            default:    null
+        created_at:
+        updated_at:
+ 
+    podcast:
+        title:          longvarchar
+        description:    longvarchar
+        feed_url:
+            type:       longvarchar
+        feed_url_hash:   
+            type:       varchar(40)
+            index:      unique
+        description:    longvarchar
+        created_at:
+        updated_at:
+        last_fetched:   timestamp
+        #todo add metas
+
+    client:
+      torrent_id:
+        type:       integer
+        foreignTable:   torrent
+        foreignReference: id
+        onDelete:   cascade 
+      peer_id:
+        type:       varchar(60)         # should be big enough for a pack()
+        #index:      unique             # SHOULD be unique, but replace this with an index of key+peer_id
+      port:         integer
+      bytes_uploaded:     integer
+      bytes_downloaded:   integer
+      bytes_left:         integer
+      state:        integer             # started stopped completed? possib remove
+      ip:           varchar(40)         # maxlength of ip6 is 39 
+      client_key:          varchar(60)         # should be big enough for a pack()
+      tracker_id:   varchar(60)         # should be big enough for a pack() 
+      created_at:
+      updated_at:
+      _uniques:
+        client_key_peer_id:  [client_key, peer_id, torrent_id]  # torrent is here just to make clients act less broken
