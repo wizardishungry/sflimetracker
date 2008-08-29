@@ -1,4 +1,4 @@
-sfLimeTracker                   by: Jon Williams <jwilliams@limewire.com
+sfLimeTracker                   by: Jon Williams <jwilliams@limewire.com>
 
 A BitTorrent tracker implementation written with the Symfony PHP framework.
 Licensed under the MIT license.
