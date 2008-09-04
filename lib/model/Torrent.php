@@ -13,9 +13,6 @@ sfLoader::loadHelpers(Array('Asset','Url'));
 class Torrent extends BaseTorrent
 {
 
-
-    
-
     function __construct($file=null)
     {
         if(!$file)

@@ -37,4 +37,13 @@ class podcastActions extends sfActions
     $this->forward404Unless($this->podcast); 
     $this->torrents=$this->podcast->getTorrents();
   }
+
+  public function executeList()
+  {
+    $c = new Criteria();
+    $c->addAscendingOrderByColumn(PodcastPeer::TITLE);
+    $c->addAscendingOrderByColumn(PodcastPeer::UPDATED_AT);
+    $c->addAscendingOrderByColumn(PodcastPeer::CREATED_AT);
+    $this->podcasts=PodcastPeer::doSelect($c);
+  }
 }
