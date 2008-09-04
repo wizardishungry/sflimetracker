@@ -18,6 +18,8 @@ propel:
             default:    null
         created_at:
         updated_at:
+        size:           integer            # file size
+        mime_type:      varchar(30)
  
     podcast:
         title:          longvarchar

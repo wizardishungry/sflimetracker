@@ -34,6 +34,16 @@ class Torrent extends BaseTorrent
             throw new sfException("$torrent_file already exists");
         }
 
+        $this->setSize(filesize($file->getSavedName()));
+
+        /*$fi = new finfo(FILEINFO_MIME);
+        $mime_type = $fi->file($file->getSavedName());
+        $fi->close();*/
+        //$mime_type=mime_content_type($file->getSavedName());
+        $mime_content_type='text/plain'; // just to have something fixme
+        $this->setMimeType($mime_type);
+        
+
         $MakeTorrent = new File_Bittorrent2_MakeTorrent($file->getSavedName());
         $MakeTorrent->setAnnounce(url_for('client/announce',true));
         $MakeTorrent->setComment('TODO');
@@ -62,6 +72,18 @@ class Torrent extends BaseTorrent
     {
         return _compute_public_path($this->getFileName().'.torrent','uploads','',true);
     }
+
+
+    public function getFeedEnclosure()
+    {
+      $e=new sfFeedEnclosure();
+      return $e->initialize(Array(
+            'url'=>$this->getUrl(),
+            'length'=>filesize($this->getTorrentPath()),
+            'mimeType'=>'application/x-bittorrent',
+        ));
+    }
+
     public function getGuid()
     {
         $components = Array();
