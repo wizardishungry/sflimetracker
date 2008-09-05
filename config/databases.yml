@@ -1,0 +1,10 @@
+all:
+  propel:
+    class:          sfPropelDatabase
+    param:
+      encoding:     binary
+      persistent:   true
+dev:
+  propel:
+    param:
+      dsn:          mysql://localhost/limetracker
