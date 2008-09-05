@@ -7,6 +7,8 @@
 
 <?php include_title() ?>
 
+<?php include_slot('feed') ?>
+
 <link rel="shortcut icon" href="/favicon.ico" />
 
 </head>
