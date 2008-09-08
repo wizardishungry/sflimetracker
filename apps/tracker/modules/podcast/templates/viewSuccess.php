@@ -6,3 +6,7 @@ Title: <?php echo $podcast->getTitle() ?>
   </li>
 <?php endforeach; ?></ul>
 <?php if(!$podcast->getFeedUrl()) echo link_to('add torrent','torrent/upload?podcast_id='.$podcast->getId()); ?>
+<?php slot('feed');
+echo auto_discovery_link_tag ('rss','feed/feed?id='.$podcast->getId());
+end_slot();
+?>

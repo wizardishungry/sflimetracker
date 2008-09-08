@@ -1,10 +1,4 @@
 <?php
-
-// fix for dumb PEAR
-// perhaps this should be globalized
-set_include_path(get_include_path().PATH_SEPARATOR.sfContext::getInstance()->
-    getConfiguration()->getRootDir().DIRECTORY_SEPARATOR.'lib');
-
 /**
  * torrent actions.
  *
