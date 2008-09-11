@@ -23,7 +23,7 @@ class accountActions extends sfActions
       if($request->getParameter('password')==$pw)
       {
         $this->getUser()->setAuthenticated(true);
-        $this->redirect('account/logout');
+        $this->redirect('account/logout'); // todo redirect to referer
       }
       else
       {
