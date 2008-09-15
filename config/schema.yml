@@ -20,6 +20,12 @@ propel:
         updated_at:
         size:           integer            # file size
         mime_type:      varchar(30)
+        # swarm state
+        downloads:      integer
+        seeders:        integer
+        peers:          integer
+        
+        
  
     podcast:
         title:          longvarchar
@@ -48,11 +54,11 @@ propel:
       bytes_uploaded:     integer
       bytes_downloaded:   integer
       bytes_left:         integer
-      state:        integer             # started stopped completed? possib remove
       ip:           varchar(40)         # maxlength of ip6 is 39 
       client_key:          varchar(60)         # should be big enough for a pack()
       tracker_id:   varchar(60)         # should be big enough for a pack() 
       created_at:
       updated_at:
-      _uniques:
-        client_key_peer_id:  [client_key, peer_id, torrent_id]  # torrent is here just to make clients act less broken
+## commenting this out to make it play better
+#      _uniques:
+#        client_key_peer_id:  [client_key, peer_id, torrent_id]  # torrent is here just to make clients act less broken

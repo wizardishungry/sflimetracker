@@ -29,6 +29,12 @@ class clientActions extends sfActions
     return $this->renderText($text);
   }
 
+
+  public function executeScrape($request)
+  {
+    return sfView::NONE; // at least don't error out
+  }
+
   public function executeAnnounce($request)
   {
     $this->encoder= new File_Bittorrent2_Encode();
