@@ -29,6 +29,12 @@ class clientActions extends sfActions
     return $this->renderText($text);
   }
 
+
+  public function executeScrape($request)
+  {
+    return sfView::NONE; // at least don't error out
+  }
+
   public function executeAnnounce($request)
   {
     $this->encoder= new File_Bittorrent2_Encode();
@@ -56,14 +62,14 @@ class clientActions extends sfActions
       $client->save();
 
       $torrent=$client->getTorrent();
-      $clients=$torrent->getClients();
+      $clients=ClientPeer::reap($torrent->getClients());
 
       if($params['compact'])
         $response['peers']='';
       
       foreach($clients as $peer_client)
       {
-        //if($client->getId()!=$peer_client->getId())
+        if($client->getId()!=$peer_client->getId() && !$peer_client->isDeleted())
         {
           if($params['compact'])
             $response['peers'].=$client->getDict(true);

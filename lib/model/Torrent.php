@@ -156,4 +156,21 @@ class Torrent extends BaseTorrent
       }
       return $ret;
     }
+
+    public function getClients($criteria= null, $con = null)
+    {
+      if(! $criteria instanceof Criteria)
+      {
+        $criteria = new Criteria();
+        $criteria->addAscendingOrderByColumn(ClientPeer::BYTES_LEFT);
+        $criteria->addAscendingOrderByColumn(ClientPeer::BYTES_UPLOADED);
+        $criteria->addDescendingOrderByColumn(ClientPeer::UPDATED_AT);
+        // naive
+      }
+      return parent::getClients($criteria,$con);
+    }
+    public function reap($try_to_do_global=true)
+    {
+      return ClientPeer::reap($this->getClients(),$try_to_do_global);
+    }
 }

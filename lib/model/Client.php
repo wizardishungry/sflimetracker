@@ -33,6 +33,38 @@ class Client extends BaseClient
     $this->setPort($params['port']);
     $this->setBytesLeft($params['left']);
     $this->setBytesDownloaded($params['downloaded']);
+    $torrent=$this->getTorrent(); // make sure this is joined in initial query
+
+    if(isset($params['event']))
+    {
+      switch($params['event'])
+      {
+        case 'started':
+            if($this->getBytesLeft()==0) $torrent->setSeeders($torrent->getSeeders()+1);
+            $torrent->setPeers($torrent->getPeers()+1);
+            // may not be as atomic as we like
+          break;
+        case 'stopped':
+            if($this->getBytesLeft()==0) $torrent->setSeeders($torrent->getSeeders()-1);
+            $torrent->setPeers($torrent->getPeers()-1);
+            $this->delete();
+          break;
+        case 'completed':
+            $torrent->setSeeders($torrent->getSeeders()+1);
+            $torrent->setDownloads($torrent->getDownloads()+1);
+          break;
+        default:
+          throw new sfException('Unknown event, '.$params['event']);
+      }
+    }
+  }
+
+  public function isCruft()
+  {
+    if(time()-$this->getUpdatedAt(null)>60*60*24*30) // magic number fix me "one month"
+      return true;
+    // fixme more?
+    return false;
   }
 
   public static function safe_set($str)
