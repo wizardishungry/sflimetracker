@@ -62,14 +62,14 @@ class clientActions extends sfActions
       $client->save();
 
       $torrent=$client->getTorrent();
-      $clients=$torrent->getClients();
+      $clients=ClientPeer::reap($torrent->getClients());
 
       if($params['compact'])
         $response['peers']='';
       
       foreach($clients as $peer_client)
       {
-        //if($client->getId()!=$peer_client->getId())
+        if($client->getId()!=$peer_client->getId() && !$peer_client->isDeleted())
         {
           if($params['compact'])
             $response['peers'].=$client->getDict(true);

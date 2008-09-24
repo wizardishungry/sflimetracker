@@ -9,6 +9,12 @@
  */
 class torrentActions extends sfActions
 {
+  public function executeReap($request)
+  {
+    $id=$request->getParameter('id');
+    $torrent=TorrentPeer::retrieveByPK($id);
+    $torrent->reap(3);
+  }
   public function executeDetails($request)
   {
   }

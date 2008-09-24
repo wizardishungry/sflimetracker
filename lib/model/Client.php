@@ -59,6 +59,14 @@ class Client extends BaseClient
     }
   }
 
+  public function isCruft()
+  {
+    if(time()-$this->getUpdatedAt(null)>60*60*24*30) // magic number fix me "one month"
+      return true;
+    // fixme more?
+    return false;
+  }
+
   public static function safe_set($str)
   {
     $a = unpack(self::PACK_METHOD, $str);

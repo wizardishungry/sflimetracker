@@ -157,16 +157,20 @@ class Torrent extends BaseTorrent
       return $ret;
     }
 
-    public function getClients($c=null)
+    public function getClients($criteria= null, $con = null)
     {
-      if(! $c instanceof Criteria)
+      if(! $criteria instanceof Criteria)
       {
-        $c = new Criteria();
-        $c->addAscendingOrderByColumn(TorrentPeer::BYTES_LEFT);
-        $c->addAscendingOrderByColumn(TorrentPeer::BYTES_UPLOADED);
-        $c->addDescendingOrderByColumn(TorrentPeer::UPDATED_AT);
+        $criteria = new Criteria();
+        $criteria->addAscendingOrderByColumn(ClientPeer::BYTES_LEFT);
+        $criteria->addAscendingOrderByColumn(ClientPeer::BYTES_UPLOADED);
+        $criteria->addDescendingOrderByColumn(ClientPeer::UPDATED_AT);
         // naive
       }
-      return parent::getClients($c);
+      return parent::getClients($criteria,$con);
+    }
+    public function reap($try_to_do_global=true)
+    {
+      return ClientPeer::reap($this->getClients(),$try_to_do_global);
     }
 }
