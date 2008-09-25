@@ -7,3 +7,4 @@ lib/model/om/*
 lib/model/map/*
 lib/form/base/*
 config/generated*
+lib/vendor/symfony
