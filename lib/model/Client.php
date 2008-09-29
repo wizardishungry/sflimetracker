@@ -24,16 +24,22 @@ class Client extends BaseClient
       'port'=>$this->getPort(),
     );
   }
-  public function updateWithParameters($params)
+  public function updateWithParameters($params,$request)
   {
     $this->setPeerId($params['peer_id']);
-    $this->setIp($params['ip']);
-    $this->setClientKey($params['key']);
+      $this->setClientKey($params['key']);
     $this->setBytesUploaded($params['uploaded']);
     $this->setPort($params['port']);
     $this->setBytesLeft($params['left']);
     $this->setBytesDownloaded($params['downloaded']);
     $torrent=$this->getTorrent(); // make sure this is joined in initial query
+
+    if(isset($params['ip']))
+      $this->setIp($params['ip']);
+    if(!isset($params['ip']) ||$this->isNatIp())
+    {
+      $this->setIp($request->getRemoteAddress());
+    }
 
     if(isset($params['event']))
     {
@@ -66,6 +72,36 @@ class Client extends BaseClient
     // fixme more?
     return false;
   }
+
+  public function isNatIp()
+  {
+    $nat_masks=Array('192.168.0.0/16', '172.16.0.0/12','10.0.0.0/8');
+    $ip_long=ip2long($this->getIp());
+    
+    if($ip_long===FALSE)
+    {
+      return FALSE; // this is either an ipv6 address or a host name (we hope!)
+    }
+    
+
+    foreach($nat_masks as $mask)
+    {
+      $ip_arr = explode('/', $mask);
+      $network_long = ip2long($ip_arr[0]);
+      $x = ip2long($ip_arr[1]);
+      $mask =  long2ip($x) == $ip_arr[1] ? $x : 0xffffffff << (32 - $ip_arr[1]);
+      if(($ip_long & $mask) == ($network_long & $mask))
+        return TRUE;
+    }
+    return false;
+  }
+
+
+/*
+  ##############################################################################
+        really boring stuff goes below
+  ##############################################################################
+*/
 
   public static function safe_set($str)
   {

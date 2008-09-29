@@ -52,12 +52,9 @@ class clientActions extends sfActions
       $params['info_hash']=$params['info_hash'][1];
       $params['peer_id']=$params['peer_id'];
 
-      if(!isset($params['ip']))
-        $params['ip']=$request->getRemoteAddress();
-
       $client=ClientPeer::retrieveByParameters($params);
 
-      $client->updateWithParameters($params);
+      $client->updateWithParameters($params,$request);
       
       $client->save();
 
