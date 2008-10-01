@@ -97,8 +97,8 @@ class Podcast extends BasePodcast
         }
 
         $b=$this->getBrowser(array(
-            'user_agent' => 'sfFeedReader/0.9',
-            'timeout'    => 5
+            'user_agent' => sfConfig::get('app_info_version'),
+            'timeout'    => 15
         ));
 
         $b->get($this->getFeedUrl()); 
