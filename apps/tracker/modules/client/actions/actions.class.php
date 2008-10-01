@@ -56,23 +56,30 @@ class clientActions extends sfActions
 
       $client->updateWithParameters($params,$request);
       
-      $client->save();
-
-      $torrent=$client->getTorrent();
-      $clients=ClientPeer::reap($torrent->getClients());
-
-      if($params['compact'])
-        $response['peers']='';
       
-      foreach($clients as $peer_client)
+      if(!$client->isDeleted())
       {
-        if($client->getId()!=$peer_client->getId() && !$peer_client->isDeleted())
+        $client->save();
+        $torrent=$client->getTorrent();
+        $clients=ClientPeer::reap($torrent->getClients());
+
+        if($params['compact'])
+          $response['peers']='';
+
+        foreach($clients as $peer_client)
         {
-          if($params['compact'])
-            $response['peers'].=$client->getDict(true);
-          else
-            $response['peers'][]=$client->getDict();
+          if($client->getId()!=$peer_client->getId() && !$peer_client->isDeleted())
+          {
+            if($params['compact'])
+              $response['peers'].=$client->getDict(true);
+            else
+              $response['peers'][]=$client->getDict();
+          }
         }
+      }
+      else
+      {
+        unset($response['peers']); // no need to send a stopping peer a list of peers
       }
 
       $response['tracker id']=$client->getTrackerId();
