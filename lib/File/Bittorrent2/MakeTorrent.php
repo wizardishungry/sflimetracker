@@ -140,6 +140,12 @@ class File_Bittorrent2_MakeTorrent
     protected $is_private = false;
 
     /**
+    * @var array    A list of custom fields to be written to the torrent's dictionary 
+    */
+    protected $custom_fields = array();
+
+
+    /**
      * Constructor
      *
      * Sets up the path to the file/dir to create
@@ -274,7 +280,7 @@ class File_Bittorrent2_MakeTorrent
      */
     protected function encodeTorrent(array $info = array())
     {
-        $bencdata = array();
+        $bencdata = $this->custom_fields; // copy the custom fields in
         $bencdata['info'] = array();
         if ($this->is_file) {
             $bencdata['info']['length'] = $info['length'];
@@ -558,6 +564,18 @@ class File_Bittorrent2_MakeTorrent
 	{
 		$this->is_private = (bool)$bool;
 	}
+
+  public function setCustomField($key, $value=null)
+  {
+    if($value===null)
+    {
+      unset($this->custom_fields[$key]);
+    }
+    else
+    {
+      $this->custom_fields[$key]=$value;
+    }
+  }
 }
 
 ?>
