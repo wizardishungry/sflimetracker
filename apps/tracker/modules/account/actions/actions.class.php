@@ -17,13 +17,19 @@ class accountActions extends sfActions
       throw new sfException('You must set password in modules/account/config/module.yml');
 
     if($this->getUser()->isAuthenticated())
-      $this->redirect('account/logout');
+      $this->redirect('@homepage');
     if($request->getMethod () == sfRequest::POST && !$this->getUser()->isAuthenticated())
     {
       if($request->getParameter('password')==$pw)
       {
         $this->getUser()->setAuthenticated(true);
-        $this->redirect('account/logout'); // todo redirect to referer
+        if($request->getReferer())
+        {
+          $this->redirect($request->getReferer()); // todo change login form to use sfForm and turn on csrf protection in settings.yml
+        }
+        {
+          $this->redirect('@homepage');
+        }
       }
       else
       {
@@ -37,7 +43,7 @@ class accountActions extends sfActions
     if($request->getMethod () == sfRequest::POST && $this->getUser()->isAuthenticated())
     {
       $this->getUser()->setAuthenticated(false);
-      $this->redirect('account/login');
+      $this->redirect('@homepage');
     }
   }
 }
