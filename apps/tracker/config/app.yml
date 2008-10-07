@@ -1,4 +1,3 @@
 # default values
 all:
-  info:
-    version:  <?php readfile(realpath(dirname(__FILE__).'/../../..').'/VERSION'); ?>
+  version:  <?php readfile(realpath(dirname(__FILE__).'/../../..').'/VERSION'); ?>
