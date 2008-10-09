@@ -200,7 +200,7 @@ class sfWebBrowser
       // relative link
       $uri = $this->urlInfo['scheme'].'://'.$this->urlInfo['host'].':'.$this->urlInfo['port'].'/'.$uri;
     }
-    else if($urlInfo['scheme'] != 'http' && $urlInfo['scheme'] != 'https')
+    else if($urlInfo['scheme'] != 'http' && $urlInfo['scheme'] != 'https' && $urlInfo['scheme'] != 'file')
     {
       throw new Exception('sfWebBrowser handles only http and https requests'); 
     }

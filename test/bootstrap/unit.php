@@ -16,14 +16,12 @@ include($configuration->getSymfonyLibDir().'/vendor/lime/lime.php');
 
 
 
-global $sf_root_dir; 
-
 $sf_symfony_lib_dir=$configuration->getSymfonyLibDir();
 $sf_root_dir=$configuration->getRootDir();
 
 require_once($sf_symfony_lib_dir.'/autoload/sfSimpleAutoload.class.php');
 $autoload = sfSimpleAutoload::getInstance();
-$autoload->addDirectory($sf_symfony_lib_dir.'/util');
+$autoload->addDirectory($sf_symfony_lib_dir);
 $autoload->addDirectory($sf_root_dir.'/plugins');
 $autoload->register();
 
@@ -36,7 +34,9 @@ sfContext::createInstance($app_config);
 
 function fixture_url($name)
 {
-//    return "file://localhost$sf_root_dir/test/fixtures/$name"; // fixme, blocked on symfony #4174
+    global $sf_root_dir;
+
+    return "file://localhost$sf_root_dir/test/fixtures/$name"; // fixme, blocked on symfony #4174
     return "http://localhost/sflimetracker/fixtures/$name";
 }
 

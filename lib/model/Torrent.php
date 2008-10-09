@@ -13,13 +13,8 @@ sfLoader::loadHelpers(Array('Asset','Url'));
 class Torrent extends BaseTorrent
 {
 
-    function __construct($file=null)
+    function __construct(sfValidatedFile $file) // todo -- abstract the validatedfile stuff out
     {
-        if(!$file)
-        {
-          return;
-        }
-
         $filename = $file->getOriginalName();
         $extension = $file->getOriginalExtension();
         $this->setTitle($filename);
