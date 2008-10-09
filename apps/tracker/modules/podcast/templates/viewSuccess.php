@@ -3,6 +3,7 @@ Title: <?php echo $podcast->getTitle() ?>
   <li>
     <?php echo link_to($torrent->getTitle(),$torrent->getUrl()) ?>
     <?php echo link_to('[details]','torrent/details?id='.$torrent->getId()); // fixme id numbers in urls boo ?>
+    <?php echo link_to('[magnet]',$torrent->getMagnet()); ?> 
   </li>
 <?php endforeach; ?></ul>
 <?php if(!$podcast->getFeedUrl()) echo link_to('add torrent','torrent/upload?podcast_id='.$podcast->getId()); ?>

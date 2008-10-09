@@ -4,9 +4,10 @@ propel:
         title:          longvarchar
         description:    longvarchar
         file_name:      varchar(255)
-        guid_hash:                         # this is a sha1 of the guid
+        guid_hash:                         # this is a sha1 of the guid from rss
             type:       varchar(40)
-            index:      unique
+            index:      unique             # perhaps this index should also include podcast_id
+
         info_hash:                         # from the .torrent
             type:       varchar(40)
         podcast_id:
@@ -19,7 +20,9 @@ propel:
         created_at:
         updated_at:
         size:           integer            # file size
-        mime_type:      varchar(30)
+        mime_type:      varchar(40)
+        web_url:        longvarchar        # for web backed torrents and non-torrent enclosure loving clients
+        file_sha1:      varchar(40)        # for magnets
         # swarm state
         downloads:      integer
         seeders:        integer
