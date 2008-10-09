@@ -49,6 +49,7 @@ class Torrent extends BaseTorrent
         $MakeTorrent->setComment('TODO');
         $MakeTorrent->setPieceLength(256); // KiB
         $meta = $MakeTorrent->buildTorrent();
+        $this->setFileSha1(sha1_file($file->getSavedName())); // todo: perhaps we should add profiling code?
         if($meta && file_put_contents($torrent_file,$meta))
         {
             $File_Bittorrent2_Decode = new File_Bittorrent2_Decode();
@@ -71,6 +72,15 @@ class Torrent extends BaseTorrent
     public function getUrl()
     {
         return _compute_public_path($this->getFileName().'.torrent','uploads','',true);
+    }
+
+    public function getMagnet()
+    {
+      // TODO: add web sources to magnets
+      // TODO: add kt param
+      // TODO: blocked on http://trac.symfony-project.org/ticket/4624
+        return 'magnet:?xt=urn:sha1:'.$this->getFileSha1().
+        '&dn='.urlencode($this->getFileName());
     }
 
 

@@ -12,18 +12,25 @@ class accountActions extends sfActions
 {
   public function executeLogin($request)
   {
-    $pw= sfConfig::get('mod_account_password', null);;
-    if($pw==null)
-      throw new sfException('You must set password in modules/account/config/module.yml');
+    
+    $this->form = new LoginForm();
 
     if($this->getUser()->isAuthenticated())
-      $this->redirect('account/logout');
+      $this->redirect('@homepage');
     if($request->getMethod () == sfRequest::POST && !$this->getUser()->isAuthenticated())
     {
-      if($request->getParameter('password')==$pw)
+      $this->form->bind($request->getPostParameters());
+      
+      if($this->form->isValid())
       {
         $this->getUser()->setAuthenticated(true);
-        $this->redirect('account/logout'); // todo redirect to referer
+        if($request->getReferer())
+        {
+          $this->redirect($request->getReferer());
+        }
+        {
+          $this->redirect('@homepage');
+        }
       }
       else
       {
@@ -37,7 +44,7 @@ class accountActions extends sfActions
     if($request->getMethod () == sfRequest::POST && $this->getUser()->isAuthenticated())
     {
       $this->getUser()->setAuthenticated(false);
-      $this->redirect('account/login');
+      $this->redirect('@homepage');
     }
   }
 }

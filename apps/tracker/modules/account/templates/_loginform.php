@@ -1,5 +1,9 @@
 <form action="<?php echo url_for('account/login') ?>" method="POST">
-  <input type="password" name="password" value="" id="password" />
+  <?php
+    if(!isset($form))
+      $form=new LoginForm();
+    echo $form;
+  ?>
   <input type="submit" value="login" />
 </form>
 

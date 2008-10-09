@@ -9,12 +9,13 @@
 
 <?php include_slot('feed') ?>
 
-<link rel="shortcut icon" href="/favicon.ico" />
-
 </head>
 <body>
 
 <?php echo $sf_content ?>
-
+<?php if($sf_user->isAuthenticated()): ?>
+  <?php include_partial('account/logoutform') ?>
+<?php else;?>
+  <?php echo link_to('Login','account/login') ?>
 </body>
 </html>

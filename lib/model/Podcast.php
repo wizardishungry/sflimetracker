@@ -97,7 +97,8 @@ class Podcast extends BasePodcast
         }
 
         $b=$this->getBrowser(array(
-            'user_agent' => sfConfig::get('app_info_version'),
+            'user_agent' => sfConfig::get('app_version_name').' ('. sfConfig::get('app_version_rev'). ' '
+              .sfConfig::get('app_version_comment'). ') '. sfConfig::get('app_version_url') , 
             'timeout'    => 15
         ));
 

@@ -1,7 +1,7 @@
 # default rules
 homepage:
   url:   /
-  param: { module: default, action: index }
+  param: { module: podcast, action: list }
 
 default_symfony:
   url:   /symfony/:action/*

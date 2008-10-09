@@ -3,10 +3,12 @@ default:
     content-type: text/html
 
   metas:
-    #title:        symfony project
-    #description:  symfony project
-    #keywords:     symfony, project
-    #language:     en
+    title:        |
+                  <?php echo sfConfig::get('app_version_name'),'(', sfConfig::get('app_version_rev'), ')'; ?> @
+                  hostnamehere
+    description:  Web-enabled BitTorrent tracker
+    keywords:     BitTorrent, bit torrent, feed, tracker, rss, limewire
+    language:     en
     robots:       index, follow
 
   stylesheets:    [main]

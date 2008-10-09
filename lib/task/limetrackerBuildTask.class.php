@@ -39,18 +39,31 @@ EOF;
   {
     $root=realpath(dirname(__FILE__).'/../..');
     $path=$root.'/VERSION';
+    $build_time="built ".date('c');
     if($unstable)
     {
-      $cmd="git log --date=local -n 1 --pretty=format:'git-%h committed %ci' $root";
+      $cmd="git log --date=local -n 1 --pretty=format:'git-%h, committed %ci' $root";
       $str=shell_exec(escapeshellcmd($cmd));
+      if($str==null)
+      {
+        $str="no-git, $build_time";
+      }
     }
     else
     {
-      $str='0.01 INVALID'; // CHANGE HOW THIS WORKS fixme
+      $str="0.01-invalid, $build_time"; // CHANGE HOW WE UNDERSTAND RELEASE #'S fixme
     }
 
-    $str="LimeTracker ($str) http://limecast.com/tracker";
-    file_put_contents($path,$str);
+    $str="LimeTracker, $str, http://limecast.com/tracker";
+    $parts=explode(', ',$str);
+    $keys=Array('name','rev','comment','url');
+    $count=0;
+    foreach($parts as &$part)
+    {
+      $key=$keys[$count++];
+      $part="$key: '$part'";
+    }
+    file_put_contents($path,"{".implode(', ',$parts)."}\n");
     $this->log('Wrote version string: '.$str);
   }
 }
