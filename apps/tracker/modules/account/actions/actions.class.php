@@ -12,20 +12,21 @@ class accountActions extends sfActions
 {
   public function executeLogin($request)
   {
-    $pw= sfConfig::get('mod_account_password', null);;
-    if($pw==null)
-      throw new sfException('You must set password in modules/account/config/module.yml');
+    
+    $this->form = new LoginForm();
 
     if($this->getUser()->isAuthenticated())
       $this->redirect('@homepage');
     if($request->getMethod () == sfRequest::POST && !$this->getUser()->isAuthenticated())
     {
-      if($request->getParameter('password')==$pw)
+      $this->form->bind($request->getPostParameters());
+      
+      if($this->form->isValid())
       {
         $this->getUser()->setAuthenticated(true);
         if($request->getReferer())
         {
-          $this->redirect($request->getReferer()); // todo change login form to use sfForm and turn on csrf protection in settings.yml
+          $this->redirect($request->getReferer());
         }
         {
           $this->redirect('@homepage');
