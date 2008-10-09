@@ -1,9 +1,9 @@
-<h3>Feeds:</h3>
+<h3>Feeds</h3>
 <ul>
 <?php foreach($podcasts as $podcast): ?>
   <li>
     <?php echo
-      link_to($podcast->getTitle(),'podcast/view?id='.$podcast->getId()),
+      link_to($podcast->getTitle(),'podcast/view?id='.$podcast->getId()), ' ',
       link_to('RSS','feed/feed?id='.$podcast->getId());
     ?>
   </li>
