@@ -57,9 +57,11 @@ class Podcast extends BasePodcast
     {
       if($this->getFeedUrl())
       {
-        $v=0+$this->last_fetched;
+        $v=0+@$this->last_fetched;
         if($file=$this->getStore())
-          $this->last_fetched= max($v, filemtime($file));
+        {
+          $this->last_fetched= max($v, @filemtime($file));
+        }
         return parent::getLastFetched($format);
       }
       return time();
