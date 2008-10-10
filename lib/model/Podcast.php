@@ -12,6 +12,7 @@ class Podcast extends BasePodcast
 
     protected $has_validation_run;
     protected $browser;
+    protected $cache_dir;
 
     function __construct()
     {
@@ -26,14 +27,14 @@ class Podcast extends BasePodcast
         $old_hash=$this->getFeedUrlHash();
         try {
             parent::setFeedUrl($url);
+            $this->setFeedUrlHash(sha1($url));
             if($url&&$validate)
             {
-                $this->setFeedUrlHash(sha1($url));
                 $this->fetch(true,false);
                 $this->has_validation_run=true;
             }
         }
-        catch(sfException $e)
+        catch(Exception $e)
         {
             if($validate)
             {
@@ -57,14 +58,17 @@ class Podcast extends BasePodcast
     {
       if($this->getFeedUrl())
       {
-        $v=0+@$this->last_fetched;
+        $this->last_fetched=0+@$this->last_fetched;
         if($file=$this->getStore())
         {
-          $this->last_fetched= max($v, @filemtime($file));
+          $this->last_fetched=max($this->last_fetched, @filemtime($file));
         }
-        return parent::getLastFetched($format);
       }
-      return time();
+      else
+      {
+        $this->last_fetched=0;
+      }
+      return parent::getLastFetched($format);
     }
 
     public function setLastFetched($v)
@@ -90,7 +94,8 @@ class Podcast extends BasePodcast
         $cached_response=$this->unserialize(); // better unserialization strategy?
 
 
-        echo "force=$force fallback=$fallback stale=$stale cached_response=",$cached_response!=null,"\n";
+        // fixme cleanup
+        //echo "force=$force fallback=$fallback stale=$stale cached_response=",$cached_response!=null,"\n";
 
 
         if($cached_response && !$force && !$stale)
@@ -178,19 +183,18 @@ class Podcast extends BasePodcast
 
     protected function getStorePath()
     {
-        static $cache_dir=null;
-        if(is_null($cache_dir))
+        if(is_null($this->cache_dir))
         {
             $c=sfContext::getInstance()->getConfiguration();
-            $cache_dir = $c->getRootDir().DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'tracker'.DIRECTORY_SEPARATOR
-            .$c->getEnvironment().DIRECTORY_SEPARATOR.'feed'.DIRECTORY_SEPARATOR;
+            $this->cache_dir = $c->getRootDir().DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'tracker'.DIRECTORY_SEPARATOR
+            .$c->getEnvironment().DIRECTORY_SEPARATOR.'feed';
         }
-        if(!file_exists($cache_dir))
+        if(!is_dir($this->cache_dir))
         {
-            if(!mkdir($cache_dir,0777,TRUE))
+            if(!mkdir($this->cache_dir,0777,TRUE)) // 3rd argument makes it recursive as `mkdirhier`
                 return false;
         }
-        return $cache_dir;
+        return $this->cache_dir;
     }
     protected function getStore()
     {
@@ -198,6 +202,6 @@ class Podcast extends BasePodcast
             throw new sfException('non feed-backed podcasts cannot have an store');
         if(!$cache_dir=$this->getStorePath())
             return null;
-        return $cache_dir.$this->getFeedUrlHash();
+        return $cache_dir.DIRECTORY_SEPARATOR.$this->getFeedUrlHash();
     }
 }
