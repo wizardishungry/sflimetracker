@@ -14,5 +14,16 @@ class testValidatedFile extends sfValidatedFile
 
 $file=new testValidatedFile(1,2,3,4);
 sfConfig::set('sf_upload_dir',$_ENV['TMPDIR']);
-$t = new lime_test(1, new lime_output_color());
+
+$t = new lime_test(4, new lime_output_color());
+
 $t->isa_ok($p=new Torrent($file),'Torrent','constructor works');
+$t->ok(file_exists($p->getTorrentPath()), '.torrent exists at path'.$p->getTorrentPath());
+$t->isa_ok($p->getFeedEnclosure(),'sfFeedEnclosure','got feed enclosure');
+
+$t->diag('running delete');
+try {
+  $p->delete();
+}
+catch(PropelException $pe) { /* no database connectivity */  }
+$t->ok(!file_exists($p->getTorrentPath()), '.torrent no longer exists at path'.$p->getTorrentPath());
