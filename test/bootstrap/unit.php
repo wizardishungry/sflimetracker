@@ -36,7 +36,7 @@ function fixture_url($name)
 {
     global $sf_root_dir;
 
-    return "file://localhost$sf_root_dir/test/fixtures/$name"; // fixme, blocked on symfony #4174
+    return "file://localhost$sf_root_dir/test/fixtures/$name"; // fixme, blocked on symfony #4174 -- comment out if unpatched
     return "http://localhost/sflimetracker/fixtures/$name";
 }
 
