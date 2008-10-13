@@ -2,6 +2,7 @@ log/*
 cache/*
 web/sf
 web/uploads/*
+# add2zip -- files below belong in the zip but not git
 data/sql/*
 lib/model/om/*
 lib/model/map/*
