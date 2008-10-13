@@ -22,11 +22,13 @@ EOF;
 
   protected function execute($arguments = array(), $options = array())
   {
-    $this->writeVersion();
+    if(!$this->checkPreconditions()) return;
     $tasks = Array(
+      new limetrackerMetaTask($this->dispatcher, $this->formatter),
       new sfPropelBuildModelTask($this->dispatcher, $this->formatter),
       new sfPropelBuildSqlTask($this->dispatcher, $this->formatter),
       new sfPropelBuildFormsTask($this->dispatcher, $this->formatter),
+      new limetrackerZipTask($this->dispatcher, $this->formatter),
     );
     foreach($tasks as $task)
     {
@@ -35,35 +37,19 @@ EOF;
     }
   }
 
-  protected function writeVersion($unstable=true)
+  protected function checkPreconditions()
   {
-    $root=realpath(dirname(__FILE__).'/../..');
-    $path=$root.'/VERSION';
-    $build_time="built ".date('c');
-    if($unstable)
-    {
-      $cmd="git log --date=local -n 1 --pretty=format:'git-%h, committed %ci' $root";
-      $str=shell_exec(escapeshellcmd($cmd));
-      if($str==null)
-      {
-        $str="no-git, $build_time";
-      }
-    }
-    else
-    {
-      $str="0.01-invalid, $build_time"; // CHANGE HOW WE UNDERSTAND RELEASE #'S fixme
-    }
+    $errors=Array();
 
-    $str="LimeTracker, $str, http://limecast.com/tracker";
-    $parts=explode(', ',$str);
-    $keys=Array('name','rev','comment','url');
-    $count=0;
-    foreach($parts as &$part)
+    if(!class_exists('ZipArchive')) $errors[]='Zip support needs to be compiled into PHP';
+    if(`git`==null) $errors[]='You need an install of git in your $PATH';
+
+    if(count($errors))
     {
-      $key=$keys[$count++];
-      $part="$key: '$part'";
+      $this->log("Cannot build; preconditions unsatisfied:");
+      $this->log($errors);
+      return false;
     }
-    file_put_contents($path,"{".implode(', ',$parts)."}\n");
-    $this->log('Wrote version string: '.$str);
+    return true;
   }
 }
