@@ -2,6 +2,9 @@ log/*
 cache/*
 web/sf
 web/uploads/*
+config/databases.yml
+config/propel.ini
+config/properties.ini
 # add2zip -- files below belong in the zip but not git
 data/sql/*
 lib/model/om/*
