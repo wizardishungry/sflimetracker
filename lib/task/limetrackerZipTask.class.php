@@ -60,7 +60,7 @@ EOF;
       {
         if(fnmatch("$this->root/$exclude",$file))
         {
-          $this->log("Ignore ". (is_dir($file)?'file':'dir ') ." $short \t\t[$exclude]");
+          $this->log("Ignore ". (is_dir($file)?'dir ':'file') ." $short \t\t[$exclude]");
           $is_ok=false;
           break;
         }
