@@ -19,9 +19,7 @@ class podcastActions extends sfActions
     $this->form=new PodcastForm();
     if ($request->isMethod('post'))
     {
-        $this->form->bind(Array(
-            'feed_url'=>$request->getParameter('feed_url')
-        ));
+        $this->form->bind($request->getGetParameters());
         if($this->form->isValid())
         {
             $podcast=$this->form->save();

@@ -23,11 +23,8 @@ class torrentActions extends sfActions
     $this->form=new TorrentForm();
     if ($request->isMethod('post'))
     {
-        $bind=Array('file'=>$request->getParameter('file'));
-        if($request->getParameter('podcast_id')!=0)
-          $bind['podcast_id']=$request->getParameter('podcast_id');
-        $this->form->bind($bind,$request->getFiles());
-        if ( $this->form->isBound())
+        $this->form->bind($request->getGetParameters(),$request->getFiles());
+        if ( $this->form->isValid())
         {
             $torrent=new Torrent($this->form->getValue('file'));
             $torrent->setPodcastId($request->getParameter('podcast_id'));
