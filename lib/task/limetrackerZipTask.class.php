@@ -34,7 +34,7 @@ EOF;
       throw new sfException("Can't make a zip");
     $this->root=realpath(dirname(__FILE__).'/../..');
     $this->generateExcludes($this->root);
-    $files=$this->processFiles($this->root);
+    $this->processFiles($this->root);
 
     if($this->zip->close()!==TRUE)
       throw new sfException('Saving zip failed');
@@ -43,7 +43,6 @@ EOF;
   protected function processFiles($path)
   {
     $files=glob($path."/{,.}*",GLOB_BRACE);
-    $match=Array();
     foreach($files as $file)
     {
       $is_ok=true;
@@ -69,29 +68,50 @@ EOF;
 
       if($is_ok)
       {
-        $match[]=$file;
 
         if(++$this->count%$this->reopen_interval==$this->reopen_interval-1)
         {
           $this->reopen(); // to stop annoying file handle exhaustion bug
         }
 
+        $is_dist=preg_match('#\.dist$#',$file)==1;
+        if($is_dist)
+        {
+          $short=preg_replace('#\.dist$#','',$short);
+        }
+
         if(is_dir($file))
         {
           $this->log("Adding dir  $short"); // double space makes it line up
+          if($is_dist)
+            throw new sfException("Cannot use .dist suffixed directories yet");
           $this->zip->addEmptyDir($short);
-          $match=array_merge($match,$this->processFiles($file));
+          $this->processFiles($file);
         }
         else
         {
-          $this->log("Adding file $short");
+          $this->log("Adding file $short".($is_dist?" from $short.dist":''));
+          
+          $entry_exists=$this->zip->locateName($short)!==FALSE;
+
+
+          if($entry_exists)
+          {
+            if($is_dist)
+            {
+              $this->log("Warning! $short already exists!",true);
+            }
+            else
+            {
+              throw new sfException("$short already exists in archive!");
+            }
+          }
+
           if($this->zip->addFile($file,$short)==FALSE)
-            throw new sfException("ARGH");
-          //$this->addFromString($short,file_get_contents($file));
+            throw new sfException("Couldn't add -- probably too many open files");
         }
       }
     }
-    return $match;
   }
   protected function generateExcludes($path)
   {
