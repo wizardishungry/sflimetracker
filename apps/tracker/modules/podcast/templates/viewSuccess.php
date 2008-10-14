@@ -6,7 +6,9 @@ Title: <?php echo $podcast->getTitle() ?>
     <?php echo link_to('[magnet]',$torrent->getMagnet()); ?> 
   </li>
 <?php endforeach; ?></ul>
-<?php if(!$podcast->getFeedUrl()) echo link_to('add torrent','torrent/upload?podcast_id='.$podcast->getId()); ?>
+<?php if($sf_user->isAuthenticated()): ?>
+  <?php if(!$podcast->getFeedUrl()) echo link_to('add torrent','torrent/upload?podcast_id='.$podcast->getId()); ?>
+<?php endif; ?>
 <?php slot('feed');
 echo auto_discovery_link_tag ('rss','feed/feed?id='.$podcast->getId());
 end_slot();
