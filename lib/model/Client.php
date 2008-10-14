@@ -96,6 +96,10 @@ class Client extends BaseClient
     return false;
   }
 
+  public function isComplete()
+  {
+    return $this->getBytesLeft()==0;
+  }
 
 /*
   ##############################################################################

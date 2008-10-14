@@ -15,7 +15,7 @@ class clientActions extends sfActions
           'peers'=>Array(),
           'complete'=>1,
           'incomplete'=>1,
-          'interval'=>6,
+          'interval'=>60,
           'tracker id'=>'',
   );
 
@@ -44,7 +44,7 @@ class clientActions extends sfActions
       $this->form=new ClientForm();
       $this->form->bind($request->getGetParameters());
 
-      if(!$this->form->isBound())
+      if(!$this->form->isValid())
         return $this->doError('form validation failed'); // append reason todo
 
       $params=$request->getGetParameters();
@@ -52,28 +52,37 @@ class clientActions extends sfActions
       $params['info_hash']=$params['info_hash'][1];
       $params['peer_id']=$params['peer_id'];
 
-      $client=ClientPeer::retrieveByParameters($params);
+      $my_client=ClientPeer::retrieveByParameters($params);
 
-      $client->updateWithParameters($params,$request);
+      $my_client->updateWithParameters($params,$request);
       
       
-      if(!$client->isDeleted())
+      if(!$my_client->isDeleted())
       {
-        $client->save();
-        $torrent=$client->getTorrent();
+        $my_client->save();
+        $torrent=$my_client->getTorrent();
         $clients=ClientPeer::reap($torrent->getClients());
+
+        if(!isset($params['compact'])) $params['compact']=TRUE;
 
         if($params['compact'])
           $response['peers']='';
 
+        $complete=0;
+        $incomplete=0;
+
         foreach($clients as $peer_client)
         {
-          if($client->getId()!=$peer_client->getId() && !$peer_client->isDeleted())
+          if($my_client->getId()!=$peer_client->getId() && !$peer_client->isDeleted())
           {
-            if($params['compact'])
-              $response['peers'].=$client->getDict(true);
+            if($peer_client->isComplete())
+              $complete++;
             else
-              $response['peers'][]=$client->getDict();
+              $incomplete++;
+            if($params['compact'])
+              $response['peers'].=$peer_client->getDict(true);
+            else
+              $response['peers'][]=$peer_client->getDict();
           }
         }
       }
@@ -82,7 +91,10 @@ class clientActions extends sfActions
         unset($response['peers']); // no need to send a stopping peer a list of peers
       }
 
-      $response['tracker id']=$client->getTrackerId();
+      $response['tracker id']=$my_client->getTrackerId();
+      $response['complete']=$complete;
+      $response['incomplete']=$incomplete;
+
 
 
    //  return sfView::ERROR;
