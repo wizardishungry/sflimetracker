@@ -42,25 +42,34 @@ EOF;
   }
   protected function processFiles($path)
   {
-    $files=glob($path."/*");
+    $files=glob($path."/{,.}*",GLOB_BRACE);
     $match=Array();
     foreach($files as $file)
     {
-      $this->log("Considering $file");
       $is_ok=true;
-      foreach($this->excludes as $exclude)
+
+      if(preg_match('#/\.\.?$#',$file)) // special directory entries
       {
-        if(fnmatch($exclude,$file))
+        $is_ok = false;
+      }
+      else
+      {
+        $short=preg_replace("#^$this->root/#",'',$file);  
+      }
+
+      if($is_ok) foreach($this->excludes as $exclude)
+      {
+        if(fnmatch("$this->root/$exclude",$file))
         {
-          $this->log("Excluding $file via $exclude");
+          $this->log("Ignore ". (is_dir($file)?'file':'dir ') ." $short \t\t[$exclude]");
           $is_ok=false;
           break;
         }
       }
+
       if($is_ok)
       {
         $match[]=$file;
-        $short=preg_replace("#^$this->root/#",'',$file);
 
         if(++$this->count%$this->reopen_interval==$this->reopen_interval-1)
         {
@@ -69,14 +78,13 @@ EOF;
 
         if(is_dir($file))
         {
-          $this->log("Adding directory $file as $short");
+          $this->log("Adding dir  $short"); // double space makes it line up
           $this->zip->addEmptyDir($short);
-          $this->log("Entering directory $file");
           $match=array_merge($match,$this->processFiles($file));
         }
         else
         {
-          $this->log("Adding file $file as $short");
+          $this->log("Adding file $short");
           if($this->zip->addFile($file,$short)==FALSE)
             throw new sfException("ARGH");
           //$this->addFromString($short,file_get_contents($file));
@@ -89,13 +97,18 @@ EOF;
   {
     $excludes=Array( // hardcoded ignores
       '.gitignore', // not dotfiles
-      'test',       // tests don't bleong in an end user release
-      'lib/vendor/symfony/test',
+      '.git',       // git directory
+      '*/.svn',
+      '*/.DS_Store','.DS_Store',
+      'lib/vendor/symfony/data/web/sf/sf_*',
       'lib/vendor/symfony/doc',
       'lib/vendor/symfony/lib/i18n',
       'lib/vendor/symfony/lib/plugins',
+      'lib/vendor/symfony/lib/task/generator/skeleton',
+      'lib/vendor/symfony/test',
       'plugins/*/test',
-      'lib/vendor/symfony/data/web/sf/sf_*',
+      'plugins/.*',
+      'test',       // tests don't bleong in an end user release
     );
 
     $contents=file_get_contents("$path/.gitignore");
@@ -111,11 +124,8 @@ EOF;
     }
     else
     {
-      $this->log('Warning: no .gitignore; building on Windows is not such a good idea right now…');
+      $this->log('WARNING: no .gitignore; building on Windows is not such a good idea right now…',true);
     }
-
-    foreach($excludes as &$glob)
-      $glob="$path/$glob";
 
     $this->excludes=$excludes;
   }
