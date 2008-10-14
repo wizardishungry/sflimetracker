@@ -125,6 +125,7 @@ EOF;
       'lib/vendor/symfony/lib/i18n',
       'lib/vendor/symfony/lib/plugins',
       'lib/vendor/symfony/lib/task/generator/skeleton',
+      'lib/vendor/symfony/lib/plugins/sfCompat10Plugin',
       'lib/vendor/symfony/test',
       'plugins/*/test',
       'plugins/.*',

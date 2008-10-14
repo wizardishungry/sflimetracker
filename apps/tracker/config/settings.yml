@@ -102,4 +102,4 @@ all:
 #    default_culture:        en        # Default user culture
 #
 #    # enable 1.0 compatibility
-    compat_10:              on          # only keeping this around for prototype backend
+    compat_10:              off          # only keeping this around for prototype backend
