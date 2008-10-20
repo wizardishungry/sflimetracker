@@ -1,0 +1,3 @@
+[submodule "plugins/File_Bittorrent2"]
+	path = plugins/File_Bittorrent2
+	url = git@github.com:WIZARDISHUNGRY/file_bittorrent2.git
