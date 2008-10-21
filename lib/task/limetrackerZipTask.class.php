@@ -3,7 +3,7 @@
 class limetrackerZipTask extends sfBaseTask
 {
 
-  protected $verbose=false; // todo add cmdline option
+  protected $verbose=false;
   protected $reopen_interval=200; // see http://bugs.php.net/bug.php?id=40494
   protected $count=0;
   protected $path;
@@ -15,10 +15,10 @@ class limetrackerZipTask extends sfBaseTask
     $this->briefDescription = 'Creates a zipfile of a release';
     $this->detailedDescription = <<<EOF
 The [limetracker:zip|INFO] task makes a ready to go zipfile.
-Call it with:
-
-  [php symfony limetracker:zip|INFO]
 EOF;
+    $this->addArgument('file', sfCommandArgument::REQUIRED, 'The path to the zipfile',null);
+    $this->addOption('verbose', null, sfCommandOption::PARAMETER_REQUIRED, 'Enables verbose output', false);
+    
   }
 
   protected function execute($arguments = array(), $options = array())
@@ -27,7 +27,8 @@ EOF;
 
     $this->zip=new ZipArchive();
 
-    $this->path='/tmp/limetracker.zip';
+    $this->path=$arguments['file'];
+    $this->verbose=$options['verbose'];
 
     $this->log("Saving  zip to $this->path , please wait…",true);
     if($this->zip->open($this->path,ZipArchive::OVERWRITE)!==TRUE)
@@ -117,10 +118,11 @@ EOF;
   {
     $excludes=Array(    // hardcoded ignores
       '.gitignore',     // not dotfiles
+      '.gitmodules',     // not dotfiles
       '.git','*/.git',  // git directory
       '*/.svn',
       '*/.DS_Store','.DS_Store',
-      'lib/vendor/symfony/data/web/sf/sf_*',
+      'lib/vendor/symfony/data/web/sf',
       'lib/vendor/symfony/doc',
       'lib/vendor/symfony/lib/i18n',
       'lib/vendor/symfony/lib/task/generator/skeleton',
@@ -136,6 +138,7 @@ EOF;
       'plugins/.*',
       'plugins/File_Bittorrent2', // added via symlinks in lib
       'test',       // tests don't bleong in an end user release
+      'web/sf/sf_*', // no debugging
       '*.swp', '*/*.swp', // no vim swapfiles
     );
 

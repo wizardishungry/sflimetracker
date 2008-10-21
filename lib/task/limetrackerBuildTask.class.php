@@ -9,31 +9,29 @@ class limetrackerBuildTask extends sfBaseTask
     $this->briefDescription = 'Build a release of LimeTracker';
     $this->detailedDescription = <<<EOF
 The [limetracker:build|INFO] task does things to setup a complete build of LimeTracker.
-Call it with:
-
-  [php symfony limetracker:build|INFO]
 EOF;
-    //$this->addArgument('application', sfCommandArgument::REQUIRED, 'The application name');
-    // add other arguments here
-    //$this->addOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev');
-    //$this->addOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel');
-    // add other options here
+    $this->addArgument('file', sfCommandArgument::REQUIRED, 'The path to the zipfile',null);
+    $this->addArgument('version', sfCommandArgument::OPTIONAL, 'The application version',null);
+    $this->addOption('verbose', null, sfCommandOption::PARAMETER_REQUIRED, 'Enables verbose output', false);
+    
   }
 
   protected function execute($arguments = array(), $options = array())
   {
     if(!$this->checkPreconditions()) return;
+
     $tasks = Array(
-      new limetrackerMetaTask($this->dispatcher, $this->formatter),
-      new sfPropelBuildModelTask($this->dispatcher, $this->formatter),
-      new sfPropelBuildSqlTask($this->dispatcher, $this->formatter),
-      new sfPropelBuildFormsTask($this->dispatcher, $this->formatter),
-      new limetrackerZipTask($this->dispatcher, $this->formatter),
+      Array(new limetrackerMetaTask($this->dispatcher, $this->formatter), Array('version'=>@$arguments['version']) , Array('verbose'=>@$options['verbose']) ),
+      Array(new sfPropelBuildModelTask($this->dispatcher, $this->formatter), Array() , Array('verbose'=>@$options['verbose']) ),
+      Array(new sfPropelBuildSqlTask($this->dispatcher, $this->formatter), Array() , Array('verbose'=>@$options['verbose']) ),
+      Array(new sfPropelBuildFormsTask($this->dispatcher, $this->formatter), Array() , Array('verbose'=>@$options['verbose']) ),
+      Array(new limetrackerZipTask($this->dispatcher, $this->formatter), Array('file'=>$arguments['file']) , Array('verbose'=>@$options['verbose']) ),
     );
-    foreach($tasks as $task)
+    foreach($tasks as $list)
     {
+      list($task,$args,$opts)=$list;
       $task->setCommandApplication($this->commandApplication);
-      $task->run();
+      $task->run($args,$opts);
     }
   }
 

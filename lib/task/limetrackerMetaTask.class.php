@@ -13,24 +13,21 @@ Call it with:
 
   [php symfony limetracker:meta|INFO]
 EOF;
-    //$this->addArgument('application', sfCommandArgument::REQUIRED, 'The application name');
-    // add other arguments here
-    //$this->addOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev');
-    //$this->addOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', 'propel');
-    // add other options here
+    $this->addArgument('version', sfCommandArgument::OPTIONAL, 'The application version',null);
+
   }
 
   protected function execute($arguments = array(), $options = array())
   {
-    $this->writeVersion();
+    $this->writeVersion(@$arguments['version']);
   }
 
-  protected function writeVersion($unstable=true)
+  protected function writeVersion($string)
   {
     $root=realpath(dirname(__FILE__).'/../..');
     $path=$root.'/VERSION';
     $build_time="built ".date('c');
-    if($unstable)
+    if(!$string) // unstable
     {
       $cmd="git log --date=local -n 1 --pretty=format:'git-%h, committed %ci' $root";
       $str=shell_exec(escapeshellcmd($cmd));
@@ -41,7 +38,7 @@ EOF;
     }
     else
     {
-      $str="0.01-invalid, $build_time"; // CHANGE HOW WE UNDERSTAND RELEASE #'S fixme
+      $str="$string, $build_time"; // CHANGE HOW WE UNDERSTAND RELEASE #'S fixme
     }
 
     $str="LimeTracker, $str, http://limecast.com/tracker";
