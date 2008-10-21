@@ -4,3 +4,6 @@
 	url = git://github.com/WIZARDISHUNGRY/file_bittorrent2.git
 # private
 #	url = git@github.com:WIZARDISHUNGRY/file_bittorrent2.git
+[submodule "lib/vendor/symfony"]
+	path = lib/vendor/symfony
+	url = git://github.com/WIZARDISHUNGRY/symfony.git

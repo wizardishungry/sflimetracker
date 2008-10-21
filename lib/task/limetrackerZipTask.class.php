@@ -115,21 +115,28 @@ EOF;
   }
   protected function generateExcludes($path)
   {
-    $excludes=Array( // hardcoded ignores
-      '.gitignore', // not dotfiles
-      '.git',       // git directory
+    $excludes=Array(    // hardcoded ignores
+      '.gitignore',     // not dotfiles
+      '.git','*/.git',  // git directory
       '*/.svn',
       '*/.DS_Store','.DS_Store',
       'lib/vendor/symfony/data/web/sf/sf_*',
       'lib/vendor/symfony/doc',
       'lib/vendor/symfony/lib/i18n',
-      'lib/vendor/symfony/lib/plugins',
       'lib/vendor/symfony/lib/task/generator/skeleton',
+      'lib/vendor/symfony/lib/task/project/upgrade*',
       'lib/vendor/symfony/lib/plugins/sfCompat10Plugin',
+      'lib/vendor/symfony/lib/plugins/sfPropelPlugin/data',
+      'lib/vendor/symfony/lib/plugins/sfPropelPlugin/lib/task',
+      'lib/vendor/symfony/lib/plugins/sfPropelPlugin/lib/vendor/phing',
+      'lib/vendor/symfony/lib/plugins/sfPropelPlugin/lib/vendor/propel-generator',
+      'lib/vendor/symfony/lib/plugins/sfPropelPlugin/test',
       'lib/vendor/symfony/test',
       'plugins/*/test',
       'plugins/.*',
+      'plugins/File_Bittorrent2', // added via symlinks in lib
       'test',       // tests don't bleong in an end user release
+      '*.swp', '*/*.swp', // no vim swapfiles
     );
 
     $contents=file_get_contents("$path/.gitignore");

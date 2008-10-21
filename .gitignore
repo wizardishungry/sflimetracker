@@ -1,6 +1,5 @@
 log/*
 cache/*
-web/sf
 web/uploads/*
 config/databases.yml
 config/propel.ini
@@ -11,5 +10,6 @@ lib/model/om/*
 lib/model/map/*
 lib/form/base/*
 config/generated*
-lib/vendor/symfony
 VERSION
+web/sf
+web/tracker_dev.php
