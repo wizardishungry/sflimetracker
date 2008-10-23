@@ -67,7 +67,7 @@ class Client extends BaseClient
 
   public function isCruft()
   {
-    if(time()-$this->getUpdatedAt(null)>60*60*24*30) // magic number fix me "one month"
+    if(time()-$this->getUpdatedAt(null)>=sfConfig::get('app_client_age_max'))
       return true;
     // fixme more?
     return false;

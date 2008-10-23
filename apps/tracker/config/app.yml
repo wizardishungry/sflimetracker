@@ -1,3 +1,9 @@
-# default values
 all:
   version:  <?php readfile(realpath(dirname(__FILE__).'/../../..').'/VERSION'); ?>
+  reap: # constants for the swarm cleanup routine
+    single_clients_min:     100     # minimum number of clients in a single swarm to try a reap 
+    multi_time_mod:         600     # trigger a global reap if the time() is modulo this number -- this should be pretty big
+    multi_clients_max:      1000    # limit the number of peers to be considered in a single global reap
+    single_kills_min:       1       # minimum number of clients to delete from a single torrent; I wouldn't change this for now.
+    single_remain_min:      100     # minimum number of remaining clients -- don't delete if there are <= this number
+    client_age_max:         <?php echo strtotime('1 month',0); ?>
