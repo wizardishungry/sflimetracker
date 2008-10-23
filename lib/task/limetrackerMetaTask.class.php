@@ -38,7 +38,7 @@ EOF;
     }
     else
     {
-      $str="$string, $build_time"; // CHANGE HOW WE UNDERSTAND RELEASE #'S fixme
+      $str="$string, $build_time";
     }
 
     $str="LimeTracker, $str, http://limecast.com/tracker";

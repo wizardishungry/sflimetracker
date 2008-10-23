@@ -76,7 +76,6 @@ class Torrent extends BaseTorrent
     public function getMagnet()
     {
       // TODO: add web sources to magnets
-      // TODO: add kt param
       // TODO: blocked on http://trac.symfony-project.org/ticket/4624
         return 'magnet:?xt=urn:sha1:'.$this->getFileSha1().
         '&dn='.urlencode($this->getFileName());
