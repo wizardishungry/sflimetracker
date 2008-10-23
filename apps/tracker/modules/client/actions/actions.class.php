@@ -35,8 +35,17 @@ class clientActions extends sfActions
     return sfView::NONE; // at least don't error out
   }
 
+
+  public function timeout($request)
+  {
+    if(!$request->isConnectionAborted())
+      $this->doError('timed out'); // will this even flush
+  }
+
   public function executeAnnounce($request)
   {
+    register_shutdown_function(array($this, "timeout"),$request);
+
     $this->encoder= new File_Bittorrent2_Encode();
     try{
       $response=$this->response_ok;
@@ -45,14 +54,19 @@ class clientActions extends sfActions
       $this->form->bind($request->getGetParameters());
 
       if(!$this->form->isValid())
-        return $this->doError('form validation failed'); // append reason todo
+      {
+        return $this->doError(implode (';\n', $form->getValidatorSchema()->getMessages()) );
+      }
 
       $params=$request->getGetParameters();
       $params['info_hash']=unpack('H*',$params['info_hash']);
       $params['info_hash']=$params['info_hash'][1];
       $params['peer_id']=$params['peer_id'];
 
+      $request->setTimeLimit(10);
       $my_client=ClientPeer::retrieveByParameters($params);
+
+      $request->setIgnoreUserAbort(true); // semi-transactional now
 
       $my_client->updateWithParameters($params,$request);
       
@@ -62,6 +76,8 @@ class clientActions extends sfActions
         $my_client->save();
         $torrent=$my_client->getTorrent();
         $clients=ClientPeer::reap($torrent->getClients());
+        $request->setIgnoreUserAbort(false);
+        $request->setTimeLimit(20);
 
         if(!isset($params['compact'])) $params['compact']=TRUE;
 
@@ -88,6 +104,8 @@ class clientActions extends sfActions
       }
       else
       {
+        $request->setIgnoreUserAbort(false);
+        $request->setTimeLimit(20);
         unset($response['peers']); // no need to send a stopping peer a list of peers
       }
 
