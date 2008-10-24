@@ -13,7 +13,7 @@ class testValidatedFile extends sfValidatedFile
 }
 
 $file=new testValidatedFile(1,2,3,4);
-sfConfig::set('sf_upload_dir',$_ENV['TMPDIR']);
+sfConfig::set('sf_upload_dir',sys_get_temp_dir());
 
 $t = new lime_test(4, new lime_output_color());
 

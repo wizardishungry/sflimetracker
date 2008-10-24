@@ -107,7 +107,7 @@ class Podcast extends BasePodcast
             'user_agent' => sfConfig::get('app_version_name').' ('. sfConfig::get('app_version_rev'). ' '
               .sfConfig::get('app_version_comment'). ') '. sfConfig::get('app_version_url') , 
             'timeout'    => 15
-        ));
+        )); // refactor this into our own browser wrapper class todo
 
         $b->get($this->getFeedUrl()); 
 

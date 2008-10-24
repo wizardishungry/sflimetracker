@@ -23,20 +23,26 @@ require_once($sf_symfony_lib_dir.'/autoload/sfSimpleAutoload.class.php');
 $autoload = sfSimpleAutoload::getInstance();
 $autoload->addDirectory($sf_symfony_lib_dir);
 $autoload->addDirectory($sf_root_dir.'/plugins');
+$autoload->addDirectory($sf_root_dir.'/lib');
 $autoload->register();
 
-$app_config=$configuration->getApplicationConfiguration('tracker','test',true,$sf_root_dir);
+// Commenting this out because it seems to be breaking stuff right now
+/*$app_config=$configuration->getApplicationConfiguration('tracker','test',true,$sf_root_dir);
 
 $databaseManager = new sfDatabaseManager($app_config);
 $databaseManager->loadConfiguration();
 
-sfContext::createInstance($app_config);
+sfContext::createInstance($app_config);*/
 
-function fixture_url($name)
+function fixture_url($name,$file_url=true)
 {
     global $sf_root_dir;
 
-    return "file://localhost$sf_root_dir/test/fixtures/$name"; // fixme, blocked on symfony #4174 -- comment out if unpatched
-    return "http://localhost/sflimetracker/fixtures/$name";
+    $file_url=false; // fixme, blocked on symfony #4174 -- comment out if unpatched
+
+    if($file_url)
+      return "file://localhost$sf_root_dir/test/fixtures/$name";
+    else
+      return "http://localhost/sflimetracker/fixtures/$name"; // todo determine real install location
 }
 
