@@ -38,7 +38,7 @@ function fixture_url($name,$file_url=true)
 {
     global $sf_root_dir;
 
-    $file_url=false; // fixme, blocked on symfony #4174 -- comment out if unpatched
+    //$file_url=false; // fixme, blocked on symfony #4174 -- uncomment out if unpatched
 
     if($file_url)
       return "file://localhost$sf_root_dir/test/fixtures/$name";

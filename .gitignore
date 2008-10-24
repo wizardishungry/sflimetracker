@@ -1,9 +1,10 @@
 log/*
 cache/*
-web/uploads/*
 config/databases.yml
 config/propel.ini
 config/properties.ini
+web/uploads/*
+web/fixtures
 # add2zip -- files below belong in the zip but not git
 data/sql/*
 lib/model/om/*
