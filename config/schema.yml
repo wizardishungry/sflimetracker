@@ -24,7 +24,7 @@ propel:
         web_url:        longvarchar        # for web backed torrents and non-torrent enclosure loving clients
         file_sha1:      varchar(40)        # for magnets
         # swarm state
-        downloads:      integer
+        downloads:      integer            # may want to use a reflector script and increment this for web downloads todo
         seeders:        integer
         peers:          integer
         

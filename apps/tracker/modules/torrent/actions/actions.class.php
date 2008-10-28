@@ -23,7 +23,7 @@ class torrentActions extends sfActions
     $this->form=new TorrentForm();
     if ($request->isMethod('post'))
     {
-        $this->form->bind($request->getGetParameters(),$request->getFiles());
+        $this->form->bind($request->getPostParameters(),$request->getFiles());
         if ( $this->form->isValid())
         {
             $torrent=new Torrent($this->form->getValue('file'));
@@ -31,7 +31,8 @@ class torrentActions extends sfActions
             $torrent->save();
             $this->redirect('podcast/view?id='.$request->getParameter('podcast_id'));
         } 
-        else throw new sfException('Form failed validation');
+        else
+          return sfView::ERROR;
     }
       $this->form->setDefaults(Array(
             'podcast_id'=>$request->getParameter('podcast_id')
