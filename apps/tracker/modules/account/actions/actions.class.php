@@ -13,7 +13,7 @@ class accountActions extends sfActions
   public function executeLogin($request)
   {
     
-    $this->form = new LoginForm();
+    $this->form = new LoginForm($this->getUser());
 
     if($this->getUser()->isAuthenticated())
       $this->redirect('@homepage');

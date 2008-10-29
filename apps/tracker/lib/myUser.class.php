@@ -42,4 +42,23 @@ class myUser extends sfBasicSecurityUser
     }
     throw new sfException("Couldn't retrieve default user");
   }
+
+  public function authenticatePassword($password)
+  {
+    if(gettype($password)!=='string')
+      throw new sfException('password is not string; is '.gettype($password));
+    try
+    {
+      return $this->getCryptedString()===self::crypt($password);
+    }
+    catch(sfException $e)
+    {
+      return false;
+    }
+  }
+
+  public static function crypt($str)
+  {
+    return base64_encode(sha1($str,true));
+  }
 }

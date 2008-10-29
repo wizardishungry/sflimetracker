@@ -10,7 +10,7 @@
     <table>
       <?php
         if(!isset($form))
-          $form=new LoginForm();
+          $form=new LoginForm($sf_user);
         echo $form;
       ?>
       <tr>
