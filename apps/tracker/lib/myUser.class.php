@@ -16,6 +16,7 @@ class myUser extends sfBasicSecurityUser
     $payload=self::getName();
     $payload.=':{SHA}'; // for apache
     $payload.=self::crypt($password); // nb no salt!!!!
+    $payload.="\n";
     file_put_contents($this->getPasswdPath(),$payload);
   }
 
