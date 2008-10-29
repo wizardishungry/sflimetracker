@@ -15,21 +15,26 @@
   echo " action_",$sf_context->getActionName();
 ?>">
 
-<?php echo $sf_content ?>
+<div class="content">
+  <?php echo $sf_content ?>
+</div>
+
 <?php if($sf_context->getModuleName()!='account'): ?>
-  <hr>
-  <?php if($sf_user->isAuthenticated()): ?>
-    <?php include_partial('account/logoutform') ?>
-  <?php else:?>
-    <?php echo link_to('Login','account/login') ?>
-  <?php endif; ?>
-  |
-  <?php
-  echo link_to(sfConfig::get('app_version_name'),sfConfig::get('app_version_url'),
-              Array('title'=>sfConfig::get('app_version_comment'))),
-              ' ',sfConfig::get('app_version_rev'),
-              '; Symfony ',SYMFONY_VERSION;
-  ?>
+  <div class="footer loginlink">
+    <?php if($sf_user->isAuthenticated()): ?>
+      <?php include_partial('account/logoutform') ?>
+    <?php else:?>
+      <?php echo link_to('Login','account/login') ?>
+    <?php endif; ?>
+  </div>
+  <div class="footer version">
+    <?php
+    echo link_to(sfConfig::get('app_version_name'),sfConfig::get('app_version_url'),
+                Array('class'=>'version_name','title'=>sfConfig::get('app_version_comment'))),
+                ' <span class="version_rev">',sfConfig::get('app_version_rev'),'</span>',
+                '; <span class="runtime_version">Symfony ',SYMFONY_VERSION,'</span>';
+    ?>
+  </div>
 <?php endif ?>
 </body>
 </html>
