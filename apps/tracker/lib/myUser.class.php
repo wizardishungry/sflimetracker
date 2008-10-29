@@ -2,17 +2,30 @@
 
 class myUser extends sfBasicSecurityUser
 {
-  public function setPassword($password)
+
+  protected static function getName()
   {
+    $name=sfConfig::get('app_version_name');
+    if(!$name)
+      $name='LimeTracker';
+    return $name;
   }
 
-  public function verifyPassword($password)
+  public function setPassword($password)
   {
+    $payload=self::getName();
+    $payload.=':{SHA}'; // for apache
+    $payload.=self::crypt($password); // nb no salt!!!!
+    file_put_contents($this->getPasswdPath(),$payload);
   }
 
   protected function getPasswdPath()
   {
-    $passwd=sfContext::getInstance()->getConfiguration()->getRootDir().DIRECTORY_SEPARATOR.'.htpasswd';
+    // need a better way fixme
+    //$passwd=sfContext::getInstance()->getConfiguration()->getRootDir().DIRECTORY_SEPARATOR.'.htpasswd';
+    $sf_root_dir = realpath(dirname(__FILE__).'/../../..');
+    $passwd="$sf_root_dir/.htpasswd";
+
     if(!file_exists($passwd))
       throw new sfException("Can't find .htpasswd");
     if(!is_readable($passwd))
@@ -28,7 +41,7 @@ class myUser extends sfBasicSecurityUser
     if(!count($lines))
       throw new sfException("Invalid .htpasswd");
 
-    $default_user=sfConfig::get('app_version_name'); // should be "LimeTracker"
+    $default_user=self::getName(); // should be "LimeTracker"
     foreach($lines as $line)
     {
       List($user,$hash)=explode(':',$line);
