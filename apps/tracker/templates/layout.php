@@ -10,21 +10,26 @@
 <?php include_slot('feed') ?>
 
 </head>
-<body>
+<body class="<?php
+  echo "module_",$sf_context->getModuleName();
+  echo " action_",$sf_context->getActionName();
+?>">
 
 <?php echo $sf_content ?>
-<hr>
-<?php if($sf_user->isAuthenticated()): ?>
-  <?php include_partial('account/logoutform') ?>
-<?php else:?>
-  <?php echo link_to('Login','account/login') ?>
-<?php endif; ?>
- |
-<?php
-echo link_to(sfConfig::get('app_version_name'),sfConfig::get('app_version_url'),
-            Array('title'=>sfConfig::get('app_version_comment'))),
-            ' ',sfConfig::get('app_version_rev'),
-            '; Symfony ',SYMFONY_VERSION;
-?>
+<?php if($sf_context->getModuleName()!='account'): ?>
+  <hr>
+  <?php if($sf_user->isAuthenticated()): ?>
+    <?php include_partial('account/logoutform') ?>
+  <?php else:?>
+    <?php echo link_to('Login','account/login') ?>
+  <?php endif; ?>
+  |
+  <?php
+  echo link_to(sfConfig::get('app_version_name'),sfConfig::get('app_version_url'),
+              Array('title'=>sfConfig::get('app_version_comment'))),
+              ' ',sfConfig::get('app_version_rev'),
+              '; Symfony ',SYMFONY_VERSION;
+  ?>
+<?php endif ?>
 </body>
 </html>
