@@ -15,6 +15,11 @@
   echo " action_",$sf_context->getActionName();
 ?>">
 
+<?php if ($sf_user->hasFlash('notice')): ?>
+  <div class="notice"><?php echo $sf_user->getFlash('notice') ?></div>
+<?php endif; ?>
+
+
 <div class="content">
   <?php echo $sf_content ?>
 </div>

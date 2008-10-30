@@ -30,5 +30,6 @@ EOF;
   {
     $user=new myUser(new sfEventDispatcher(), new sfSessionTestStorage());
     $user->setPassword($arguments['password']);
+    $this->log('Password changed.');
   }
 }

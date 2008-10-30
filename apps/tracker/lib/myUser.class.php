@@ -11,16 +11,19 @@ class myUser extends sfBasicSecurityUser
     return $name;
   }
 
-  public function setPassword($password)
+  public function setPassword($password,$write=true)
   {
     $payload=self::getName();
     $payload.=':{SHA}'; // for apache
     $payload.=self::crypt($password); // nb no salt!!!!
     $payload.="\n";
-    file_put_contents($this->getPasswdPath(),$payload);
+    if($write)
+      if(false==file_put_contents($this->getPasswdPath(),$payload))
+        throw new sfException("Couldn't write password, check permissions");
+    return $payload;
   }
 
-  protected function getPasswdPath()
+  public function getPasswdPath()
   {
     // need a better way fixme
     //$passwd=sfContext::getInstance()->getConfiguration()->getRootDir().DIRECTORY_SEPARATOR.'.htpasswd';
