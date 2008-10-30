@@ -15,15 +15,25 @@ class accountActions extends sfActions
   public function executeLogin($request)
   {
     
-    $this->form = new LoginForm($this->getUser());
+    $user = $this->getUser();
 
-    if($this->getUser()->isAuthenticated())
+    if($user->isAuthenticated())
       $this->redirect('@homepage');
-    if($request->getMethod () == sfRequest::POST && !$this->getUser()->isAuthenticated())
+    if(($request->getMethod () == sfRequest::POST||$request->getCookie($this->cookie_name))
+      && !$this->getUser()->isAuthenticated())
     {
-      $this->form->bind($request->getPostParameters());
+      $params=$request->getPostParameters();
+
+      if($request->getCookie($this->cookie_name)&&!isset($params['password']))
+      {
+       $params['password']=$request->getCookie($this->cookie_name);
+        sfForm::disableCSRFProtection();
+      }
+
+      $form = $this->form = new LoginForm($this->getUser());
+      $form->bind($params);
       
-      if($this->form->isValid())
+      if($form->isValid())
       {
         $this->getUser()->setAuthenticated(true);
         if($form->getValue('remember_me'))
@@ -47,15 +57,18 @@ class accountActions extends sfActions
  
   public function executeLogout($request)
   {
-    if($request->getMethod () == sfRequest::POST && $this->getUser()->isAuthenticated())
+    $user=$this->getUser();
+    if($request->getMethod () == sfRequest::POST && $user->isAuthenticated())
     {
-      $this->getUser()->setAuthenticated(false);
+      $this->remember(true); // also known as "forget"
+      $user->setAuthenticated(false);
       $this->redirect('@homepage');
     }
   }
   public function executePassword($request)
   {
     $user=$this->getUser();
+    $payload=null;
     $this->form = $form = new PasswordForm($user);
     if($request->getMethod () == sfRequest::POST)
     {
