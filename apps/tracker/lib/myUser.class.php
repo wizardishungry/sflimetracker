@@ -23,6 +23,11 @@ class myUser extends sfBasicSecurityUser
     return $payload;
   }
 
+  public function canWritePasswd()
+  {
+    return is_writeable($this->getPasswdPath());
+  }
+
   public function getPasswdPath()
   {
     // need a better way fixme

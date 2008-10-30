@@ -58,15 +58,13 @@ class accountActions extends sfActions
       {
         if($user->isAuthenticated())
         {
-          try
+          $can_write=$user->canWritePasswd();
+          $payload=$user->setPassword($form->getValue('password'),$can_write);
+          if($can_write)
           {
-            $payload=$user->setPassword($form->getValue('password'));
             $user->setAuthenticated(false);
             $user->setFlash('notice','Password changed');
             return $this->redirect('@homepage');
-          }
-          catch(sfException $e)
-          {
           }
         }
         else
