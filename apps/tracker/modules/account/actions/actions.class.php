@@ -10,6 +10,8 @@
  */
 class accountActions extends sfActions
 {
+  protected $cookie_name='remember_me';
+
   public function executeLogin($request)
   {
     
@@ -24,6 +26,10 @@ class accountActions extends sfActions
       if($this->form->isValid())
       {
         $this->getUser()->setAuthenticated(true);
+        if($form->getValue('remember_me'))
+        {
+          $this->remember();
+        }
         if($request->getReferer())
         {
           $this->redirect($request->getReferer());
@@ -76,5 +82,28 @@ class accountActions extends sfActions
           $this->exception=$e;
       }
     }
+  }
+  protected function remember($cookie_eraser=false)
+  {
+    $response=$this->getResponse();
+    $request=$this->getRequest();
+    if($request->getCookie($this->cookie_name) && !$cookie_eraser)
+    {
+      return;
+    }
+
+    $path='/';
+
+    if($cookie_eraser)
+    {
+      $value='';
+      $expire=null;
+    }
+    else
+    {
+      $value=$request->getPostParameter('password');
+      $expire=time()+sfConfig::get('app_admin_remember_me_time');
+    }
+    $response->setCookie($this->cookie_name,$value,$expire,$path,'',false);
   }
 }
