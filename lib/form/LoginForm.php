@@ -13,14 +13,15 @@ class LoginForm extends sfForm
   {
     $this->setWidgets(array(
       'password'    => new sfWidgetFormInputPassword(),
+      'remember_me' => new sfWidgetFormInputCheckbox(),
     ));
     $this->setValidators(array(
       'password'    =>   new sfValidatorCallback(array(
-          'required' => true,
-          'callback' => Array($this,'passwordCallback'),
-          'arguments' => Array($this->getValue('password'))
-        )
-      )
+        'required' => true,
+        'callback' => Array($this,'passwordCallback'),
+        'arguments' => Array($this->getValue('password'))
+      )),
+      'remember_me' =>  new sfValidatorPass(Array('required'=>false)),
     ));
   }
 
