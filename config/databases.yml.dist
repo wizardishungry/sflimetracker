@@ -4,7 +4,14 @@ all:
     param:
       encoding:     binary
       persistent:   true
-dev:
+prod:
   propel:
     param:
-      dsn:          mysql://localhost/limetracker
+      dsn:          mysql://user:pass@localhost/limetracker
+
+
+## For developers only!
+#dev:
+#  propel:
+#    param:
+#      dsn:          mysql://localhost/limetracker

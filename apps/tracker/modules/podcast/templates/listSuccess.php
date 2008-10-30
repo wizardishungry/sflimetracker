@@ -13,3 +13,9 @@
 <ul>
   <li>TODO</li>
 </ul>
+
+<h3>Settings</h3>
+<ul>
+  <li><?php echo link_to('Change password','account/password') ?></li>
+  <li>todo add more
+</ul>
