@@ -6,4 +6,6 @@ all:
     multi_clients_max:      1000    # limit the number of peers to be considered in a single global reap
     single_kills_min:       1       # minimum number of clients to delete from a single torrent; I wouldn't change this for now.
     single_remain_min:      100     # minimum number of remaining clients -- don't delete if there are <= this number
-    client_age_max:         <?php echo strtotime('1 month',0); ?>
+    client_age_max:         <?php echo strtotime('1 month',0),"\n"; ?>
+  admin:
+    remember_me_time:       <?php echo strtotime('1 month',0),"\n"; ?>
