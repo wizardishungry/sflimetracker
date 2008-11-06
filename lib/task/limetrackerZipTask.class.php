@@ -118,7 +118,8 @@ EOF;
   {
     $excludes=Array(    // hardcoded ignores
       '.gitignore',     // not dotfiles
-      '.gitmodules',     // not dotfiles
+      '.gitmodules',    // not dotfiles
+      '.htpasswd',      // do not include developer password
       '.git','*/.git',  // git directory
       '*/.svn',
       '*/.DS_Store','.DS_Store',
