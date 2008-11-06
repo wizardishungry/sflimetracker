@@ -13,5 +13,4 @@ lib/form/base/*
 config/generated*
 VERSION
 web/sf
-web/tracker_dev.php
 .htpasswd
