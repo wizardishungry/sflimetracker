@@ -8,6 +8,7 @@
     ?>
   </li>
 <?php endforeach; ?>
+<?php echo link_to('Add…','podcast/add') ?>
 </ul>
 <h3>Files</h3>
 <ul>
