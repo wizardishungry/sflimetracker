@@ -1,10 +1,12 @@
-h1. "sfLimeTracker":http://limecast.com/tracker
+h1. sfLimeTracker
 <div style="float:right;">
 by: "Jon Williams":mailto:jwilliams@limewire.com
-part of the "LimeCast":http://limecast.com/ project
+"LimeTracker":http://limecast.com/tracker is part of the "LimeCast":http://limecast.com/ project.
 </div>
 
-A BitTorrent tracker implementation written with the Symfony PHP framework.
-Licensed under the MIT license; see "LICENSE":./license for details.
+_A BitTorrent tracker implementation written with the Symfony PHP framework.
+Licensed under the MIT license; see "LICENSE":master/LICENSE for details._
+
+Please see the "wiki":http://github.com/WIZARDISHUNGRY/sflimetracker/wikis for documentation.
 
 Copyright (c) 2008 "Limewire":http://www.limewire.com, LLC
