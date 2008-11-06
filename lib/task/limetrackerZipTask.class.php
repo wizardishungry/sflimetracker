@@ -30,7 +30,7 @@ EOF;
     $this->path=$arguments['file'];
     $this->verbose=$options['verbose'];
 
-    $this->log("Saving  zip to $this->path , please wait…",true);
+    $this->log("Saving zip to $this->path, please wait…",true);
     if($this->zip->open($this->path,ZipArchive::OVERWRITE)!==TRUE)
       throw new sfException("Can't make a zip");
     $this->root=realpath(dirname(__FILE__).'/../..');
@@ -100,7 +100,7 @@ EOF;
           {
             if($is_dist)
             {
-              $this->log("Warning! $short already exists!",true);
+              $this->log("$short already exists -- replaced with $short.dist.",true);
             }
             else
             {
