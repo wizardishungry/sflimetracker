@@ -7,6 +7,7 @@ web/uploads/*
 web/fixtures
 # add2zip -- files below belong in the zip but not git
 data/sql/*
+data/tracker.db*
 lib/model/om/*
 lib/model/map/*
 lib/form/base/*
