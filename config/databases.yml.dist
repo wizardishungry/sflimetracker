@@ -4,14 +4,27 @@ all:
     param:
       encoding:     binary
       persistent:   true
-prod:
+dev:
   propel:
-    param:
-      dsn:          mysql://user:pass@localhost/limetracker
 
+    ## mysql
+    #param:
+    #  dsn:          mysql://user:password@localhost/limetracker
+
+    # sqlite
+    param:
+      phptype:  sqlite
+      database: %SF_DATA_DIR%/tracker.db
 
 ## For developers only!
 #dev:
 #  propel:
 #    param:
 #      dsn:          mysql://localhost/limetracker
+
+# this environment included to help with project builds
+sqlite:
+  propel:
+    param:
+      phptype:  sqlite
+      database: %SF_DATA_DIR%/tracker.db

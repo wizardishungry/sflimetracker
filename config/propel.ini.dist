@@ -1,9 +1,16 @@
 propel.targetPackage       = lib.model
 propel.packageObjectModel  = true
 propel.project             = sflimetracker
-propel.database            = mysql
-propel.database.createUrl  = mysql://localhost/
-propel.database.url        = mysql://localhost/limetracker
+
+; mysql
+;propel.database            = mysql
+;propel.database.createUrl  = mysql://user:password@localhost/
+;propel.database.url        = ${propel.database.createUrl}/limetracker
+
+; sqlite
+propel.database            = sqlite
+propel.database.url        = sqlite://localhost//full/path/to/sflimetracker/data/tracker.db
+
 
 propel.addGenericAccessors = true
 propel.addGenericMutators  = true
@@ -13,7 +20,7 @@ propel.schema.validate     = false
 
 ; directories
 propel.home                    = .
-propel.output.dir              = /Users/jwilliams/Projects/sflimetracker
+propel.output.dir              = /full/path/to/sflimetracker
 propel.schema.dir              = ${propel.output.dir}/config
 propel.conf.dir                = ${propel.output.dir}/config
 propel.phpconf.dir             = ${propel.output.dir}/config
