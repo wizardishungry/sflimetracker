@@ -13,12 +13,18 @@ EOF;
     $this->addArgument('version', sfCommandArgument::OPTIONAL, 'The application version',null);
     $this->addArgument('file', sfCommandArgument::OPTIONAL, 'The path to the zipfile',null);
     $this->addOption('verbose', null, sfCommandOption::PARAMETER_REQUIRED, 'Enables verbose output', false);
+    $this->addOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'Environment for build SQL task', 'sqlite');
+    $this->addOption('build-db', null, sfCommandOption::PARAMETER_REQUIRED,
+      'builds the database -- defaults to true if env==sqlite', 'false');
     
   }
 
   protected function execute($arguments = array(), $options = array())
   {
     if(!$this->checkPreconditions($arguments,$options)) return;
+
+    if($options['env']=='sqlite')
+      $options['build-db']=true; // actually a connection
 
     $tasks = Array(
       Array(new limetrackerMetaTask($this->dispatcher, $this->formatter),
@@ -30,6 +36,14 @@ EOF;
       Array(new sfPropelBuildFormsTask($this->dispatcher, $this->formatter),
         Array() , Array('verbose'=>@$options['verbose']) ),
     );
+
+    if($options['build-db'])
+    {
+      $tasks[]=Array(new sfPropelBuildDbTask($this->dispatcher, $this->formatter),Array(),Array() );
+      // todo ^ this doesn't work
+      // todo copy tracker.db to tracker.db.dist
+    }
+
     if(@$arguments['file'])
     {
       $tasks[]=Array(new limetrackerZipTask($this->dispatcher, $this->formatter),
