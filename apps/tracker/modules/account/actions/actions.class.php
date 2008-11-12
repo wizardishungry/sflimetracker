@@ -27,7 +27,7 @@ class accountActions extends sfActions
       if($request->getCookie($this->cookie_name)&&!isset($params['password']))
       {
        $params['password']=$request->getCookie($this->cookie_name);
-        sfForm::disableCSRFProtection();
+       sfForm::disableCSRFProtection();
       }
 
       $form = $this->form = new LoginForm($this->getUser());
