@@ -7,10 +7,15 @@
         echo $form;
       ?>
       <tr>
-        <td><input type="submit" value="Login" /></td>
         <td><?php
-          echo button_to('I forgot my password!',"account/password")
+          echo link_to('Change',"account/password")
         ?></td>
+        <td><?php
+          echo link_to('I forget',"http://limecast.com/tracker")
+        ?></td>
+      </tr>
+      <tr>
+        <td><input type="submit" value="Login" /></td>
       </tr>
     </table>
   </form>

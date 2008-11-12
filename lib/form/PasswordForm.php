@@ -30,12 +30,6 @@ class PasswordForm extends sfForm
       'password_again' => new sfValidatorString(Array('required'=>true)),
     );
 
-    if(!$this->user->isAuthenticated())
-    {
-      unset($widgets['current_password']);
-      unset($vals['current_password']);
-    }
-
     $this->setWidgets($widgets);
     $this->setValidators($vals);
 

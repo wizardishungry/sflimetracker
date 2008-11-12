@@ -75,21 +75,16 @@ class accountActions extends sfActions
       $form->bind($request->getPostParameters());
       if($form->isValid())
       {
-        if($user->isAuthenticated())
+
+        $can_write=$user->canWritePasswd();
+        $payload=$user->setPassword($form->getValue('password'),$can_write);
+        if($can_write)
         {
-          $can_write=$user->canWritePasswd();
-          $payload=$user->setPassword($form->getValue('password'),$can_write);
-          if($can_write)
-          {
-            $user->setAuthenticated(false);
-            $user->setFlash('notice','Password changed');
-            return $this->redirect('@homepage');
-          }
+          $user->setAuthenticated(false);
+          $user->setFlash('notice','Password changed');
+          return $this->redirect('@homepage');
         }
-        else
-        {
-          $payload=$user->setPassword($form->getValue('password'),FALSE);
-        }
+
         $this->payload=$payload;
         if(isset($e))
           $this->exception=$e;
