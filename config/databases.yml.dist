@@ -4,8 +4,6 @@ all:
     param:
       encoding:     binary
       persistent:   true
-dev:
-  propel:
 
     ## mysql
     #param:
