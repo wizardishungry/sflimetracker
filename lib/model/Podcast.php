@@ -27,7 +27,11 @@ class Podcast extends BasePodcast
         $old_hash=$this->getFeedUrlHash();
         try {
             parent::setFeedUrl($url);
-            $this->setFeedUrlHash(sha1($url));
+            if($url)
+              $h=sha1($url);
+            else
+              $h=null;
+            $this->setFeedUrlHash($h);
             if($url&&$validate)
             {
                 $this->fetch(true,false);
