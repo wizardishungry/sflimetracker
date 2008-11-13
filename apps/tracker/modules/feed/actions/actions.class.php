@@ -5,16 +5,10 @@
  *
  * @package    sflimetracker
  * @subpackage feed
- * @author     Your name here
- * @version    SVN: $Id: actions.class.php 9301 2008-05-27 01:08:46Z dwhittle $
  */
 class feedActions extends sfActions
 {
- /**
-  * Executes index action
-  *
-  * @param sfRequest $request A request object
-  */
+
   public function executeFeed($request)
   {
     $feed = new sfRss201Feed();
