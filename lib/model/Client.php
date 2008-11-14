@@ -27,7 +27,7 @@ class Client extends BaseClient
   public function updateWithParameters($params,$request)
   {
     $this->setPeerId($params['peer_id']);
-      $this->setClientKey($params['key']);
+    $this->setClientKey($params['key']);
     $this->setBytesUploaded($params['uploaded']);
     $this->setPort($params['port']);
     $this->setBytesLeft($params['left']);
