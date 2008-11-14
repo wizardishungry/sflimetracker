@@ -21,19 +21,23 @@ class torrentActions extends sfActions
     $this->form=new TorrentForm();
     if ($request->isMethod('post'))
     {
+        $params=$request->getPostParameters();
+        $files=$request->getFiles();
+        if(isset($files['file']))
+          $params['file']=$files['file'];
         $this->form->bind($request->getPostParameters(),$request->getFiles());
         if ( $this->form->isValid())
         {
             $torrent=new Torrent($this->form->getValue('file'));
-            $torrent->setPodcastId($request->getParameter('podcast_id'));
+            $torrent->setEpisodeId($request->getParameter('episode_id'));
             $torrent->save();
-            $this->redirect('podcast/view?id='.$request->getParameter('podcast_id'));
+            $this->redirect('episode/view?id='.$request->getParameter('episode_id'));
         } 
         else
           return sfView::ERROR;
     }
       $this->form->setDefaults(Array(
-            'podcast_id'=>$request->getParameter('podcast_id')
+            'episode_id'=>$request->getParameter('episode_id')
       ),Array());
   }
 }

@@ -1,48 +1,61 @@
 propel:
 
     torrent:
-        title:          longvarchar
-        description:    longvarchar
-        file_name:      varchar(255)
-        guid_hash:                         # this is a sha1 of the guid from rss
-            type:       varchar(40)
-            index:      unique             # perhaps this index should also include podcast_id
-
-        info_hash:                         # from the .torrent
-            type:       varchar(40)
-        podcast_id:
-            type:       integer
-            foreignTable:   podcast
-            foreignReference: id
-            onDelete:   cascade            # probably want to delete the .torrent too 
-            required:   false
-            default:    null
-        created_at:
-        updated_at:
-        size:           integer            # file size
-        mime_type:      varchar(40)
-        web_url:        longvarchar        # for web backed torrents and non-torrent enclosure loving clients
-        file_sha1:      varchar(40)        # for magnets
-        # swarm state
-        downloads:      integer            # may want to use a reflector script and increment this for web downloads todo
-        seeders:        integer
-        peers:          integer
-        
-        
+      file_name:      varchar(255)
+      guid_hash:                         # this is a sha1 of the guid from rss
+          type:       varchar(40)
+          index:      unique             # perhaps this index should also include podcast_id
+      info_hash:                         # from the .torrent
+          type:       varchar(40)
+      episode_id:
+          type:       integer
+          foreignTable:  episode 
+          foreignReference: id
+          onDelete:   cascade            # probably want to delete the .torrent too 
+          required:   false
+          default:    null
+      created_at:
+      updated_at:
+      size:           integer            # file size
+      mime_type:      varchar(40)
+      web_url:        longvarchar        # for web backed torrents and non-torrent enclosure loving clients
+      file_sha1:      varchar(40)        # for magnets
+      # swarm state
+      downloads:      integer            # may want to use a reflector script and increment this for web downloads todo
+      seeders:        integer
+      peers:          integer
+      
+    episode:
+      title:          longvarchar
+      description:    longvarchar
+      created_at:
+      updated_at:
+      length:         integer          # time
+      downloads:      integer          # is this web downloads only? 
+      podcast_id:
+        type:       integer
+        foreignTable:   podcast
+        foreignReference: id
+        onDelete:   cascade            # probably want to delete the .torrent too 
+        required:   false
+        default:    null
+      guid_hash:    # we need this todo?
+        type:       varchar(40)
+        index:      unique
  
     podcast:
-        title:          longvarchar
-        description:    longvarchar
-        feed_url:
-            type:       longvarchar
-        feed_url_hash:   
-            type:       varchar(40)
-            index:      unique
-        description:    longvarchar
-        created_at:
-        updated_at:
-        last_fetched:   timestamp
-        #todo add metas
+      title:          longvarchar
+      description:    longvarchar
+      feed_url:
+          type:       longvarchar
+      feed_url_hash:   
+          type:       varchar(40)
+          index:      unique
+      description:    longvarchar
+      created_at:
+      updated_at:
+      last_fetched:   timestamp
+      #todo add metas
 
     client:
       torrent_id:
@@ -58,7 +71,7 @@ propel:
       bytes_downloaded:   integer
       bytes_left:         integer
       ip:           varchar(40)         # maxlength of ip6 is 39 
-      client_key:          varchar(60)         # should be big enough for a pack()
+      client_key:   varchar(60)         # should be big enough for a pack()
       tracker_id:   varchar(60)         # should be big enough for a pack() 
       created_at:
       updated_at:
