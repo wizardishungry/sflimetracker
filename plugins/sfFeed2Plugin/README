@@ -7,17 +7,18 @@ The `sfFeed2Plugin` offers an object interface for feeds and feed items, feed in
  * serving a RSS/Atom feed based on model objects
  * Using web feeds as data source
  * Feed aggregator
- 
+
 As compared with the `sfFeedPlugin`, this plugin has a cleaner code separation in classes and offers more features. The syntax differs, but many classes have the same names, therefore the two plugins are not compatible.
 
 == Contents ==
 
-This plugin contains three data structure classes:
+This plugin contains four data structure classes:
 
  * `sfFeed`
  * `sfFeedItem`
+ * `sfFeedImage`
  * `sfFeedEnclosure`
- 
+
 It also contains specific classes containing specific input/output methods based on specific feed formats:
 
  * `sfAtom1Feed`
@@ -25,7 +26,7 @@ It also contains specific classes containing specific input/output methods based
  * `sfRss10Feed`
  * `sfRss201Feed`
  * `sfRss091Feed`
- 
+
 Last but not least, the most important (and smart) class is the feed manager, which contains only static methods:
 
  * `sfFeedPeer`
@@ -86,7 +87,7 @@ The `Author` class is extended by a custom `->getName()` method as follows:
 {{{
 public function getName()
 {
-  return $this->getFirstName().' '.$this->getLastName()
+  return $this->getFirstName().' '.$this->getLastName();
 }
 }}}
 
@@ -122,7 +123,7 @@ The feed action has to output an [http://en.wikipedia.org/wiki/Atom_%28standard%
     <author_email>pclive@myblog.com</author_email>
   </author>
   <id>4543D55FF756G734</id>
-
+  <icon>http://www.myblog.com/favicon.ico</icon>
   <entry>
     <title>I love mice</title>
     <link href="http://www.myblog.com/permalink/i-love-mice" />
@@ -163,6 +164,10 @@ public function executeLastPosts()
   $feed->setLink('http://www.myblog.com/');
   $feed->setAuthorEmail('pclive@myblog.com');
   $feed->setAuthorName('Peter Clive');
+
+  $feedImage = new sfFeedImage();
+  $feedImage->setFavicon('http://www.myblog.com/favicon.ico');
+  $feed->setImage($feedImage);
 
   $c = new Criteria;
   $c->addDescendingOrderByColumn(PostPeer::CREATED_AT);
@@ -229,7 +234,7 @@ public function executeLastPosts()
       'link'        => '@permalink?stripped_title='.$post->getStrippedTitle(),
       'authorName'  => $post->getAuthor()->getName(),
       'authorEmail' => $post->getAuthor()->getEmail(),
-      'pubdate'     => $post->getCreatedAt(),
+      'pubDate'     => $post->getCreatedAt(),
       'uniqueId'    => $post->getStrippedTitle(),
       'description' => $post->getDescription(),
     ));
@@ -320,6 +325,19 @@ The other way to use a specific method for an item property is to pass a `method
   ));
 }}}
 
+You can also pass some arguments to the user defined method by passing an array composed of the method name and an array of arguments:
+
+{{{
+  $postItems = sfFeedPeer::convertObjectsToItems($posts, array(
+    'routeName' => '@permalink',
+    'methods'   => array(
+      'authorEmail' => '',
+      'authorName'  => 'getUserFirstName',
+      'pubdate'     => array('getPublishedAtDate', array('U')),
+    )
+  ));
+}}}
+
 ==== Using the sfFeedPeer static methods ====
 
 The `sfFeedPeer` class offer helper methods that facilitate the creation and population of feed items.
@@ -380,16 +398,16 @@ You may want to display the latest posts of the symfony users group in your appl
 public function executeLastPosts()
 {
   $uri = 'http://groups.google.com/group/symfony-users/feed/rss_v2_0_msgs.xml';
-  
+
   $browser = new sfWebBrowser(array(
       'user_agent' => 'sfFeedReader/0.9',
       'timeout'    => 5
   ));
-  $feedString = $browser->get($uri)->getResponseText(); 
+  $feedString = $browser->get($uri)->getResponseText();
 
   $feed = new sfRssFeed();
-  $feed->setUrl($feedString);
-  $feed->fromXml($uri);
+  $feed->setUrl($uri);
+  $feed->fromXml($feedString);
   $this->feed = $feed;
 }
 }}}
@@ -443,7 +461,16 @@ public function executeLastPosts()
 
 == Changelog ==
 
-=== 2007-04-15 | 0.9.4 Beta === 
+== Trunk ==
+
+ * fabien: fixed response content-type encoding
+ * francois: Fixed encoding inside CDATA sections
+ * fabien: fixed routing for symfony 1.1 and optimized the 1.0 version
+ * fabien: added the possibility to pass arguments to methods that convert an object to an item
+ * Pascal.Borreli : symfony coding practices : removed lib closing tag (#2657)
+ * Fabian Lange : added image capabilities (#2551)
+
+=== 2007-04-15 | 0.9.4 Beta ===
 
  * francois: Added a `toXML` method to `sfRssFeed`, `sfRss10Feed` and `sfAtom1Feed` (based on an idea from Frank Stelzer)
  * Frank.Stelzer: Added a new `sfFeedPeer::createFromXml()` method
@@ -459,7 +486,7 @@ public function executeLastPosts()
  * francois: Fixed a bug in generated Atom1 feeds (summary attribute)
  * francois: Fixed a bug in `sfFeedPeer::aggregate()` when defining a feed format
 
-=== 2007-03-13 | 0.9.3 Beta === 
+=== 2007-03-13 | 0.9.3 Beta ===
 
  * francois: `sfFeedPeer::createFromWeb()` is smarter at determining the type of feed it reads
  * francois: Added smart guessing of publication date for RSS and Atom feeds, based on URL scheme
@@ -470,24 +497,24 @@ public function executeLastPosts()
  * francois: Added `sfFeed::keepOnlyItems($count)` method
  * francois: `sfRssReed` now looks for a `dc:creator` of no regular author is found
 
-=== 2007-03-03 | 0.9.2 Beta === 
+=== 2007-03-03 | 0.9.2 Beta ===
 
  * francois: Added a way to get an item description based on a content when no description exists
  * francois: Added `<content:encoded>` handling in RSS 1 and 2 feeds (based on a patch from Jeff Merlet)
 
-=== 2007-02-22 | 0.9.1 Beta === 
+=== 2007-02-22 | 0.9.1 Beta ===
 
  * francois: Added the `sfRss10Feed` class and unit tests
  * francois: Changed feed type detection technique to avoid building a simpleXML element twice
 
-=== 2007-02-21 | 0.9.0 Beta === 
+=== 2007-02-21 | 0.9.0 Beta ===
 
  * francois: Added more unit tests
- * francois: Improved `sfRssFeed` conversions 
+ * francois: Improved `sfRssFeed` conversions
  * francois: Moved `getLatestPostDate()` method to `sfFeed` and unit tested it.
  * francois: '''BC break''' Renamed specialized RSS classes to `sfRss201Feed` and `sfRss901Feed`. These classes are not really useful anyway, since all their code was refactored to `sfRssFeed`.
 
-=== 2007-02-19 | 0.8.1 Alpha === 
+=== 2007-02-19 | 0.8.1 Alpha ===
 
  * francois: Added much more unit tests
  * francois: Improved `sfAtom1Feed` conversions
@@ -495,8 +522,8 @@ public function executeLastPosts()
  * francois: Added `content` property to `sfFeedItem`
  * francois: '''BC break''' `fromXML()` methods now expect a string rather than a simpleXML object
  * francois: '''BC break''' `sfFeedPeer::createFromObjects()` signature changed ($objects, $parameters = array())
- 
 
-=== 2007-02-18 | 0.8.0 Alpha === 
+
+=== 2007-02-18 | 0.8.0 Alpha ===
 
  * francois: Initial release

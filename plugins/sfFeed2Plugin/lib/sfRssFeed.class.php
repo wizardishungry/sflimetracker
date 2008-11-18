@@ -4,12 +4,14 @@
  * This file is part of the sfFeed2 package.
  * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
  * (c) 2004-2007 Francois Zaninotto <francois.zaninotto@symfony-project.com>
- * 
+ *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 /**
+ * sfRssFeed.
+ *
  * Specification: 2.01 http://www.rssboard.org/rss-2-0-1-rv-6
  *                0.91 http://www.rssboard.org/rss-0-9-1
  *
@@ -25,24 +27,24 @@ class sfRssFeed extends sfFeed
 
   protected function initContext()
   {
-  	if(!$this->context) 
-  	{
-  	  $this->context = sfContext::getInstance();
-  	}
+    if(!$this->context)
+    {
+      $this->context = sfContext::getInstance();
+    }
   }
 
   /**
    * Populate the feed object from a XML feed string.
    *
-   * @param string A XML feed (RSS 2.0 format).
+   * @param string A XML feed (RSS 2.0 format)
    *
-   * @return sfRss10Feed The current object.
+   * @return sfRss10Feed The current object
    *
-   * @throws Exception If the argument is not a well-formatted RSS feed.
+   * @throws Exception If the argument is not a well-formatted RSS feed
    */
   public function fromXml($feedXml)
   {
-    preg_match('/^<\?xml\s*version="1\.0"\s*encoding="(.*?)\"\s*\?>$/mi', $feedXml, $matches);
+    preg_match('/^<\?xml\s*version="1\.0"\s*encoding="(.*?)".*?\?>$/mi', $feedXml, $matches);
     if(isset($matches[1]))
     {
       $this->setEncoding($matches[1]);
@@ -50,9 +52,9 @@ class sfRssFeed extends sfFeed
     $feedXml = simplexml_load_string($feedXml);
     if(!$feedXml)
     {
-      throw new Exception('Error creating feed from XML: string is not well-formatted XML'); 
+      throw new Exception('Error creating feed from XML: string is not well-formatted XML');
     }
-    
+
     $authorString = (string) $feedXml->channel[0]->managingEditor;
     $pos = strpos($authorString, '(');
     if($pos !== false)
@@ -68,14 +70,26 @@ class sfRssFeed extends sfFeed
     $this->setLink((string) $feedXml->channel[0]->link);
     $this->setDescription((string) $feedXml->channel[0]->description);
     $this->setLanguage((string) $feedXml->channel[0]->language);
-    
+
+    if ($feedXml->channel[0]->image)
+    {
+      $image = new sfFeedImage(array(
+        "image"  => (string)$feedXml->channel[0]->image->url,
+        "imageX" => (int)$feedXml->channel[0]->image->width,
+        "imageY" => (int)$feedXml->channel[0]->image->height,
+        "link"   => (string)$feedXml->channel[0]->image->link,
+        "title"  => (string)$feedXml->channel[0]->image->title
+      ));
+      $this->setImage($image);
+    }
+
     $categories = array();
     foreach($feedXml->channel[0]->category as $category)
     {
-      $categories[] = (string) $category; 
+      $categories[] = (string) $category;
     }
-    $this->setCategories($categories);    
-    
+    $this->setCategories($categories);
+
     foreach($feedXml->channel[0]->item as $itemXml)
     {
       $url = (string) $itemXml->link;
@@ -116,7 +130,7 @@ class sfRssFeed extends sfFeed
       $categories = array();
       foreach($itemXml->category as $category)
       {
-        $categories[] = (string) $category; 
+        $categories[] = (string) $category;
       }
       if($enclosureElement = $itemXml->enclosure)
       {
@@ -127,10 +141,10 @@ class sfRssFeed extends sfFeed
       }
       else
       {
-        $enclosure = null; 
+        $enclosure = null;
       }
       $this->addItemFromArray(array(
-        'title'       => (string) $itemXml->title, 
+        'title'       => (string) $itemXml->title,
         'link'        => $url,
         'description' => (string) $itemXml->description,
         'content'     => (string) $content->encoded,
@@ -143,27 +157,27 @@ class sfRssFeed extends sfFeed
         'categories'  => $categories,
         'feed'        => $this
       ));
-    }    
+    }
   }
-    
+
   /**
-   * Returns the the current object as a valid RSS 1.0 XML feed
+   * Returns the the current object as a valid RSS 1.0 XML feed.
    * And sets the response content type accordingly.
    *
-   * @return string A RSS 2.0 XML string.
+   * @return string A RSS 2.0 XML string
    */
   public function asXml()
   {
     $this->initContext();
-    $this->context->getResponse()->setContentType('application/rss+xml');
-    
+    $this->context->getResponse()->setContentType('application/rss+xml; charset='.$this->getEncoding());
+
     return $this->toXml();
   }
-  
+
   /**
    * Returns the the current object as a valid RSS 1.0 XML feed.
    *
-   * @return string A RSS 2.0 XML string.
+   * @return string A RSS 2.0 XML string
    */
   public function toXml()
   {
@@ -175,7 +189,7 @@ class sfRssFeed extends sfFeed
     $xml[] = '    <title>'.$this->getTitle().'</title>';
     $xml[] = '    <link>'.$this->context->getController()->genUrl($this->getLink(), true).'</link>';
     $xml[] = '    <description>'.$this->getDescription().'</description>';
-    $xml[] = '    <pubDate>'.strftime('%Y-%m-%dT%H:%M:%SZ', $this->getLatestPostDate()).'</pubDate>';
+    $xml[] = '    <pubDate>'.date(DATE_RFC822, $this->getLatestPostDate()).'</pubDate>';
     if ($this->getAuthorEmail())
     {
       $xml[] = '    <managingEditor>'.$this->getAuthorEmail().($this->getAuthorName() ? ' ('.$this->getAuthorName().')' : '').'</managingEditor>';
@@ -186,6 +200,16 @@ class sfRssFeed extends sfFeed
     }    if ($this->getLanguage())
     {
       $xml[] = '    <language>'.$this->getLanguage().'</language>';
+    }
+    if ($this->getImage())
+    {
+      $xml[] = '    <image>';
+      $xml[] = '      <url>'.$this->getImage()->getImage().'</url>';
+      $xml[] = '      <title>'.$this->getImage()->getTitle().'</title>';
+      $xml[] = '      <link>'.$this->context->getController()->genUrl($this->getImage()->getLink(), true).'</link>';
+      $xml[] = '      <width>'.$this->getImage()->getImageX().'</width>';
+      $xml[] = '      <height>'.$this->getImage()->getImageY().'</height>';
+      $xml[] = '    </image>';
     }
     if(strpos($this->version, '2.') !== false)
     {
@@ -207,7 +231,7 @@ class sfRssFeed extends sfFeed
   /**
    * Returns an array of <item> tags corresponding to the feed's items.
    *
-   * @return string An list of <item> elements.
+   * @return string An list of <item> elements
    */
   protected function getFeedElements()
   {
@@ -215,11 +239,11 @@ class sfRssFeed extends sfFeed
     foreach ($this->getItems() as $item)
     {
       $xml[] = '    <item>';
-      $xml[] = '      <title>'.htmlspecialchars($item->getTitle()).'</title>';
+      $xml[] = '      <title><![CDATA['.$item->getTitle().']]></title>';
       $xml[] = '      <link>'.$this->context->getController()->genUrl($item->getLink(), true).'</link>';
       if ($item->getDescription())
       {
-        $xml[] = '      <description>'.htmlspecialchars($item->getDescription()).'</description>';
+        $xml[] = '      <description><![CDATA['.$item->getDescription().']]></description>';
       }
       if ($item->getContent())
       {
@@ -229,9 +253,9 @@ class sfRssFeed extends sfFeed
       {
         if ($item->getUniqueId())
         {
-          $xml[] = '      <guid isPermalink="false">'.$item->getUniqueId().'</guid>';
+          $xml[] = '      <guid isPermaLink="false">'.$item->getUniqueId().'</guid>';
         }
-  
+
         // author information
         if ($item->getAuthorEmail())
         {
@@ -239,26 +263,26 @@ class sfRssFeed extends sfFeed
         }
         if ($item->getPubdate())
         {
-          $xml[] = '      <pubDate>'.strftime('%Y-%m-%dT%H:%M:%SZ', $item->getPubdate()).'</pubDate>';
+          $xml[] = '      <pubDate>'.date(DATE_RFC822, $item->getPubdate()).'</pubDate>';
         }
         if (is_string($item->getComments()))
         {
           $xml[] = '      <comments>'.htmlspecialchars($item->getComments()).'</comments>';
         }
-  
+
         // enclosure
         if ($enclosure = $item->getEnclosure())
         {
           $enclosure_attributes = sprintf('url="%s" length="%s" type="%s"', $enclosure->getUrl(), $enclosure->getLength(), $enclosure->getMimeType());
           $xml[] = '      <enclosure '.$enclosure_attributes.'></enclosure>';
         }
-  
+
         // categories
         if(is_array($item->getCategories()))
         {
           foreach ($item->getCategories() as $category)
           {
-            $xml[] = '      <category>'.$category.'</category>';
+            $xml[] = '      <category><![CDATA['.$category.']]></category>';
           }
         }
       }
@@ -272,7 +296,7 @@ class sfRssFeed extends sfFeed
   {
     $this->setVersion(isset($feed_array['version']) ? $feed_array['version'] : '');
     parent::initialize($feed_array);
-    
+
     return $this;
   }
 
@@ -289,5 +313,3 @@ class sfRssFeed extends sfFeed
     return $this->version;
   }
 }
-
-?>

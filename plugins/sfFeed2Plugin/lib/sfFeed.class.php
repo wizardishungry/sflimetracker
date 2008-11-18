@@ -4,7 +4,7 @@
  * This file is part of the sfFeed2 package.
  * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
  * (c) 2004-2007 Francois Zaninotto <francois.zaninotto@symfony-project.com>
- * 
+ *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -22,6 +22,7 @@ class sfFeed
 {
   protected
     $items = array(),
+    $image,
     $title,
     $link,
     $description,
@@ -38,12 +39,12 @@ class sfFeed
   {
     if($feed_array)
     {
-      $this->initialize($feed_array); 
-    } 
+      $this->initialize($feed_array);
+    }
   }
-  
+
   /**
-   * Defines the feed properties, based on an associative array
+   * Defines the feed properties, based on an associative array.
    *
    * @param array an associative array of feed parameters
    *
@@ -52,6 +53,7 @@ class sfFeed
   public function initialize($feed_array)
   {
     $this->setItems(isset($feed_array['items']) ? $feed_array['items'] : '');
+    $this->setImage(isset($feed_array['image']) ? $feed_array['image'] : '');
     $this->setTitle(isset($feed_array['title']) ? $feed_array['title'] : '');
     $this->setLink(isset($feed_array['link']) ? $feed_array['link'] : '');
     $this->setDescription(isset($feed_array['description']) ? $feed_array['description'] : '');
@@ -63,12 +65,12 @@ class sfFeed
     $this->setCategories(isset($feed_array['categories']) ? $feed_array['categories'] : '');
     $this->setFeedUrl(isset($feed_array['feedUrl']) ? $feed_array['feedUrl'] : '');
     $this->setEncoding(isset($feed_array['encoding']) ? $feed_array['encoding'] : $this->encoding);
-    
+
     return $this;
   }
 
   /**
-   * Retrieves the feed items
+   * Retrieves the feed items.
    *
    * @return array an array of sfFeedItem objects
    */
@@ -78,7 +80,8 @@ class sfFeed
   }
 
   /**
-   * Defines the items of the feed
+   * Defines the items of the feed.
+   *
    * Caution: in previous versions, this method used to accept all kinds of objects.
    * Now only objects of class sfFeedItem are allowed.
    *
@@ -90,12 +93,12 @@ class sfFeed
   {
     $this->items = array();
     $this->addItems($items);
-    
+
     return $this;
   }
 
   /**
-   * Adds one item to the feed
+   * Adds one item to the feed.
    *
    * @param sfFeedItem an item object
    *
@@ -112,12 +115,12 @@ class sfFeed
     }
     $item->setFeed($this);
     $this->items[] = $item;
-    
+
     return $this;
   }
-  
+
   /**
-   * Adds several items to the feed
+   * Adds several items to the feed.
    *
    * @param array an array of sfFeedItem objects
    *
@@ -129,15 +132,15 @@ class sfFeed
     {
       foreach($items as $item)
       {
-        $this->addItem($item); 
+        $this->addItem($item);
       }
     }
-    
+
     return $this;
   }
 
   /**
-   * Adds one item to the feed, based on an associative array
+   * Adds one item to the feed, based on an associative array.
    *
    * @param array an associative array
    *
@@ -146,13 +149,12 @@ class sfFeed
   public function addItemFromArray($item_array)
   {
     $this->items[] = new sfFeedItem($item_array);
-    
+
     return $this;
   }
-  
+
    /**
-   * Removes the last items of the feed 
-   * so that the total number doesn't bypass the limit defined as a parameter
+   * Removes the last items of the feed so that the total number doesn't bypass the limit defined as a parameter.
    *
    * @param integer the maximum number of items
    *
@@ -164,13 +166,41 @@ class sfFeed
     {
       $this->items = array_slice($this->items, 0, $count);
     }
+    return $this;
+  }
+
+  /**
+   * Retrieves the feed image
+   *
+   * @return sfFeedImage actual sfFeedImage object
+   */
+  public function getImage()
+  {
+    return $this->image;
+  }
+
+  /**
+   * Defines the image/icon of the feed
+   *
+   * @param image sfFeedImage object
+   *
+   * @return sfFeed the current sfFeed object
+   */
+  public function setImage($image)
+  {
+    $this->image = $image;
     
     return $this;
   }
-  
+
   public function setTitle ($title)
   {
     $this->title = $title;
+    //if an image is there that has no title yet set it as well
+    if ($this->image instanceof sfFeedImage && !$this->image->getTitle())
+    {
+      $this->image->setTitle($title);
+    }
   }
 
   public function getTitle ()
@@ -181,6 +211,11 @@ class sfFeed
   public function setLink ($link)
   {
     $this->link = $link;
+    //if an image is there that has no link yet set it as well
+    if ($this->image instanceof sfFeedImage && !$this->image->getLink())
+    {
+      $this->image->setLink($link);
+    }
   }
 
   public function getLink ()
@@ -292,10 +327,12 @@ class sfFeed
     if ($updates)
     {
       sort($updates);
+
       return array_pop($updates);
     }
     else
     {
+
       return time();
     }
   }
@@ -306,5 +343,3 @@ class sfFeed
   }
 
 }
-
-?>

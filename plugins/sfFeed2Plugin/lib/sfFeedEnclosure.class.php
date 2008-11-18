@@ -3,12 +3,13 @@
 /*
  * This file is part of the sfFeed2 package.
  * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
- * 
+ *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 /**
+ * sfFeedEnclosure.
  *
  * @package    sfFeed2
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
@@ -21,7 +22,7 @@ class sfFeedEnclosure
     $mimeType;
 
   /**
-   * Defines the feed enclosure properties, based on an associative array
+   * Defines the feed enclosure properties, based on an associative array.
    *
    * @param array an associative array of feed parameters
    *
@@ -32,15 +33,15 @@ class sfFeedEnclosure
     $this->setUrl(isset($feed_array['url']) ? $feed_array['url'] : '');
     $this->setLength(isset($feed_array['length']) ? $feed_array['length'] : '');
     $this->setMimeType(isset($feed_array['mimeType']) ? $feed_array['mimeType'] : '');
-    
+
     return $this;
   }
-  
+
   public function __toString()
   {
-    return sprintf("url=%s length=%s mimeType=%s", $this->getUrl(), $this->getLength(), $this->getMimeType());  
+    return sprintf('url=%s length=%s mimeType=%s', $this->getUrl(), $this->getLength(), $this->getMimeType());
   }
-  
+
   public function setUrl ($url)
   {
     $this->url = $url;
@@ -71,5 +72,3 @@ class sfFeedEnclosure
     return $this->mimeType;
   }
 }
-
-?>

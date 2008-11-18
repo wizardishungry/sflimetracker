@@ -4,12 +4,13 @@
  * This file is part of the sfFeed2 package.
  * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
  * (c) 2004-2007 Francois Zaninotto <francois.zaninotto@symfony-project.com>
- * 
+ *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 /**
+ * sfFeedItem.
  *
  * @package    sfFeed2
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
@@ -35,12 +36,12 @@ class sfFeedItem
   {
     if($item_array)
     {
-      $this->initialize($item_array); 
+      $this->initialize($item_array);
     }
   }
-  
+
   /**
-   * Sets the feed item parameters, based on an associative array
+   * Sets the feed item parameters, based on an associative array.
    *
    * @param array an associative array
    *
@@ -61,7 +62,7 @@ class sfFeedItem
     $this->setEnclosure(isset($item_array['enclosure']) ? $item_array['enclosure'] : '');
     $this->setCategories(isset($item_array['categories']) ? $item_array['categories'] : '');
     $this->setFeed(isset($item_array['feed']) ? $item_array['feed'] : '');
-    
+
     return $this;
   }
 
@@ -94,7 +95,7 @@ class sfFeedItem
   {
     if($this->description)
     {
-      return $this->description; 
+      return $this->description;
     }
     else if($this->content)
     {
@@ -209,5 +210,3 @@ class sfFeedItem
   }
 
 }
-
-?>

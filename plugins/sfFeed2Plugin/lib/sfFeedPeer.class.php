@@ -4,14 +4,13 @@
  * This file is part of the sfFeed2 package.
  * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
  * (c) 2004-2007 Francois Zaninotto <francois.zaninotto@symfony-project.com>
- * 
+ *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 /**
- * sfFeedPeer
- *
+ * sfFeedPeer.
  *
  * @package    sfFeed2
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
@@ -22,11 +21,11 @@ class sfFeedPeer
   /**
    * Retrieve a new sfFeed implementation instance.
    *
-   * @param string A sfFeed implementation name.
+   * @param string A sfFeed implementation name
    *
-   * @return sfFeed A sfFeed implementation instance.
+   * @return sfFeed A sfFeed implementation instance
    *
-   * @throws sfFactoryException If a new syndication feed implementation instance cannot be created.
+   * @throws sfFactoryException If a new syndication feed implementation instance cannot be created
    */
   public static function newInstance($format = '')
   {
@@ -61,7 +60,7 @@ class sfFeedPeer
    *
    * @param string A web feed URI
    *
-   * @return sfFeed A sfFeed implementation instance.
+   * @return sfFeed A sfFeed implementation instance
    */
   public static function createFromWeb($uri, $options = array())
   {
@@ -80,19 +79,19 @@ class sfFeedPeer
       $error = sprintf($error, $uri, $browser->getResponseCode(), $browser->getResponseMessage());
       throw new Exception($error);
     }
-    $feedString = $browser->getResponseText(); 
-    
-    return self::createFromXml($feedString, $uri);    
+    $feedString = $browser->getResponseText();
+
+    return self::createFromXml($feedString, $uri);
   }
-  
+
   /**
    * Retrieve a new sfFeed implementation instance, populated from a xml feed.
    * The class of the returned instance depends on the nature of the xml feed.
    *
    * @param string $feedString a feed as xml string
    * @param string A web feed URI
-   * 
-   * @return sfFeed A sfFeed implementation instance.
+   *
+   * @return sfFeed A sfFeed implementation instance
    */
   public static function createFromXml($feedString, $uri)
   {
@@ -103,34 +102,35 @@ class sfFeedPeer
     }
     if(strpos($feedString, '<rss') !== false)
     {
-      $feedClass = 'sfRssFeed'; 
+      $feedClass = 'sfRssFeed';
     }
     if(strpos($feedString, '<rdf:RDF') !== false)
     {
-      $feedClass = 'sfRss10Feed'; 
+      $feedClass = 'sfRss10Feed';
     }
-    
+
     if($feedClass)
     {
       $object = new $feedClass();
       $object->setFeedUrl($uri);
       $object->fromXml($feedString);
-      return $object; 
+
+      return $object;
     }
     else
     {
-      throw new Exception('Impossible to decode feed format'); 
+      throw new Exception('Impossible to decode feed format');
     }
   }
 
   /**
-   * Merge the items from several feeds and retrieve a sfFeed instance
+   * Merge the items from several feeds and retrieve a sfFeed instance.
    * Populated with all the items, and sorted.
    *
    * @param array an array of sfFeed objects
    * @param array an associative array of feed parameters
    *
-   * @return sfFeed A sfFeed implementation instance.
+   * @return sfFeed A sfFeed implementation instance
    */
   public static function aggregate($feeds, $parameters = array())
   {
@@ -146,18 +146,18 @@ class sfFeedPeer
           $index++;
         }
         $feed_items[$index] = $item;
-      } 
+      }
     }
-    
+
     // sort in reverse chronological order
     krsort($feed_items);
-    
+
     // limit the number of feed items to be added
     if(isset($parameters['limit']))
     {
       $feed_items = array_slice($feed_items, 0, $parameters['limit']);
     }
-    
+
     // create a feed with these items
     $feed = self::newInstance(isset($parameters['format']) ? $parameters['format'] : '');
     $feed->initialize($parameters);
@@ -168,12 +168,12 @@ class sfFeedPeer
       $feed->addItem($item);
       $item->setFeed($origin_feed);
     }
-    
+
     return $feed;
   }
 
   /**
-   * Populates a feed with items based on objects
+   * Populates a feed with items based on objects.
    * Inspects the available methods of the objects to populate items properties.
    *
    * @param array an array of objects
@@ -188,8 +188,8 @@ class sfFeedPeer
     foreach($objects as $object)
     {
       $item = new sfFeedItem();
-  
-      // For each item property, check if an object method is provided, 
+
+      // For each item property, check if an object method is provided,
       // and if not, guess it. Here is what it does for the link property
       if(isset($options['methods']['link']))
       {
@@ -208,33 +208,40 @@ class sfFeedPeer
         $fallbackUrl = (isset($options['fallbackUrl'])) ? $options['fallbackUrl'] : '';
         $item->setLink(self::getItemFeedLink($object, $routeName, $fallbackUrl));
       }
-      
+
       // For the other properties, it can be automated
       // Not as readable but definitely more concise
       $details = array('title', 'description', 'content', 'authorEmail', 'authorName', 'authorLink', 'pubdate', 'comments', 'uniqueId', 'enclosure', 'categories');
-      foreach($details as $detail)
+      foreach ($details as $detail)
       {
         $itemMethod = 'set'.ucfirst($detail);
-        if(isset($options['methods'][$detail]))
+        if (isset($options['methods'][$detail]))
         {
-          if($options['methods'][$detail])
+          if ($options['methods'][$detail])
           {
-            call_user_func(array($item, $itemMethod), call_user_func(array($object, $options['methods'][$detail])));            
+            if (is_array($options['methods'][$detail]))
+            {
+              call_user_func(array($item, $itemMethod), call_user_func_array(array($object, $options['methods'][$detail][0]), $options['methods'][$detail][1]));
+            }
+            else
+            {
+              call_user_func(array($item, $itemMethod), call_user_func(array($object, $options['methods'][$detail])));
+            }
           }
           else
           {
-            call_user_func(array($item, $itemMethod), '');            
+            call_user_func(array($item, $itemMethod), '');
           }
         }
         else
-        { 
+        {
           call_user_func(array($item, $itemMethod), call_user_func(array('sfFeedPeer', 'getItemFeed'.ucfirst($detail)), $object));
         }
       }
-        
+
       $items[] = $item;
     }
-    
+
     return $items;
   }
 
@@ -253,10 +260,10 @@ class sfFeedPeer
     $feed->initialize($options);
     $options['fallbackUrl'] = $feed->getLink();
     $feed->addItems(self::convertObjectsToItems($objects, $options));
-    
+
     return $feed;
   }
-  
+
   private static function getItemFeedTitle($item)
   {
     foreach (array('getFeedTitle', 'getTitle', 'getName', '__toString') as $methodName)
@@ -274,48 +281,55 @@ class sfFeedPeer
   {
     if ($routeName)
     {
-      $routing = sfRouting::getInstance();
-      $route = $routing->getRouteByName($routeName);
-
-      $url = $route[0];
-      $defaults = $route[4];
+      if (method_exists('sfRouting', 'getInstance'))
+      {
+        $route = sfRouting::getInstance()->getRouteByName($routeName);
+        $url = $route[0];
+        $paramNames = $route[2];
+        $defaults = $route[4];
+      }
+      else
+      {
+        $routes = sfContext::getInstance()->getRouting()->getRoutes();
+        $route = $routes[substr($routeName, 1)];
+        $url = $route[0];
+        $paramNames = array_keys($route[2]);
+        $defaults = $route[3];
+      }
 
       // we get all parameters
       $params = array();
-      if (preg_match_all('/\:([^\/]+)/', $url, $matches))
+      foreach ($paramNames as $paramName)
       {
-        foreach ($matches[1] as $paramName)
+        $value = null;
+        $name = ucfirst(sfInflector::camelize($paramName));
+
+        $found = false;
+        foreach (array('getFeed'.$name, 'get'.$name) as $methodName)
         {
-          $value = null;
-          $name = ucfirst(sfInflector::camelize($paramName));
-
-          $found = false;
-          foreach (array('getFeed'.$name, 'get'.$name) as $methodName)
+          if (method_exists($item, $methodName))
           {
-            if (method_exists($item, $methodName))
-            {
-              $value = $item->$methodName();
-              $found = true;
-              break;
-            }
+            $value = $item->$methodName();
+            $found = true;
+            break;
           }
-
-          if (!$found)
-          {
-            if (array_key_exists($paramName, $defaults))
-            {
-              $value = $defaults[$paramName];
-            }
-            else
-            {
-              $error = 'Cannot find a "getFeed%s()" or "get%s()" method for object "%s" to generate URL with the "%s" route';
-              $error = sprintf($error, $name, $name, get_class($item), $routeName);
-              throw new sfException($error);
-            }
-          }
-
-          $params[] = $paramName.'='.$value;
         }
+
+        if (!$found)
+        {
+          if (array_key_exists($paramName, $defaults))
+          {
+            $value = $defaults[$paramName];
+          }
+          else
+          {
+            $error = 'Cannot find a "getFeed%s()" or "get%s()" method for object "%s" to generate URL with the "%s" route';
+            $error = sprintf($error, $name, $name, get_class($item), $routeName);
+            throw new sfException($error);
+          }
+        }
+
+        $params[] = $paramName.'='.$value;
       }
 
       return sfContext::getInstance()->getController()->genUrl($routeName.($params ? '?'.implode('&', $params) : ''), true);
@@ -468,7 +482,7 @@ class sfFeedPeer
 
   private static function getItemFeedPubdate($item)
   {
-    foreach (array('getFeedPubdate', 'getPubdate', 'getCreatedAt', 'getDate') as $methodName)
+    foreach (array('getFeedPubdate', 'getPubdate', 'getCreatedAt', 'getDate', 'getPublishedAt') as $methodName)
     {
       if (method_exists($item, $methodName))
       {
@@ -496,20 +510,15 @@ class sfFeedPeer
   {
     foreach (array('getFeedCategories', 'getCategories') as $methodName)
     {
-      if (method_exists($item, $methodName) && is_object($item->$methodName()))
+      if (method_exists($item, $methodName) && is_array($item->$methodName()))
       {
-        // categories as an object
-        $categories = $item->$methodName();
-        if (is_array($categories))
+        $cats = array();
+        foreach ($item->$methodName() as $category)
         {
-          $cats = array();
-          foreach ($categories as $category)
-          {
-            $cats[] = (string) $category;
-          }
-
-          return $cats;
+          $cats[] = (string) $category;
         }
+
+        return $cats;
       }
     }
 
@@ -527,5 +536,3 @@ class sfFeedPeer
   }
 
 }
-
-?>

@@ -5,6 +5,7 @@ config/propel.ini
 config/properties.ini
 web/uploads/*
 web/fixtures
+plugins/.*
 # add2zip -- files below belong in the zip but not git
 data/sql/*
 data/tracker.db*

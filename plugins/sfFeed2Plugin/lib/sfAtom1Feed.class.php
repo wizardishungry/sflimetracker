@@ -4,44 +4,46 @@
  * This file is part of the sfFeed2 package.
  * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
  * (c) 2004-2007 Francois Zaninotto <francois.zaninotto@symfony-project.com>
- * 
+ *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 /**
+ * sfAtom1Feed.
  *
  * Specification: http://www.ietf.org/rfc/rfc4287.txt
  *
  * @package    sfFeed2
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Francois Zaninotto <francois.zaninotto@symfony-project.com>
+ * @author     Stefan Koopmanschap <stefan.koopmanschap@symfony-project.com>
  */
 class sfAtom1Feed extends sfFeed
 {
   protected
     $context;
-  
+
   protected function initContext()
   {
-  	if(!$this->context) 
-  	{
-  	  $this->context = sfContext::getInstance();
-  	}
+    if(!$this->context)
+    {
+      $this->context = sfContext::getInstance();
+    }
   }
-  
+
   /**
    * Populate the feed object from a XML feed string.
    *
-   * @param string A XML feed (Atom 1.0 format).
+   * @param string A XML feed (Atom 1.0 format)
    *
-   * @return sfAtom1Feed The current object.
+   * @return sfAtom1Feed The current object
    *
-   * @throws Exception If the argument is not a well-formatted Atom feed.
+   * @throws Exception If the argument is not a well-formatted Atom feed
    */
   public function fromXml($feedXml)
   {
-    preg_match('/^<\?xml\s*version="1\.0"\s*encoding="(.*?)\"\s*\?>$/mi', $feedXml, $matches);
+    preg_match('/^<\?xml\s*version="1\.0"\s*encoding="(.*?)".*?\?>$/mi', $feedXml, $matches);
     if(isset($matches[1]))
     {
       $this->setEncoding($matches[1]);
@@ -49,11 +51,11 @@ class sfAtom1Feed extends sfFeed
     $feedXml = simplexml_load_string($feedXml);
     if(!$feedXml)
     {
-      throw new Exception('Error creating feed from XML: string is not well-formatted XML'); 
+      throw new Exception('Error creating feed from XML: string is not well-formatted XML');
     }
-    
+
     $attributes = $feedXml->attributes('http://www.w3.org/XML/1998/namespace');
-    
+
     $this->setLanguage((string) $attributes['lang']);
     $this->setTitle((string) $feedXml->title);
     $feedXml->registerXPathNamespace('atom', 'http://www.w3.org/2005/Atom');
@@ -69,31 +71,38 @@ class sfAtom1Feed extends sfFeed
     $this->setAuthorName((string) $feedXml->author->name);
     $this->setAuthorEmail((string) $feedXml->author->email);
     $this->setAuthorLink((string) $feedXml->author->uri);
+
+    $image = new sfFeedImage(array(
+      "favicon"  => (string)$feedXml->icon,
+      "image"    => (string)$feedXml->logo,
+    ));
+    $this->setImage($image);
+
     $categories = array();
     foreach($feedXml->category as $category)
     {
-      $categories[] = (string) $category['term']; 
+      $categories[] = (string) $category['term'];
     }
     $this->setCategories($categories);
-    
+
     foreach($feedXml->entry as $itemXml)
     {
       $categories = array();
       foreach($itemXml->category as $category)
       {
-        $categories[] = (string) $category['term']; 
+        $categories[] = (string) $category['term'];
       }
       $url = (string) $itemXml->link['href'];
-      $pubdate = strtotime(str_replace(array('UT', 'Z'), '', (string) $itemXml->issued));
+      $pubdate = strtotime((string) $itemXml->published);
       if(!$pubdate)
       {
         if((string) $itemXml->updated)
         {
-          $pubdate = strtotime(str_replace(array('UT', 'Z'), '', (string) $itemXml->updated));
+          $pubdate = strtotime((string) $itemXml->updated);
         }
         else if((string) $itemXml->modified)
         {
-          $pubdate = strtotime(str_replace(array('UT', 'Z'), '', (string) $itemXml->modified));
+          $pubdate = strtotime((string) $itemXml->modified);
         }
         else if(preg_match('/\d{4}\/\d{2}\/\d{2}/', $url, $matches))
         {
@@ -114,51 +123,58 @@ class sfAtom1Feed extends sfFeed
       }
       else
       {
-        $enclosure = null; 
+        $enclosure = null;
       }
+
+      $content = (string) $itemXml->content;
+
+      if (!$content)
+      {
+        $content = preg_replace('/<\/?content[^>]*>/iU', '', $itemXml->content->asXml());
+      }
+
       $this->addItemFromArray(array(
-        'title'       => (string) $itemXml->title, 
+        'title'       => (string) $itemXml->title,
         'link'        => $url,
         'authorName'  => (string) $itemXml->author->name,
         'authorEmail' => (string) $itemXml->author->email,
         'authorLink'  => (string) $itemXml->author->uri,
         'pubDate'     => $pubdate,
         'description' => (string) $itemXml->summary,
-        'content'     => (string) $itemXml->content,
+        'content'     => $content,
         'uniqueId'    => (string) $itemXml->id,
         'enclosure'   => $enclosure,
         'categories'  => $categories,
         'feed'        => $this
       ));
     }
-    
+
     return $this;
   }
-  
+
   /**
-   * Returns the the current object as a valid Atom 1.0 XML feed
-   * And sets the response content type accordingly.
+   * Returns the the current object as a valid Atom 1.0 XML feed and sets the response content type accordingly.
    *
-   * @return string An Atom 1.0 XML string.
+   * @return string An Atom 1.0 XML string
    */
   public function asXml()
   {
     $this->initContext();
-    $this->context->getResponse()->setContentType('application/atom+xml');
-    
+    $this->context->getResponse()->setContentType('application/atom+xml; charset='.$this->getEncoding());
+
     return $this->toXml();
   }
-  
+
   /**
    * Returns the the current object as a valid Atom 1.0 XML feed.
    *
-   * @return string An Atom 1.0 XML string.
+   * @return string An Atom 1.0 XML string
    */
   public function toXml()
   {
     $this->initContext();
     $controller = $this->context->getController();
-    
+
     $xml = array();
     $xml[] = '<?xml version="1.0" encoding="'.$this->getEncoding().'" ?>';
 
@@ -178,7 +194,7 @@ class sfAtom1Feed extends sfFeed
       $xml[] = '  <link rel="self" href="'.$controller->genUrl($this->getFeedUrl(), true).'"></link>';
     }
     $xml[] = '  <id>'.$controller->genUrl($this->getLink(), true).'</id>';
-    $xml[] = '  <updated>'.strftime('%Y-%m-%dT%H:%M:%SZ', $this->getLatestPostDate()).'</updated>';
+    $xml[] = '  <updated>'.gmstrftime('%Y-%m-%dT%H:%M:%SZ', $this->getLatestPostDate()).'</updated>';
 
     if ($this->getAuthorName())
     {
@@ -200,6 +216,12 @@ class sfAtom1Feed extends sfFeed
       $xml[] = '  <subtitle>'.$this->getSubtitle().'</subtitle>';
     }
 
+    if ($this->getImage())
+    {
+      $xml[] = '  <icon>'.$this->getImage()->getFavicon().'</icon>';
+      $xml[] = '  <logo>'.$this->getImage()->getImage().'</logo>';
+    }
+
     if(is_array($this->getCategories()))
     {
       foreach ($this->getCategories() as $category)
@@ -218,7 +240,7 @@ class sfAtom1Feed extends sfFeed
   /**
    * Returns an array of <entry> tags corresponding to the feed's items.
    *
-   * @return string A list of <entry> elements.
+   * @return string A list of <entry> elements
    */
   private function getFeedElements()
   {
@@ -232,7 +254,7 @@ class sfAtom1Feed extends sfFeed
       $xml[] = '  <link rel="alternate" href="'.$controller->genUrl($item->getLink(), true).'"></link>';
       if ($item->getPubdate())
       {
-        $xml[] = '  <updated>'.strftime('%Y-%m-%dT%H:%M:%SZ', $item->getPubdate()).'</updated>';
+        $xml[] = '  <updated>'.gmstrftime('%Y-%m-%dT%H:%M:%SZ', $item->getPubdate()).'</updated>';
       }
 
       // author information
@@ -273,7 +295,7 @@ class sfAtom1Feed extends sfFeed
       {
         $xml[] = sprintf('  <content type="text/html"><![CDATA[%s]]></content>', $item->getContent());
       }
-      
+
       // enclosure
       if ($enclosure = $item->getEnclosure())
       {
@@ -296,13 +318,13 @@ class sfAtom1Feed extends sfFeed
   }
 
   /**
-   * Creates a TagURI. 
+   * Creates a TagURI.
    * See http://diveintomark.org/archives/2004/05/28/howto-atom-id
    *
    * @param string An URI to the Feed Element
    * @param datetime A publication date
    *
-   * @return string A valid TagURI.
+   * @return string A valid TagURI
    */
   private function getTagUri($url, $date)
   {
@@ -317,5 +339,3 @@ class sfAtom1Feed extends sfFeed
   }
 
 }
-
-?>

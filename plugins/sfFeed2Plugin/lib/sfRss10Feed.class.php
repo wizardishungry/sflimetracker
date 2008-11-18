@@ -4,12 +4,14 @@
  * This file is part of the sfFeed2 package.
  * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
  * (c) 2004-2007 Francois Zaninotto <francois.zaninotto@symfony-project.com>
- * 
+ *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 /**
+ * sfRss10Feed.
+ *
  * Specification: http://web.resource.org/rss/1.0/spec
  *                http://web.resource.org/rss/1.0/modules/dc/
  *                http://web.resource.org/rss/1.0/modules/syndication/
@@ -17,6 +19,7 @@
  * @package    sfFeed2
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Francois Zaninotto <francois.zaninotto@symfony-project.com>
+ * @author     Stefan Koopmanschap <stefan.koopmanschap@symfony-project.com>
  */
 class sfRss10Feed extends sfRssFeed
 {
@@ -24,15 +27,15 @@ class sfRss10Feed extends sfRssFeed
   /**
    * Populate the feed object from a XML feed string.
    *
-   * @param string A XML feed (RSS 1.0 format).
+   * @param string A XML feed (RSS 1.0 format)
    *
-   * @return sfRss10Feed The current object.
+   * @return sfRss10Feed The current object
    *
-   * @throws Exception If the argument is not a well-formatted RSS feed.
+   * @throws Exception If the argument is not a well-formatted RSS feed
    */
   public function fromXml($feedXml)
   {
-    preg_match('/^<\?xml\s*version="1\.0"\s*encoding="(.*?)\"\s*\?>$/mi', $feedXml, $matches);
+    preg_match('/^<\?xml\s*version="1\.0"\s*encoding="(.*?)".*?\?>$/mi', $feedXml, $matches);
     if(isset($matches[1]))
     {
       $this->setEncoding($matches[1]);
@@ -40,16 +43,16 @@ class sfRss10Feed extends sfRssFeed
 
     // we get rid of namespaces to avoid simpleXML headaches
     $feedXml = str_replace(
-      array('<dc:', '</dc:', '<rdf:', '</rdf:', '<content:', '</content:'), 
-      array('<', '</', '<', '</', '<', '</'), 
+      array('<dc:', '</dc:', '<rdf:', '</rdf:', '<content:', '</content:'),
+      array('<', '</', '<', '</', '<', '</'),
       $feedXml
-    ); 
+    );
     $feedXml = simplexml_load_string($feedXml);
     if(!$feedXml)
     {
-      throw new Exception('Error creating feed from XML: string is not well-formatted XML'); 
+      throw new Exception('Error creating feed from XML: string is not well-formatted XML');
     }
-    
+
     $this->setTitle((string) $feedXml->channel->title);
     $this->setLink((string) $feedXml->channel->link);
     $this->setDescription((string) $feedXml->channel->description);
@@ -62,18 +65,18 @@ class sfRss10Feed extends sfRssFeed
         'description' => (string) $itemXml->description,
         'content'     => (string) $itemXml->encoded,
         'authorName'  => (string) $itemXml->creator,
-        'pubDate'     => strtotime(str_replace(array('UT', 'Z'), '', (string) $itemXml->date)),
+        'pubDate'     => strtotime((string) $itemXml->date),
         'feed'        => $this
       ));
     }
-    
+
     return $this;
-  } 
-  
+  }
+
   /**
    * Returns the the current object as a valid RSS 1.0 XML feed.
    *
-   * @return string A RSS 1.0 XML string.
+   * @return string A RSS 1.0 XML string
    */
   public function toXml()
   {
@@ -100,7 +103,7 @@ class sfRss10Feed extends sfRssFeed
   /**
    * Returns an array of <rdf:li> tags corresponding to the feed's items sequence.
    *
-   * @return string A list of <rdf:li> elements.
+   * @return string A list of <rdf:li> elements
    */
   protected function getFeedItemSequence()
   {
@@ -116,7 +119,7 @@ class sfRss10Feed extends sfRssFeed
   /**
    * Returns an array of <item> tags corresponding to the feed's items.
    *
-   * @return string An list of <item> elements.
+   * @return string An list of <item> elements
    */
   protected function getFeedElements()
   {
@@ -140,14 +143,12 @@ class sfRss10Feed extends sfRssFeed
       }
       if ($item->getPubdate())
       {
-        $xml[] = '    <dc:date>'.strftime('%Y-%m-%dT%H:%M:%SZ', $item->getPubdate()).'</dc:date>';
+        $xml[] = '    <dc:date>'.gmstrftime('%Y-%m-%dT%H:%M:%SZ', $item->getPubdate()).'</dc:date>';
       }
       $xml[] = '  </item>';
     }
 
     return $xml;
   }
-  
-}
 
-?>
+}
