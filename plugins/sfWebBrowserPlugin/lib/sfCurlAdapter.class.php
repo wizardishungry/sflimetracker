@@ -20,12 +20,24 @@
 
 class sfCurlAdapter
 {
-
   protected
     $options = array(),
     $curl    = null,
     $headers = array();
 
+  /**
+   * Build a curl adapter instance
+   * Accepts an option of parameters passed to the PHP curl adapter:
+   *  ssl_verify  => [true/false]
+   *  verbose     => [true/false]
+   *  verbose_log => [true/false]
+   * Additional options are passed as curl options, under the form:
+   *  userpwd => CURL_USERPWD
+   *  timeout => CURL_TIMEOUT
+   *  ...
+   *
+   * @param array $options Curl-specific options
+   */
   public function __construct($options = array())
   {
     if (!extension_loaded('curl'))
@@ -34,14 +46,31 @@ class sfCurlAdapter
     }
 
     $this->options = $options;
+    $curl_options = $options;
+    
     $this->curl = curl_init();
 
     // cookies
-    if (isset($this->options['cookies']))
+    if (isset($curl_options['cookies']))
     {
-      $cookie_file = isset($this->options['cookies_file']) ? $this->options['cookies_file'] : sfConfig::get('sf_data_dir').'/sfWebBrowserPlugin/sfCurlAdapter/cookies.txt';
-      $cookie_dir = isset($this->options['cookies_dir']) ? $this->options['cookies_dir'] : sfConfig::get('sf_data_dir').'/sfWebBrowserPlugin/sfCurlAdapter';
-
+      if (isset($curl_options['cookies_file']))
+      {
+        $cookie_file = $curl_options['cookies_file'];
+        unset($curl_options['cookies_file']);
+      }
+      else
+      {
+        $cookie_file = sfConfig::get('sf_data_dir').'/sfWebBrowserPlugin/sfCurlAdapter/cookies.txt';
+      }
+      if (isset($curl_options['cookies_dir']))
+      {
+        $cookie_dir = $curl_options['cookies_dir'];
+        unset($curl_options['cookies_dir']);
+      }
+      else
+      {
+        $cookie_dir = sfConfig::get('sf_data_dir').'/sfWebBrowserPlugin/sfCurlAdapter';
+      }
       if (!is_dir($cookie_dir))
       {
         if (!mkdir($cookie_dir, 0777, true))
@@ -53,6 +82,7 @@ class sfCurlAdapter
       curl_setopt($this->curl, CURLOPT_COOKIESESSION, false);
       curl_setopt($this->curl, CURLOPT_COOKIEJAR, $cookie_file);
       curl_setopt($this->curl, CURLOPT_COOKIEFILE, $cookie_file);
+      unset($curl_options['cookies']);
     }
 
     // default settings
@@ -72,25 +102,37 @@ class sfCurlAdapter
     {
       curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, (bool) $this->options['ssl_verify_host']);
     }
-    if (isset($this->options['ssl_verify']))
+    if (isset($curl_options['ssl_verify']))
     {
       curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, (bool) $this->options['ssl_verify']);
+      unset($curl_options['ssl_verify']);
     }
-
-    if (isset($this->options['verbose']))
+    // verbose execution?
+    if (isset($curl_options['verbose']))
     {
       curl_setopt($this->curl, CURLOPT_NOPROGRESS, false);
       curl_setopt($this->curl, CURLOPT_VERBOSE, true);
+      unset($curl_options['cookies']);
     }
-
-    if(isset($this->options['verbose_log']))
+    if (isset($curl_options['verbose_log']))
     {
       $log_file = sfConfig::get('sf_log_dir').'/sfCurlAdapter_verbose.log';
       curl_setopt($this->curl, CURLOPT_VERBOSE, true);
       $this->fh = fopen($log_file, 'a+b');
       curl_setopt($this->curl, CURLOPT_STDERR, $this->fh);
+      unset($curl_options['verbose_log']);
     }
-
+    
+    // Additional options
+    foreach ($curl_options as $key => $value)
+    {
+      $const = constant('CURL_' . strtoupper($key));
+      if(!is_null($const))
+      {
+        curl_setopt($this->curl, $const, $value);
+      }
+    }
+    
     // response header storage - uses callback function
     curl_setopt($this->curl, CURLOPT_HEADERFUNCTION, array($this, 'read_header'));
   }
@@ -189,7 +231,7 @@ class sfCurlAdapter
   protected function read_header($curl, $headers)
   {
     $this->headers[] = $headers;
+    
     return strlen($headers);
   }
-
 }

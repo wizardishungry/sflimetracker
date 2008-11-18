@@ -41,59 +41,60 @@ class sfSocketsAdapter
    */
   public function call($browser, $uri, $method = 'GET', $parameters = array(), $headers = array())
   {
-    
     $m_headers = array_merge($browser->getDefaultRequestHeaders(), $browser->initializeRequestHeaders($headers));
-    $url_info  = parse_url($uri);
+    $request_headers = $browser->prepareHeaders($m_headers);
 
-    if ($method == 'POST' && !array_key_exists('Content-Type', $m_headers))
-    {
-      $m_headers['Content-Type'] = "application/x-www-form-urlencoded";
-    }
+    $url_info = parse_url($uri);
 
     // initialize default values
     isset($url_info['path']) ? $path = $url_info['path'] : $path = '/';
     isset($url_info['query']) ? $qstring = '?'.$url_info['query'] : $qstring = null;
     isset($url_info['port']) ? null : $url_info['port'] = 80;
-    $body = is_array($parameters) ? http_build_query($parameters, '', '&') : $parameters;
 
     if (!$socket = @fsockopen($url_info['host'], $url_info['port'], $errno, $errstr, 15))
     {
       throw new Exception("Could not connect ($errno): $errstr");
     }
-    
+
     // build request
-    
-    if(!isset($m_headers['Host']))
-    {
-      $m_headers["Host"] = $url_info['host'];
-    }
-    
-    if(!isset($m_headers['Content-Length']))
-    {
-      $m_headers["Content-Length"] = strlen($body);
-    }
-    
-    if(!isset($m_headers['Connection']))
-    {
-      $m_headers["Connection"] = "Close";
-    }
-    
-    
-    $request_headers = $browser->prepareHeaders($m_headers);
-    
     $request = "$method $path$qstring HTTP/1.1\r\n";
-    
+    $request .= 'Host: '.$url_info['host'].':'.$url_info['port']."\r\n";
     $request .= $request_headers;
-    
-    if ($body)
+    $request .= "Connection: Close\r\n";
+
+    if ($method == 'POST')
     {
+      $request .= 'Content-Length: '.strlen($body)."\r\n";
+      $request .= "Content-type: application/x-www-form-urlencoded\r\n";
       $request .= "\r\n";
-      $request .= $body;
+      $request .= http_build_query($parameters, '', '&');
     }
-    $request .= "\r\n";
-    
+    else if ($method == 'PUT')
+    {
+      $fp = fopen($parameters['file'], 'rb');
+      $sent = 0;
+      $blocksize = (2 << 20); // 2MB chunks
+      $filesize = filesize($parameters['file']);
+
+      $request .= 'Content-Length: '.$filesize."\r\n";
+
+      $request .= "\r\n";
+
+      fwrite($socket, $request);
+
+      while ($sent < $filesize)
+      {
+        $data = fread($fp, $blocksize);
+        fwrite($socket, $data);
+        $sent += $blocksize;
+      }
+      fclose($fp);
+    }
+
+    $request = "\r\n";
+
     fwrite($socket, $request);
-   
+
     $response = '';
     $response_body = '';
     while (!feof($socket))
@@ -104,7 +105,7 @@ class sfSocketsAdapter
 
     // parse response components: status line, headers and body
     $response_lines = explode("\r\n", $response);
-    
+
     // http status line (ie "HTTP 1.1 200 OK")
     $status_line = array_shift($response_lines);
 
