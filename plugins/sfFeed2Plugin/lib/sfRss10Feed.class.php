@@ -65,7 +65,7 @@ class sfRss10Feed extends sfRssFeed
         'description' => (string) $itemXml->description,
         'content'     => (string) $itemXml->encoded,
         'authorName'  => (string) $itemXml->creator,
-        'pubDate'     => strtotime((string) $itemXml->date),
+        'pubDate'     => strtotime(str_replace(array('UT', 'Z'), '', (string) $itemXml->date)),
         'feed'        => $this
       ));
     }

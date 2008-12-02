@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.1" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+ <name>sfFeed2Plugin</name>
+ <channel>pear.symfony-project.com</channel>
+ <summary>Feed manager for reading and writing feeds</summary>
+ <description>The sfFeed2Plugin offers an object interface for feeds and feed items, feed input methods using a web feed or an array of objects as source, and feed output methods for displaying items on a page and serving feeds through a symfony application.</description>
+ <lead>
+  <name>François Zaninotto</name>
+  <user>fzaninotto</user>
+  <email>francois.zaninotto@symfony-project.com</email>
+  <active>yes</active>
+ </lead>
+ <date>2007-04-15</date>
+ <version>
+   <release>0.9.4</release>
+   <api>0.9.4</api>
+ </version>
+ <stability>
+  <release>beta</release>
+  <api>beta</api>
+ </stability>
+ <license uri="http://www.symfony-project.com/license">MIT license</license>
+ <notes>-</notes>
+ <contents>
+   <dir name="/">
+     <dir name="lib">
+       <file name="sfFeed.class.php" role="data"/>
+       <file name="sfFeedItem.class.php" role="data"/>
+       <file name="sfFeedEnclosure.class.php" role="data"/>
+       <file name="sfAtom1Feed.class.php" role="data"/>
+       <file name="sfRssFeed.class.php" role="data"/>
+       <file name="sfRss201Feed.class.php" role="data"/>
+       <file name="sfRss091Feed.class.php" role="data"/>
+       <file name="sfRss10Feed.class.php" role="data"/>
+       <file name="sfFeedPeer.class.php" role="data"/>
+     </dir>
+     <file name="README" role="data"/>
+     <file name="LICENSE" role="data"/>
+   </dir>
+ </contents>
+
+ <dependencies>
+  <required>
+   <php>
+    <min>5.1.0</min>
+   </php>
+   <pearinstaller>
+    <min>1.4.1</min>
+   </pearinstaller>
+   <package>
+    <name>symfony</name>
+    <channel>pear.symfony-project.com</channel>
+    <min>0.8.1</min>
+    <max>1.1.5</max>
+   </package>
+  </required>
+ </dependencies>
+
+ <phprelease>
+ </phprelease>
+
+ <changelog>
+ </changelog>
+</package>
