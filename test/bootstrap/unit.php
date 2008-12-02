@@ -32,7 +32,7 @@ $app_config=$configuration->getApplicationConfiguration('tracker','test',true/*,
 $databaseManager = new sfDatabaseManager($app_config);
 //$databaseManager->loadConfiguration();
 
-//sfContext::createInstance($app_config,'tracker');
+sfContext::createInstance($app_config,'tracker');
 
 function fixture_url($name,$file_url=true)
 {
