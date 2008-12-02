@@ -1,6 +1,6 @@
 <?php
 
-class myUser extends sfBasicSecurityUser
+class trackerUser extends sfBasicSecurityUser
 {
 
   protected static function getName()

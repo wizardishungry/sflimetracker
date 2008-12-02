@@ -1,6 +1,6 @@
 <?php
 $sf_root_dir = realpath(dirname(__FILE__).'/../..');
-require_once("$sf_root_dir/apps/tracker/lib/myUser.class.php");
+require_once("$sf_root_dir/apps/tracker/lib/trackerUser.class.php");
 
 class limetrackerPasswordTask extends sfBaseTask
 {
@@ -28,7 +28,7 @@ EOF;
 
   protected function execute($arguments = array(), $options = array())
   {
-    $user=new myUser(new sfEventDispatcher(), new sfSessionTestStorage());
+    $user=new trackerUser(new sfEventDispatcher(), new sfSessionTestStorage());
     $user->setPassword($arguments['password']);
     $this->log('Password changed.');
   }
