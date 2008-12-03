@@ -9,4 +9,8 @@
  */ 
 class Episode extends BaseEpisode
 {
+  public function __toString()
+  {
+    return $this->getTitle();
+  }
 }

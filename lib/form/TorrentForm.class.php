@@ -11,7 +11,7 @@ class TorrentForm extends BaseTorrentForm
   public function configure()
   {
     $this->setWidgets(Array(
-        'episode_id' => new sfWidgetFormInputHidden(),
+        'episode_id' => new sfWidgetFormPropelSelect(Array('model'=>'Episode'),Array('disabled'=>'true')),
         'web_url'=> new sfWidgetFormInput(),
         'server_path' => new sfWidgetFormInput(),
         'file'=> new sfWidgetFormInputFile(),

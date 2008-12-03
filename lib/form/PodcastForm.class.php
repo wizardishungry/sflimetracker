@@ -13,7 +13,7 @@ class PodcastForm extends BasePodcastForm
     $this->setWidgets(Array(
         'title'       => new sfWidgetFormInput(),
         'slug'        => new sfWidgetFormInput(),
-        'description' => new sfWidgetFormInput(),
+        'description' => new sfWidgetFormTextarea(),
     ));
    $this->setValidators(array(
         'title'       => new sfValidatorString(array('required' => true)),
