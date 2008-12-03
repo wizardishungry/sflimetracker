@@ -17,7 +17,12 @@ class podcastActions extends sfActions
         if($this->form->isValid())
         {
             $podcast=$this->form->save();
-            //$podcast->fetch();
+            $feed=new Feed(); // add a sensible default feed
+            $feed->setTags('default');
+            $podcast->addFeed($feed);
+            $podcast->setDefaultFeed($feed);
+            $feed->save();
+            $podcast->save();
             $this->redirect('podcast/view?id='.$podcast->getId());
         }
     }

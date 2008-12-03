@@ -107,6 +107,14 @@ propel:
 
 
   podcast:
+    default_feed_id:
+      type:             integer
+      foreignTable:     feed
+      foreignReference: id
+      required:         false
+      default:          null
+      phpName:          DefaultFeed
+
     created_at:
     updated_at:
 
