@@ -28,6 +28,7 @@ class podcastActions extends sfActions
     $this->podcast=PodcastPeer::retrieveByPK($id);
     $this->forward404Unless($this->podcast); 
     $this->episodes=$this->podcast->getEpisodes();
+    $this->feeds=$this->podcast->getFeeds();
   }
 
   public function executeList()

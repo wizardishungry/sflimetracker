@@ -11,10 +11,14 @@ class PodcastForm extends BasePodcastForm
   public function configure()
   {
     $this->setWidgets(Array(
-        'feed_url'  => new sfWidgetFormInput(),
+        'title'       => new sfWidgetFormInput(),
+        'slug'        => new sfWidgetFormInput(),
+        'description' => new sfWidgetFormInput(),
     ));
    $this->setValidators(array(
-        'feed_url'  => new sfValidatorUrl(array('required' => false)),
+        'title'       => new sfValidatorString(array('required' => true)),
+        'slug'        => new sfValidatorString(array('required' => false)),
+        'description' => new sfValidatorString(array('required' => false)),
     ));
   }
 }
