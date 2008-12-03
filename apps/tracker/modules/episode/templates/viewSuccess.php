@@ -1,3 +1,4 @@
+Title: <?php echo $episode->getTitle() ?>
 <?php foreach($torrents as $torrent): ?>
   <li>
     <?php echo $torrent->getFileName(); ?>
