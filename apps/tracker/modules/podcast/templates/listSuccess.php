@@ -1,4 +1,4 @@
-<h3>Feeds</h3>
+<h3>Podcasts</h3>
 <ul>
 <?php foreach($podcasts as $podcast): ?>
   <li>

@@ -80,7 +80,7 @@ propel:
     description:    longvarchar
     length:         integer          # time
     downloads:      integer          # is this web downloads only? 
-    guid_hash:      # we need this todo?
+    guid_hash:      # we need this TODO?
       type:         varchar(40)
       index:        unique
 
