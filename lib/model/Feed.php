@@ -21,6 +21,11 @@ class Feed extends BaseFeed
         $this->unserialize();
     }
 
+    public function __toString()
+    {
+      return $this->getTags();
+    }
+
     public function setRssUrl($url,$validate=true)
     {
         $old_url=$this->getRssUrl();
@@ -208,4 +213,5 @@ class Feed extends BaseFeed
             return null;
         return $cache_dir.DIRECTORY_SEPARATOR.$this->getRssUrlHash();
     }
+
 }
