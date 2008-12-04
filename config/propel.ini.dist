@@ -5,7 +5,7 @@ propel.project             = sflimetracker
 ; mysql
 ;propel.database            = mysql
 ;propel.database.createUrl  = mysql://user:password@localhost/
-;propel.database.url        = ${propel.database.createUrl}/limetracker
+;propel.database.url        = ${propel.database.createUrl}limetracker
 
 ; sqlite
 propel.database            = sqlite
