@@ -26,3 +26,8 @@ class Podcast extends BasePodcast
   }
 
 }
+
+$columns_map = array('from'   => PodcastPeer::TITLE,
+                       'to'     => PodcastPeer::SLUG);
+ 
+sfPropelBehavior::add('Podcast', array('sfPropelActAsSluggableBehavior' => array('columns' => $columns_map, 'separator' => '_', 'permanent' => true)));
