@@ -13,7 +13,7 @@ class podcastActions extends sfActions
     $this->form=new PodcastForm();
     if ($request->isMethod('post'))
     {
-        $this->form->bind($request->getPostParameters());
+        $this->form->bind($request->getPostParameters(),Array()); // FIXME bind to real files array
         if($this->form->isValid())
         {
             $podcast=$this->form->save();
@@ -31,8 +31,9 @@ class podcastActions extends sfActions
   public function executeView($request)
   {
     $id=$request->getParameter('id');
-    $this->podcast=PodcastPeer::retrieveByPK($id);
+    $this->podcast=$podcast=PodcastPeer::retrieveByPK($id);
     $this->forward404Unless($this->podcast); 
+    $this->form=new PodcastForm($podcast);
     $this->episodes=$this->podcast->getEpisodes();
     $this->feeds=$this->podcast->getFeeds();
   }
