@@ -30,6 +30,7 @@ class torrentActions extends sfActions
         {
             $torrent=new Torrent($this->form->getValue('file'));
             $torrent->setEpisodeId($request->getParameter('episode_id'));
+            $torrent->setFeedId($request->getParameter('feed_id'));
             $torrent->save();
             $this->redirect('episode/view?id='.$request->getParameter('episode_id'));
         } 
@@ -37,7 +38,8 @@ class torrentActions extends sfActions
           return sfView::ERROR;
     }
       $this->form->setDefaults(Array(
-            'episode_id'=>$request->getParameter('episode_id')
+            'episode_id'=>$request->getParameter('episode_id'),
+            'feed_id'=>$request->getParameter('feed_id')
       ),Array());
   }
 }
