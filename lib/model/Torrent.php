@@ -67,9 +67,9 @@ class Torrent extends BaseTorrent
         }
     }
 
-    public function getUrl()
+    public function getUrl($torrent=true)
     {
-        return _compute_public_path($this->getFileName().'.torrent','uploads','',true);
+        return _compute_public_path($this->getFileName().($torrent?'.torrent':''),'uploads','',true);
     }
 
     public function getMagnet()
