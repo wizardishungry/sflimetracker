@@ -19,7 +19,7 @@ class episodeActions extends sfActions
         {
             $episode=$this->form->save();
             // redirect to default feed
-            $this->redirect('torrent/upload?episode_id='.$episode->getId().'&feed_id='.$episode->getPodcast()->getDefaultFeed()->getId());
+            $this->redirect('episode/view?episode_id='.$episode->getId());
         } 
         else
           return;
