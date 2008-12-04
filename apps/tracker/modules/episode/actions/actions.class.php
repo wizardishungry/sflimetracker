@@ -32,8 +32,22 @@ class episodeActions extends sfActions
   public function executeView($request)
   {
     $id=$request->getParameter('id');
-    $this->episode=EpisodePeer::retrieveByPK($id);
-    $this->forward404Unless($this->episode); 
-    $this->torrents=$this->episode->getTorrents();
+
+    $this->episode=$episode=EpisodePeer::retrieveByPK($id);
+    $this->forward404Unless($episode); 
+
+    $this->podcast=$podcast=$episode->getPodcast();
+    $this->forward404Unless($podcast); 
+
+    $this->torrents=$torrents=$episode->getTorrentsJoinFeed();
+    $this->feeds=$feeds=$podcast->getFeeds();
+
+    $has_feeds=Array();
+    foreach($torrents as $torrent)
+    {
+      $has_feeds[]=$torrent->getFeed();
+    }
+    $this->missing_feeds=array_diff($feeds,$has_feeds);
+
   }
 }
