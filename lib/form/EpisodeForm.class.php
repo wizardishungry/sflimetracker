@@ -11,7 +11,7 @@ class EpisodeForm extends BaseEpisodeForm
   public function configure()
   {
     $this->setWidgets(Array(
-        'podcast_id' => new sfWidgetFormPropelSelect(Array('model'=>'Podcast'),Array('disabled'=>true)),
+        'podcast_id' => new sfWidgetFormInputHidden(),
         'title'=> new sfWidgetFormInput(),
         'slug'=> new sfWidgetFormInput(),
         'length'=> new sfWidgetFormTime(Array('with_seconds'=>true,'hours'=>range(0,100))),
