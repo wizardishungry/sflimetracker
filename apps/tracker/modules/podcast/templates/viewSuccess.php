@@ -31,7 +31,7 @@
       [rss]
       <?php 
         $url = url_for('feed/feed?id='.$feed->getId(),true); // make this use a slug todo
-        echo $url;
+        echo link_to($url,$url);
       ?>
     </li>
   <?php endforeach; ?>
@@ -54,7 +54,7 @@
   <ul>
     <?php foreach($episodes as $episode): ?>
       <li>
-        <?php echo link_to($episode->getTitle(),'episode/view?id='.$episode->getId()) ?>
+        <?php echo link_to($episode->getCreatedAt('Y M d').' - '.$episode->getTitle(),'episode/view?id='.$episode->getId()) ?>
       </li>
     <?php endforeach; ?>
   </ul>

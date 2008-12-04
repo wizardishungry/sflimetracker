@@ -3,9 +3,17 @@
   <?php foreach($podcasts as $podcast): ?>
     <li>
       <?php echo
-        link_to($podcast->getTitle(),'podcast/view?id='.$podcast->getId()), ' ',
-        link_to('RSS','feed/feed?id='.$podcast->getId());
+        link_to($podcast->getTitle(),'podcast/view?id='.$podcast->getId());
       ?>
+      <ul>
+        <li>[web] <?php 
+          $url=url_for('podcast/view?id='.$podcast->getId(),true);
+          echo link_to($url,$url);
+        ?></li>
+        <li>[add] <?php 
+          echo link_to('Add…','episode/add?podcast_id='.$podcast->getId());
+        ?></li>
+      </ul>
     </li>
   <?php endforeach; ?>
   <li><?php echo link_to('New Podcast…','podcast/add') ?></li>

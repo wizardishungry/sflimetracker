@@ -50,5 +50,6 @@ class episodeActions extends sfActions
     }
     $this->missing_feeds=array_diff($feeds,$has_feeds);
 
+    $this->form=new EpisodeForm($episode);
   }
 }
