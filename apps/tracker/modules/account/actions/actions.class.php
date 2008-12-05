@@ -48,6 +48,7 @@ class accountActions extends sfActions
       }
       else
       {
+        $user->setFlash('notice','Oops, you probably entered your password wrong!');
         return sfView::ERROR;
       }
     }
