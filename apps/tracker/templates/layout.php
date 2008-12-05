@@ -15,31 +15,122 @@
   echo " action_",$sf_context->getActionName();
 ?>">
 
-<?php if ($sf_user->hasFlash('notice')): ?>
-  <div class="notice"><?php echo $sf_user->getFlash('notice') ?></div>
-<?php endif; ?>
+<div id="document">
+  <div id="layout">
 
+    <div id="header_wrapper">
+      <div id="header">
+        
+        <div id="title">
+          <h1>
+            <span>
+              <?php echo image_tag('lime_sm', "alt=Logo class=inline_icon"); ?>
+              <?php echo sfConfig::get('app_version_name') ?>
+            </span> 
+          </h1>
+        </div>
+        
+        <div class="version">
+          <?php echo '<span title="'.sfConfig::get('app_version_comment').
+            '" class="version_rev">',sfConfig::get('app_version_rev'),'</span>',
+            '; <span class="runtime_version">Symfony ',SYMFONY_VERSION,'</span>';
+          ?>
+        </div>
+        
+        <div id="account_bar">      
+          <ul>
+            <li class="">
+              <a href="#">
+                <?php echo image_tag('house', "class=inline_icon"); ?>
+                Home
+              </a>
+            </li>
+            <li class="">
+              <a href="#">
+                <?php echo image_tag('cog', "class=inline_icon"); ?>
+                Settings
+              </a>
+            </li>
+            <li class="">
+              <a href="#">
+                <?php echo image_tag('help', "class=inline_icon"); ?>
+                Help
+              </a>
+            </li>
+            <li class="signup">
+              <?php
+                $img=image_tag('user', "class=inline_icon");
+                if($sf_user->isAuthenticated())
+                  echo link_to("$img Logout",'account/logout');
+                else
+                  echo link_to("$img Login",'account/login');
+              ?>
+            </li>
+          </ul>
+                      
 
+<div class="quick_signin global palette top_bar" style="display: none;">
+  <div class="titlebar">
+          <a href="#" class="close">Exit</a>
+      </div>
+  <div class="message">
+    <?php if ($sf_user->hasFlash('notice')): ?>
+      <?php echo $sf_user->getFlash('notice') ?>
+    <?php endif; ?>
+  </div>
+                      
+  <div class="contents">
+    <form action="/session" method="post"><div style="margin: 0pt; padding: 0pt;"><input name="authenticity_token" value="479d51aeb685fb93d2d43cff20e8d2bf8543b228" type="hidden"></div>      <div class="field">
+        <label for="login_global">User</label>
+        <div>
+          <input id="login_global" class="text login" name="user[login]" type="text">
+        </div>
+      </div>
+      <div class="field">
+        <label for="password_global">Pass</label>
+        <div>
+          <input id="password_global" class="text password" name="user[password]" type="password">
+        </div>
+      </div>
+      <div class="field sign_up" style="display: none;">
+        <label for="email_global">Email</label>
+        <div>
+          <input id="email_global" class="text email" name="user[email]" type="text">
+        </div>
+      </div>
+
+      <div class="response_container">
+        <a href="http://limecast.com/forgot">I forgot my password</a>      </div>
+
+      <div class="controls">
+        <input class="button signup_button" id="signup_global" name="commit" value="Sign Up" type="submit">
+        <input class="button signin_button" id="signin_global" name="commit" value="Sign In" type="submit">
+      </div>
+    </form>  </div>
+</div>
+                  </div>
+      </div>
+    </div>
+    <div id="body_wrapper">
+      <div id="body">
+        
+        <!-- New Content -->
+        <div id="full_width">
+          
 <div class="content">
   <?php echo $sf_content ?>
 </div>
 
-<?php if($sf_context->getModuleName()!='account'): ?>
-  <div class="footer loginlink">
-    <?php if($sf_user->isAuthenticated()): ?>
-      <?php include_partial('account/logoutform') ?>
-    <?php else:?>
-      <?php echo link_to('Login','account/login') ?>
-    <?php endif; ?>
+          </div>
+        </div>
+
+        <div style="clear: both;">&nbsp;</div>
+
+      </div>
+    </div>
   </div>
-  <div class="footer version">
-    <?php
-    echo link_to(sfConfig::get('app_version_name'),sfConfig::get('app_version_url'),
-                Array('class'=>'version_name','title'=>sfConfig::get('app_version_comment'))),
-                ' <span class="version_rev">',sfConfig::get('app_version_rev'),'</span>',
-                '; <span class="runtime_version">Symfony ',SYMFONY_VERSION,'</span>';
-    ?>
-  </div>
-<?php endif ?>
+</div>
+
+
 </body>
 </html>
