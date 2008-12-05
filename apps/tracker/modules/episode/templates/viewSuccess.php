@@ -1,4 +1,4 @@
-<h2><?php echo 'Episode "', $episode->getTitle(),'" - ',link_to($podcast->getTitle(),'podcast/view?podcast_id='.$podcast->getId()) ?></h2>
+<h2><?php echo 'Episode "', $episode->getTitle(),'" - ',link_to($podcast->getTitle(),'podcast/view?id='.$podcast->getId()) ?></h2>
 <form action="<?php echo url_for('episode/edit') ?>" method="POST" enctype="multipart/form-data">
   <table>
     <?php echo $form ?>
