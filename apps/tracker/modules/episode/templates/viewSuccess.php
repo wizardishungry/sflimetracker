@@ -26,33 +26,36 @@
     </li>
   <?php endforeach; ?>
 </ul>
+
 <?php if($missing_feeds): ?>
-  We do not have files for the following subfeeds:
-  <ul>
-    <?php foreach($missing_feeds as $feed):
-      $form=new TorrentForm();
-      $form->setDefaults(Array(
-        'episode_id'=>$episode->getId(),
-        'feed_id'=>$feed->getId(),
-        ),Array());
-    ?>
-      <li>
-        <?php echo $feed ?>
-        <?php if($sf_user->isAuthenticated()): ?>
-          <?php // echo link_to('add file','torrent/upload?feed_id='.$feed->getId().'&episode_id='.$episode->getId()); ?>
-          <form action="<?php echo url_for('torrent/upload') ?>" method="POST" enctype="multipart/form-data">
-            <table>
-              <?php echo $form ?>
-              <tr>
-                <td colspan="2">
-                  <input type="submit" value="upload"/>
-                </td>
-              </tr>
-            </table>
-          </form>
-        <?php endif; ?>
-      </li>
-    <?php endforeach; ?>
-  </ul>
+  We do not have files for the following formats:
 <?php endif; ?>
-<li><a href="#">New Format</a></li>
+<ul>
+<?php if($missing_feeds): ?>
+  <?php foreach($missing_feeds as $feed):
+    $form=new TorrentForm();
+    $form->setDefaults(Array(
+      'episode_id'=>$episode->getId(),
+      'feed_id'=>$feed->getId(),
+      ),Array());
+  ?>
+    <li>
+      <?php echo $feed ?>
+      <?php if($sf_user->isAuthenticated()): ?>
+        <?php // echo link_to('add file','torrent/upload?feed_id='.$feed->getId().'&episode_id='.$episode->getId()); ?>
+        <form action="<?php echo url_for('torrent/upload') ?>" method="POST" enctype="multipart/form-data">
+          <table>
+            <?php echo $form ?>
+            <tr>
+              <td colspan="2">
+                <input type="submit" value="upload"/>
+              </td>
+            </tr>
+          </table>
+        </form>
+      <?php endif; ?>
+    </li>
+  <?php endforeach; ?>
+<?php endif; ?>
+<li><a href="#">Add New Format…</a></li>
+</ul>
