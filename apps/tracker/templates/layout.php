@@ -40,19 +40,15 @@
         <div id="account_bar">      
           <ul>
             <li class="">
-              <a href="#">
-                <?php echo image_tag('house', "class=inline_icon"); ?>
-                Home
-              </a>
+                <?php echo link_to(image_tag('house', "class=inline_icon").' Home','@homepage'); ?>
             </li>
             <li class="">
-              <a href="#">
+            <a href="#">
                 <?php echo image_tag('cog', "class=inline_icon"); ?>
-                Settings
-              </a>
+                Settings</a>
             </li>
             <li class="">
-              <a href="#">
+              <a href="http://limecast.com/tracker">
                 <?php echo image_tag('help', "class=inline_icon"); ?>
                 Help
               </a>
