@@ -2,6 +2,7 @@
   <table>
     <?php echo $form ?>
     <tr>
+      <td>&nbsp;</td>
       <td colspan="2">
         <input type="submit" value="upload"/>
       </td>
