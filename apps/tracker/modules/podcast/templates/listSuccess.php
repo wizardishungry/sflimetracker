@@ -1,3 +1,5 @@
+<?php use_helper('IconLinks') ?>
+
 <h2>Podcasts</h2>
 <ul>
   <?php foreach($podcasts as $podcast): ?>
@@ -7,14 +9,12 @@
       ?>
       <ul>
         <li>
-	  <?php $url= url_for('podcast/view?id='.$podcast->getId(),true); ?>
-	  <a href="<?php echo $url ?>">
-            <img class="inline_icon" src="/images/icons/web.png" /><?php echo $url ?>
-	  </a>
-	</li>
-        <li><?php 
-          echo link_to('<img class="inline_icon" src="/images/icons/add.png" />Add…','episode/add?podcast_id='.$podcast->getId());
-        ?></li>
+          <?php $url= url_for('podcast/view?id='.$podcast->getId(),true); ?>
+          <?php echo link_to_with_icon($url, "web", $url); ?>
+        </li>
+        <li>
+          <?php echo link_to_with_icon('Add…', "add", 'episode/add?podcast_id='.$podcast->getId()); ?>
+        </li>
       </ul>
     </li>
   <?php endforeach; ?>
