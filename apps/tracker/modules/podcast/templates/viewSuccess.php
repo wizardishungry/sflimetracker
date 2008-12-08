@@ -5,6 +5,7 @@
   <table>
     <?php echo $form ?>
     <tr>
+      <td>&nbsp;</td>
       <td>
         <input type="submit" value="Save"/>
       </td>
