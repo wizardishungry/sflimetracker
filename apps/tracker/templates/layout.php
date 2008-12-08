@@ -22,12 +22,10 @@
       <div id="header">
         
         <div id="title">
-          <h1>
             <span>
               <?php echo image_tag('lime_sm', "alt=Logo class=inline_icon"); ?>
               <?php echo sfConfig::get('app_version_name') ?>
             </span> 
-          </h1>
         </div>
         
         <div class="version">
