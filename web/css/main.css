@@ -32,8 +32,7 @@ h3 { /* 14px HACK!! */
   margin: 0;
   padding: 0;
 }
-div#body ul.list { margin: 0 0 14px 2em; }
-div#body ul.list li { list-style: disc; }
+div#body ul { margin: 0 0 14px 0; }
 p {
   margin: 0;
   padding: 0;
@@ -325,7 +324,23 @@ dl.linkspace dd {
 }
 
 
-
+/**
+* Icons
+**/
+a img.inline_icon {
+  margin: -4px 0 0 0;
+  position: relative;
+  top: 3px;
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+  display: inline-table;
+}
+span > img.inline_icon {
+  margin: -4px 0 0 0;
+  position: relative;
+  top: 3px;
+}
 
 /**
 * Forms
