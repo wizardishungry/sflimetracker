@@ -23,8 +23,7 @@
         
         <div id="title">
             <span>
-              <?php echo image_tag('lime_sm', "alt=Logo class=inline_icon"); ?>
-              <?php echo sfConfig::get('app_version_name') ?>
+              <?php echo link_to_with_icon(sfConfig::get('app_version_name'), 'lime_sm', 'http://limecast.com/tracker'); ?>
             </span> 
         </div>
         
@@ -38,26 +37,20 @@
         <div id="account_bar">      
           <ul>
             <li class="">
-                <?php echo link_to(image_tag('house', "class=inline_icon").' Home','@homepage'); ?>
+              <?php echo link_to_with_icon('Home', 'house', '@homepage'); ?>
             </li>
             <li class="">
-            <a href="#">
-                <?php echo image_tag('cog', "class=inline_icon"); ?>
-                Settings</a>
+              <?php echo link_to_with_icon('Settings', 'cog', '@homepage'); ?>
             </li>
             <li class="">
-              <a href="http://limecast.com/tracker">
-                <?php echo image_tag('help', "class=inline_icon"); ?>
-                Help
-              </a>
+              <?php echo link_to_with_icon('Help', 'help', 'http://limecast.com/tracker'); ?>
             </li>
             <li class="signup">
               <?php
-                $img=image_tag('user', "class=inline_icon");
                 if($sf_user->isAuthenticated())
-                  echo link_to("$img Logout",'account/logout');
+                  echo link_to_with_icon('Logout', 'user', 'account/logout');
                 else
-                  echo link_to("$img Login",'account/login');
+                  echo link_to_with_icon('Login', 'user', 'account/login');
               ?>
             </li>
           </ul>

@@ -1,5 +1,3 @@
-<?php use_helper('IconLinks') ?>
-
 <h2>Podcasts</h2>
 <ul>
   <?php foreach($podcasts as $podcast): ?>

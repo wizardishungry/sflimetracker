@@ -19,19 +19,18 @@
 <h3>Feeds</h3>
 <?php if($feeds): ?>
 <ul>
-  <li>[html]
+  <li>
   <?php
     $url = url_for($sf_context->getRouting()->getCurrentInternalUri(), true);
-    echo link_to($url,$url);
+    echo link_to_with_icon($url, 'web', $url);
   ?>
     
   </li>
   <?php foreach($feeds as $feed): ?>
     <li>
-      [rss]
       <?php 
         $url = url_for('feed/feed?id='.$feed->getId(),true); // make this use a slug todo
-        echo link_to($url,$url);
+        echo link_to_with_icon($url, 'rss', $url);
       ?>
     </li>
   <?php endforeach; ?>
