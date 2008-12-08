@@ -368,9 +368,17 @@ form textarea {
 form input.text,
 form textarea.text {
   background: #F3F3F3 url("../images/content/input_bg.png") repeat-x left top;
-  border: 1px solid #212121;
   color: #676767;
   padding: 4px;
+}
+form input[type=text] {
+  width: 276px;
+}
+form textarea {
+  width: 280px;
+}
+form input[type=submit] {
+  width: auto;
 }
 form input.text.focus,
 form textarea.text.focus {
