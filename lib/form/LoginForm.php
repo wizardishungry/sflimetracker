@@ -14,6 +14,7 @@ class LoginForm extends sfForm
     $this->setWidgets(array(
       'password'    => new sfWidgetFormInputPassword(),
       'remember_me' => new sfWidgetFormInputCheckbox(),
+      'i_will_not_use_LimeTracker_for_copyright_infringement' => new sfWidgetFormInputCheckbox(),
     ));
     $this->setValidators(array(
       'password'    =>   new sfValidatorCallback(array(
@@ -23,6 +24,7 @@ class LoginForm extends sfForm
       )),
       'remember_me' =>  new sfValidatorPass(Array('required'=>false)),
     ));
+    $this->validatorSchema->setOption('allow_extra_fields', true); // remove this eventually FIXME
   }
 
   public function passwordCallback($validator,$password)
