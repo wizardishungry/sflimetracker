@@ -47,7 +47,7 @@
     {  
       if(true) // TODO add !Podcast->isFeedBased() here
       {
-        echo '<li>',link_to('Add episode…','episode/add?podcast_id='.$podcast->getId()),'</li>';
+        echo '<li>',link_to_with_icon('Add episode…','add','episode/add?podcast_id='.$podcast->getId()),'</li>';
       }
     }
   ?>
