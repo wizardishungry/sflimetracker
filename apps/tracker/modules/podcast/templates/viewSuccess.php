@@ -41,27 +41,26 @@
 <?php endif; ?>
 
 <h3>Episodes</h3>
-<?php
-  if($sf_user->isAuthenticated())
-  {  
-    if(true) // TODO add !Podcast->isFeedBased() here
-    {
-      echo link_to('Add episode','episode/add?podcast_id='.$podcast->getId());
+<ul>
+  <?php
+    if($sf_user->isAuthenticated())
+    {  
+      if(true) // TODO add !Podcast->isFeedBased() here
+      {
+        echo '<li>',link_to('Add episode…','episode/add?podcast_id='.$podcast->getId()),'</li>';
+      }
     }
-  }
-?>
-<?php if($episodes): ?>
-  <ul>
-    <?php foreach($episodes as $episode): ?>
-      <li>
-        <?php echo link_to($episode->getCreatedAt('Y M d').' - '.$episode->getTitle(),'episode/view?id='.$episode->getId()) ?>
-      </li>
-    <?php endforeach; ?>
-  </ul>
-<?php else: ?>
-  <p><i>No episodes yet.</i></p>
-<?php endif; ?>
-
+  ?>
+  <?php if($episodes): ?>
+      <?php foreach($episodes as $episode): ?>
+        <li>
+          <?php echo link_to($episode->getCreatedAt('Y M d').' - '.$episode->getTitle(),'episode/view?id='.$episode->getId()) ?>
+        </li>
+      <?php endforeach; ?>
+  <?php else: ?>
+    <p><i>No episodes yet.</i></p>
+  <?php endif; ?>
+</ul>
 <?php slot('feed');
 foreach($feeds as $feed) 
 {
