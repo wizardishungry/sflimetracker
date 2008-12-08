@@ -54,7 +54,7 @@
   <?php if($episodes): ?>
       <?php foreach($episodes as $episode): ?>
         <li>
-          <?php echo link_to($episode->getCreatedAt('Y M d').' - '.$episode->getTitle(),'episode/view?id='.$episode->getId()) ?>
+          <?php echo link_to_with_icon($episode->getCreatedAt('Y M d').' - '.$episode->getTitle(),'episode','episode/view?id='.$episode->getId()) ?>
         </li>
       <?php endforeach; ?>
   <?php else: ?>
