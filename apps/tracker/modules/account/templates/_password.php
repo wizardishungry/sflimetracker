@@ -4,6 +4,7 @@
       echo $form;
     ?>
     <tr>
+      <td>&nbsp;</td>
       <td><input type="submit" value="Change password" /></td>
       <td><?php
         echo button_to('Wait, I remember!',"account/login")

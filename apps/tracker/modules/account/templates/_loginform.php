@@ -15,6 +15,7 @@
         ?></td>
       </tr>
       <tr>
+        <td>&nbsp;</td>
         <td><input type="submit" value="Login" /></td>
       </tr>
     </table>
