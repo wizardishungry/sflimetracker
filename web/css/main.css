@@ -391,3 +391,15 @@ form div.huge div {
 form div.huge div input.text {
   width: 85%;
 }
+.content table tr th {
+width: 120px;
+text-align: right;
+vertical-align: top;
+padding-right: 10px;
+}
+.content table {
+margin-left: -130px;
+}
+.content table tr td {
+padding: 0 0 14px 0;
+}
