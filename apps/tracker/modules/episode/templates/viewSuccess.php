@@ -58,5 +58,5 @@
     </li>
   <?php endforeach; ?>
 <?php endif; ?>
-<li><a href="#">Add New Format…</a></li>
+<li><?php echo link_to_with_icon('Add New Format…', "add", '@homepage');?></li>
 </ul>
