@@ -32,7 +32,13 @@ h3 { /* 14px HACK!! */
   margin: 0;
   padding: 0;
 }
-div#body ul { margin: 0 0 14px 0; }
+div#body ul { 
+  margin: 0 0 14px 0; 
+  padding: 0;
+}
+div#body ul li {
+  list-style: none;
+}
 p {
   margin: 0;
   padding: 0;
@@ -71,7 +77,7 @@ h1, h2, h3, h4, h5 {
 h1 { font-size: 2.2em; }
 h1.heading { font-size: 1.6em; } /* effectively h2 */
 h2 { font-size: 1.6em; }
-h3 { font-size: 1.1em; }
+h3 { font-size: 1.3em; }
 div#document {
   font-size: 1.1em;
   min-height: 100%;
@@ -425,4 +431,11 @@ margin-left: -130px;
 }
 .content table tr td {
 padding: 0 0 14px 0;
+}
+
+/**
+* Podcast
+**/
+.podcasts h3 {
+  margin: 0;
 }

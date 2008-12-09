@@ -1,4 +1,4 @@
-<h2><?php echo $podcast->getTitle() ?></h2>
+<h1><?php echo $podcast->getTitle() ?></h1>
 
 <?php if($sf_user->isAuthenticated()): ?>
 <form action="<?php echo url_for('podcast/update') ?>" method="POST" enctype="multipart/form-data">
@@ -17,14 +17,14 @@
 </form>
 <?php endif; ?>
 
-<h3>Feeds</h3>
+<h2>Feeds</h2>
 <?php if($feeds): ?>
 <ul>
   <li>
   <?php
     $url = url_for($sf_context->getRouting()->getCurrentInternalUri(), true);
     echo link_to_with_icon($url, 'web', $url);
-  ?>
+  ?> (All feeds)
     
   </li>
   <?php foreach($feeds as $feed): ?>
@@ -40,17 +40,8 @@
   <p><i>No feeds yet.</i></p>
 <?php endif; ?>
 
-<h3>Episodes</h3>
+<h2>Episodes</h2>
 <ul>
-  <?php
-    if($sf_user->isAuthenticated())
-    {  
-      if(true) // TODO add !Podcast->isFeedBased() here
-      {
-        echo '<li>',link_to_with_icon('Add episode…','add','episode/add?podcast_id='.$podcast->getId()),'</li>';
-      }
-    }
-  ?>
   <?php if($episodes): ?>
       <?php foreach($episodes as $episode): ?>
         <li>
@@ -60,6 +51,15 @@
   <?php else: ?>
     <p><i>No episodes yet.</i></p>
   <?php endif; ?>
+  <?php
+    if($sf_user->isAuthenticated())
+    {  
+      if(true) // TODO add !Podcast->isFeedBased() here
+      {
+        echo '<li>',link_to_with_icon('Add episode…','add','episode/add?podcast_id='.$podcast->getId()),'</li>';
+      }
+    }
+  ?>
 </ul>
 <?php slot('feed');
 foreach($feeds as $feed) 
