@@ -1,18 +1,22 @@
 <h2><?php echo 'Episode "', $episode->getTitle(),'" - ',link_to($podcast->getTitle(),'podcast/view?id='.$podcast->getId()) ?></h2>
+
+<?php if($sf_user->isAuthenticated()): ?>
 <form action="<?php echo url_for('episode/edit') ?>" method="POST" enctype="multipart/form-data">
-  <table>
-    <?php echo $form ?>
-    <tr>
-      <td>&nbsp;</td>
-      <td>
-        <input type="submit" value="Save"/>
-      </td>
-      <td>
-        <input type="submit" value="Remove"/> <?php /* fixme todo */ ?>
-      </td>
-    </tr>
-  </table>
-</form>
+    <table>
+      <?php echo $form ?>
+      <tr>
+        <td>&nbsp;</td>
+        <td>
+          <input type="submit" value="Save"/>
+        </td>
+        <td>
+          <input type="submit" value="Remove"/> <?php /* fixme todo */ ?>
+        </td>
+      </tr>
+    </table>
+  </form>
+<?php endif; ?>
+
 <ul>
   <?php foreach($torrents as $torrent): ?>
     <li>
