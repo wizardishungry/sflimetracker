@@ -26,7 +26,9 @@
         <li>Address: <?php echo link_to($torrent->getUrl(false),$torrent->getUrl(false)); ?>
         <li>Torrent: <?php echo link_to($torrent->getUrl(),$torrent->getUrl()) ?>
         <li>Hash: <?php echo link_to($torrent->getFileSha1(),$torrent->getMagnet()); ?> </li>
-        <li><a href="#">Remove</a></li>
+        <?php if($sf_user->isAuthenticated()): ?>
+          <li><a href="#">Remove</a></li>
+        <?php endif; ?>
       </ul>
     </li>
   <?php endforeach; ?>
@@ -63,5 +65,7 @@
     </li>
   <?php endforeach; ?>
 <?php endif; ?>
-<li><?php echo link_to_with_icon('Add New Format…', "add", '@homepage');?></li>
+<?php if($sf_user->isAuthenticated()): ?>
+  <li><?php echo link_to_with_icon('Add New Format…', "add", '@homepage');?></li>
+<?php endif; ?>
 </ul>
