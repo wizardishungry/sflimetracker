@@ -1,4 +1,4 @@
 add:
   is_secure: on
-list:
+edit:
   is_secure: on

@@ -1,2 +1,4 @@
 upload:
   is_secure:    on
+edit:
+  is_secure:    on
