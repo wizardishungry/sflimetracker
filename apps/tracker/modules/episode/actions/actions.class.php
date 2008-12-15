@@ -27,7 +27,6 @@ class episodeActions extends sfActions
 
     $this->form->setDefaults(Array(
           'podcast_id'=>$request->getParameter('podcast_id'),
-          'created_at'=>time()
     ),Array());
   }
 
