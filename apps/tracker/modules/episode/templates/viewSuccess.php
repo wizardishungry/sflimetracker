@@ -27,7 +27,7 @@
         <li>Torrent: <?php echo link_to($torrent->getUrl(),$torrent->getUrl()) ?>
         <li>Hash: <?php echo link_to($torrent->getFileSha1(),$torrent->getMagnet()); ?> </li>
         <?php if($sf_user->isAuthenticated()): ?>
-          <li><a href="#">Remove</a></li>
+          <li><?php echo link_to('Remove','torrent/delete?id='.$torrent->getId()); ?></li>
         <?php endif; ?>
       </ul>
     </li>
