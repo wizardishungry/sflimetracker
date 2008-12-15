@@ -59,4 +59,15 @@ class feedActions extends sfActions
     $pager->setPage(1);
     return $pager;
   }
+
+  public function executeDelete($request)
+  {
+    $id=$request->getParameter('id');
+
+    $torrent=TorrentPeer::retrieveByPK($id);
+    $this->forward404Unless($torrent); 
+    $this->getUser()->setFlash('notice','Deleted torrent '.$podcas->getFileName());
+    $torrent->delete();
+    $this->redirect('episode/view?id='.$torrent->getEpisodeId());
+  } 
 }

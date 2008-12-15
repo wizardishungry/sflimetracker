@@ -42,4 +42,14 @@ class torrentActions extends sfActions
             'feed_id'=>$request->getParameter('feed_id')
       ),Array());
   }
+  public function executeDelete($request)
+  {
+    $id=$request->getParameter('id');
+
+    $torrent=TorrentPeer::retrieveByPK($id);
+    $this->forward404Unless($torrent); 
+    $this->getUser()->setFlash('notice','Deleted torrent '.$torrent->getFileName());
+    $torrent->delete();
+    $this->redirect('episode/view?id='.$torrent->getEpisodeId());
+  }
 }

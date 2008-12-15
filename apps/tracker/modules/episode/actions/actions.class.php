@@ -52,4 +52,15 @@ class episodeActions extends sfActions
 
     $this->form=new EpisodeForm($episode);
   }
+
+  public function executeDelete($request)
+  {
+    $id=$request->getParameter('id');
+
+    $this->episode=$episode=EpisodePeer::retrieveByPK($id);
+    $this->forward404Unless($episode); 
+    $this->getUser()->setFlash('notice','Deleted episode'.$episode->getTitle());
+    $episode->delete();
+    $this->redirect('podcast/view?id='.$episode->getPodcastId());
+  }
 }

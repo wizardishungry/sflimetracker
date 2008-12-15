@@ -46,4 +46,15 @@ class podcastActions extends sfActions
     $c->addAscendingOrderByColumn(PodcastPeer::CREATED_AT);
     $this->podcasts=PodcastPeer::doSelect($c);
   }
+
+  public function executeDelete($request)
+  {
+    $id=$request->getParameter('id');
+
+    $podcast=PodcastPeer::retrieveByPK($id);
+    $this->forward404Unless($podcast); 
+    $this->getUser()->setFlash('notice','Deleted podcast '.$podcast->getTitle());
+    $podcast->delete();
+    $this->redirect('@home');
+  }
 }
