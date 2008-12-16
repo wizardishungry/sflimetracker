@@ -9,14 +9,13 @@
         <td>
           <input type="submit" value="Save"/>
         </td>
-        <td>
-          <input type="submit" value="Remove"/> <?php /* fixme todo */ ?>
-        </td>
       </tr>
     </table>
   </form>
+  <?php echo delete_form_for_object($episode); ?>
 <?php endif; ?>
 
+<h3>Files</h3>
 <ul>
   <?php foreach($torrents as $torrent): ?>
     <li>
@@ -27,7 +26,9 @@
         <li>Torrent: <?php echo link_to($torrent->getUrl(),$torrent->getUrl()) ?>
         <li>Hash: <?php echo link_to($torrent->getFileSha1(),$torrent->getMagnet()); ?> </li>
         <?php if($sf_user->isAuthenticated()): ?>
-          <li><?php echo link_to('Remove','torrent/delete?id='.$torrent->getId()); ?></li>
+          <li>
+            <?php echo delete_form_for_object($torrent); ?>
+          </li>
         <?php endif; ?>
       </ul>
     </li>

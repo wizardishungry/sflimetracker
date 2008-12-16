@@ -10,11 +10,12 @@
           <input type="submit" value="Save"/>
         </td>
         <td>
-          <input type="submit" value="Remove"/><?php /* todo fixme */ ?>
+
         </td>
       </tr>
     </table>
   </form>
+  <?php echo delete_form_for_object($podcast); ?>
 <?php endif; ?>
 
 <h2>Feeds</h2>
