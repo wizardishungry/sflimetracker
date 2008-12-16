@@ -19,7 +19,7 @@ class episodeActions extends sfActions
         {
             $episode=$this->form->save();
             // redirect to default feed
-            $this->redirect('episode/view?episode_id='.$episode->getId());
+            $this->redirect('episode/view?id='.$episode->getId());
         } 
         else
           return;

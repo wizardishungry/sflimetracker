@@ -49,12 +49,13 @@ class podcastActions extends sfActions
 
   public function executeDelete($request)
   {
+    $this->forward404Unless($request->getMethod () == sfRequest::POST); 
     $id=$request->getParameter('id');
 
     $podcast=PodcastPeer::retrieveByPK($id);
     $this->forward404Unless($podcast); 
     $this->getUser()->setFlash('notice','Deleted podcast '.$podcast->getTitle());
     $podcast->delete();
-    $this->redirect('@home');
+    $this->redirect('@homepage');
   }
 }
