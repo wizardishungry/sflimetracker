@@ -1,7 +1,7 @@
 <h1><?php echo $podcast->getTitle() ?></h1>
 
 <?php if($sf_user->isAuthenticated()): ?>
-  <form action="<?php echo url_for('podcast/update') ?>" method="POST" enctype="multipart/form-data">
+  <form action="<?php echo url_for('podcast/edit') ?>" method="POST" enctype="multipart/form-data">
     <table>
       <?php echo $form ?>
       <tr>
