@@ -24,6 +24,8 @@
 
 <h2>Files</h2>
 <ul>
-  <li><?php echo link_to_with_icon('Add file…','add','podcast/add'); ?>
+  <?php if($sf_user->isAuthenticated()): ?>
+    <li><?php echo link_to_with_icon('Add file…','add','#' /*'torrent/add'*/ ); // fixme when implemented ?>
+  <?php endif; ?>
 </li>
 </ul>
