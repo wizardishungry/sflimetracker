@@ -120,6 +120,7 @@ propel:
       type:             integer
       foreignTable:     feed
       foreignReference: id
+      onDelete:         cascade
       required:         false
       default:          null
 
