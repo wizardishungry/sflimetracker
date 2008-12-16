@@ -10,6 +10,12 @@ class DeleteForm extends sfForm
 {
   public function configure()
   {
-    $this->validatorSchema->setOption('allow_extra_fields', true);
+    $this->setWidgets(Array(
+        'id' => new sfWidgetFormInputHidden(),
+    ));
+
+    $this->setValidators(array(
+        'id' => new sfValidatorInteger(array('required' => true)),
+    ));
   }
 }
