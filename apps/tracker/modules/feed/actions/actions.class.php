@@ -62,6 +62,7 @@ class feedActions extends sfActions
 
   public function executeDelete($request)
   {
+    $this->forward404Unless($request->getMethod () == sfRequest::POST);   
     $id=$request->getParameter('id');
 
     $torrent=TorrentPeer::retrieveByPK($id);
