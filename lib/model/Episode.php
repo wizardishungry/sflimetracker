@@ -21,7 +21,7 @@ class Episode extends BaseEpisode
     {
         $torrent->delete($con);
     }
-    parent::delete($con);
+    return parent::delete($con);
   }
 }
 $columns_map = array('from'   => EpisodePeer::TITLE,
