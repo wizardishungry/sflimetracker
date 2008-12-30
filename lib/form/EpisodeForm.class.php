@@ -11,6 +11,7 @@ class EpisodeForm extends BaseEpisodeForm
   public function configure()
   {
     $this->setWidgets(Array(
+        'id' => new sfWidgetFormInputHidden(),
         'created_at'=> new sfWidgetFormDateTime(),
         'length'=> new sfWidgetFormTime(Array('with_seconds'=>true,'hours'=>range(0,100))),
         'podcast_id' => new sfWidgetFormInputHidden(),
@@ -20,6 +21,7 @@ class EpisodeForm extends BaseEpisodeForm
     ));
 
     $this->setValidators(array(
+        'id' => new sfValidatorInteger(array('required' => false)),
         'created_at' => new sfValidatorDateTime(array('required' => false)),
         'podcast_id' => new sfValidatorInteger(array('required' => true)),
         'title' => new sfValidatorString(array('required' => true)),

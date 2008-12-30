@@ -11,6 +11,7 @@ class PodcastForm extends BasePodcastForm
   public function configure()
   {
     $this->setWidgets(Array(
+        'id' => new sfWidgetFormInputHidden(),
         'cover'       => new sfWidgetFormInputFile(), // dummy FIXME
         'title'       => new sfWidgetFormInput(),
         'author'      => new sfWidgetFormInput(), // dummy FIXME
@@ -23,6 +24,7 @@ class PodcastForm extends BasePodcastForm
         'custom_xml'  => new sfWidgetFormTextarea(), // dummy FIXME
     ));
    $this->setValidators(array(
+        'id' => new sfValidatorInteger(array('required' => false)),
         'title'       => new sfValidatorString(array('required' => true)),
         'slug'        => new sfValidatorString(array('required' => false)),
         'description' => new sfValidatorString(array('required' => false)),

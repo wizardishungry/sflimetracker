@@ -11,6 +11,7 @@ class TorrentForm extends BaseTorrentForm
   public function configure()
   {
     $this->setWidgets(Array(
+        'id' => new sfWidgetFormInputHidden(),
         'episode_id' => new sfWidgetFormInputHidden(),
         'feed_id' => new sfWidgetFormInputHidden(),
         'web_url'=> new sfWidgetFormInput(),
@@ -19,6 +20,7 @@ class TorrentForm extends BaseTorrentForm
     ));
 
     $this->setValidators(array(
+        'id' => new sfValidatorInteger(array('required' => false)),
         'episode_id' => new sfValidatorInteger(array('required' => true)),
         'feed_id' => new sfValidatorInteger(array('required' => true)),
 
