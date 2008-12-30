@@ -22,7 +22,7 @@ class Torrent extends BaseTorrent
         $filename = $file->getOriginalName();
         $extension = $file->getOriginalExtension();
         $this->setFileName($filename);
-        $file->save(sfConfig::get('sf_upload_dir').'/'.$filename);
+        $file->save(sfConfig::get('sf_upload_dir').'/'.$filename,0644); // todo abstract filemode out
                     
         $torrent_file=$this->getTorrentPath();
 
