@@ -31,3 +31,23 @@ function parse_size($size) {
   }
 }
 
+function pretty_size($val)
+{
+    //settype($val,'double');
+    switch(true)
+    {
+        case($val>1024*1024):
+            $unit='mebibytes';
+            $val/=(1024*1024);
+            break;
+        case($val>1024):
+            $unit='kibibytes';
+            $val/=1024;
+            break;
+        default:
+            $unit='bytes';
+            break;
+    }
+//    echo "gettype : ",gettype($val);
+    return $val.' '.$unit;
+}

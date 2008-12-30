@@ -20,7 +20,7 @@
 <ul>
   <?php foreach($torrents as $torrent): ?>
     <li>
-      <?php echo $torrent->getFileName(), $torrent->getFileSize(), ' bytes' ?>
+      <?php echo $torrent->getFileName(), ' ', pretty_size($torrent->getFileSize()) ?>
       <ul>
         <li>Format: <?php echo $torrent->getFeed()->getTags(); ?>
         <li>Address: <?php echo link_to($torrent->getUrl(false),$torrent->getUrl(false)); ?>
@@ -62,22 +62,7 @@
                 You should be able to upload up to about 
                 <?php
                     $bytes=file_upload_max_size(); 
-                    switch(true)
-                    {
-                        case($bytes>1024*1024):
-                            $unit='mebibytes';
-                            $val=$bytes/(1024*1024);
-                            break;
-                        case($bytes>1024):
-                            $unit='kibibytes';
-                            $val=$bytes/(1024);
-                            break;
-                        default:
-                            $unit='bytes';
-                            $val=$bytes;
-                            break;
-                    }
-                    echo "<span title='$bytes bytes'>$val $unit</span>.";
+                    echo "<span title='$bytes bytes'>",pretty_size($bytes),'</span>.';
                 ?>
               </td>
             </tr>
