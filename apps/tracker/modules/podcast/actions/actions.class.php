@@ -28,6 +28,22 @@ class podcastActions extends sfActions
         }
     }
   }
+
+  public function executeEdit($request)
+  {
+    $this->form=new PodcastForm(PodcastPeer::retrieveByPk($request->getParameter('id')));
+    if ($request->isMethod('post'))
+    {
+        $this->form->bind($request->getPostParameters(),Array()); // FIXME bind to real files array
+        if($this->form->isValid())
+        {
+            $podcast=$this->form->save();
+            $podcast->save();
+            $this->redirect('podcast/view?id='.$podcast->getId());
+        }
+    }
+  }
+
   public function executeView($request)
   {
     $id=$request->getParameter('id');

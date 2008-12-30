@@ -30,6 +30,22 @@ class episodeActions extends sfActions
     ),Array());
   }
 
+  public function executeEdit($request)
+  {
+    $this->form=new EpisodeForm(EpisodePeer::retrieveByPk($request->getParameter('id')));
+    if ($request->isMethod('post'))
+    {
+        $this->form->bind($request->getPostParameters());
+        if($this->form->isValid())
+        {
+            $episode=$this->form->save();
+            $this->redirect('episode/view?id='.$episode->getId());
+        } 
+        else
+          return sfView::ERROR;
+    }
+  }
+
   public function executeView($request)
   {
     $id=$request->getParameter('id');
