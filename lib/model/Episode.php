@@ -13,6 +13,16 @@ class Episode extends BaseEpisode
   {
     return $this->getTitle();
   }
+
+  public function delete($con = null)
+  {
+    $torrents=$this->getTorrents();
+    foreach($torrents as $torrent)
+    {
+        $torrent->delete($con);
+    }
+    parent::delete($con);
+  }
 }
 $columns_map = array('from'   => EpisodePeer::TITLE,
                        'to'     => EpisodePeer::SLUG);
