@@ -169,4 +169,11 @@ class Torrent extends BaseTorrent
     {
       return ClientPeer::reap($this->getClients(),$try_to_do_global);
     }
+
+    public function getFileSize()
+    {
+        // todo remote files need to have this information cached
+        // NB: this will look negative if >= 2**31 use sprintf 
+        return filesize($this->getOriginalFilePath());
+    }
 }

@@ -1,3 +1,4 @@
+<?php use_helper('ApacheConfig'); ?>
 <h2><?php echo 'Episode "', $episode->getTitle(),'" - ',link_to($podcast->getTitle(),'podcast/view?id='.$podcast->getId()) ?></h2>
 
 <?php if($sf_user->isAuthenticated()): ?>
@@ -19,7 +20,7 @@
 <ul>
   <?php foreach($torrents as $torrent): ?>
     <li>
-      <?php echo $torrent->getFileName() ?>
+      <?php echo $torrent->getFileName(), $torrent->getFileSize(), ' bytes' ?>
       <ul>
         <li>Format: <?php echo $torrent->getFeed()->getTags(); ?>
         <li>Address: <?php echo link_to($torrent->getUrl(false),$torrent->getUrl(false)); ?>
@@ -58,6 +59,26 @@
               <td>&nbsp;</td>
               <td colspan="2">
                 <input type="submit" value="upload"/>
+                You should be able to upload up to about 
+                <?php
+                    $bytes=file_upload_max_size(); 
+                    switch(true)
+                    {
+                        case($bytes>1024*1024):
+                            $unit='mebibytes';
+                            $val=$bytes/(1024*1024);
+                            break;
+                        case($bytes>1024):
+                            $unit='kibibytes';
+                            $val=$bytes/(1024);
+                            break;
+                        default:
+                            $unit='bytes';
+                            $val=$bytes;
+                            break;
+                    }
+                    echo "<span title='$bytes bytes'>$val $unit</span>.";
+                ?>
               </td>
             </tr>
           </table>
