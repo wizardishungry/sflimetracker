@@ -13,6 +13,22 @@ class Podcast extends BasePodcast
   {
     return $this->getTitle();
   }
+
+  public function delete($con = null)
+  {
+    $episodes=$this->getEpisodes();
+    foreach($episodes as $episode)
+    {
+        $episode->delete($con);
+    }
+    $feeds=$this->getFeeds();
+    foreach($feeds as $feed)
+    {
+        $feed->delete($con);
+    }
+    return parent::delete($con);
+  }
+
   public function getDefaultFeed($con=null)
   {
     // convenience function until I figure out how to have propel make this correctly
