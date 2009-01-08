@@ -31,7 +31,7 @@
   <?php foreach($feeds as $feed): ?>
     <li>
       <?php 
-        $url = url_for('feed/feed?id='.$feed->getId(),true); // make this use a slug todo
+        $url = url_for($feed->getUri(),true); // make this use a slug todo
         echo link_to_with_icon($url, 'rss', $url);
       ?>
     </li>
@@ -46,7 +46,8 @@
   <?php if($episodes): ?>
       <?php foreach($episodes as $episode): ?>
         <li>
-          <?php echo link_to_with_icon($episode->getCreatedAt('Y M d').' - '.$episode->getTitle(),'episode','episode/view?id='.$episode->getId()) ?>
+          <?php echo link_to_with_icon($episode->getCreatedAt('Y M d').
+            ' - '.$episode->getTitle(),'episode', $episode->getUri()) ?>
         </li>
       <?php endforeach; ?>
   <?php else: ?>
@@ -65,7 +66,7 @@
 <?php slot('feed');
 foreach($feeds as $feed) 
 {
-  echo auto_discovery_link_tag ('rss','feed/feed?id='.$feed->getId()); // make this use a slug todo
+  echo auto_discovery_link_tag ('rss','feed/feed?slug='.$feed->getSlug()); // make this use a slug todo
 }
 end_slot();
 ?>

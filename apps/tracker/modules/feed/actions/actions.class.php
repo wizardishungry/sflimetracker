@@ -15,17 +15,23 @@ class feedActions extends sfActions
 
     $link = '@homepage';
 
-    if($request->hasParameter('id'))
+    if($request->hasParameter('slug') && $request->hasParameter('podcast_slug'))
     {
-      $id=$request->getParameter('id');
-      $podcast_feed=FeedPeer::retrieveByPK($id);
+      $podcast=CommonBehavior::retrieveBySlug('PodcastPeer',$request->getParameter('podcast_slug'));
+
+      $c = new Criteria();
+      $c->add(EpisodePeer::PODCAST_ID,$podcast->getId());
+
+      $podcast_feed=CommonBehavior::retrieveBySlug('FeedPeer',$request->getParameter('slug'),$c);
+
       if(!$podcast_feed)
         $this->forward404();
-      $link='feed/view?id='.$id;
+
+      $link=$podcast->getUri();
     }
 
     $feed->initialize(array(
-        'title'       => $podcast_feed->getPodcast()->getTitle(),
+        'title'       => $podcast->getTitle(),
         'link'        => $link,
 //        'authorEmail' => 'herman@example.com',
 //        'authorName'  => 'T. Herman Zweibel'
@@ -65,10 +71,10 @@ class feedActions extends sfActions
     $this->forward404Unless($request->getMethod () == sfRequest::POST);   
     $id=$request->getParameter('id');
 
-    $torrent=TorrentPeer::retrieveByPK($id);
-    $this->forward404Unless($torrent); 
-    $this->getUser()->setFlash('notice','Deleted torrent '.$podcas->getFileName());
-    $torrent->delete();
-    $this->redirect('episode/view?id='.$torrent->getEpisodeId());
+    $feed=FeedPeer::retrieveByPK($id);
+    $this->forward404Unless($feed); 
+    $this->getUser()->setFlash('notice','Deleted feed '.$feed->getTitle());
+    $feed->delete();
+    $this->redirect($feed->getPodcast()->getUri());
   } 
 }

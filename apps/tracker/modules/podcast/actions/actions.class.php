@@ -24,7 +24,7 @@ class podcastActions extends sfActions
             $feed->save();
             $podcast->setDefaultFeed($feed);
             $podcast->save();
-            $this->redirect('podcast/view?id='.$podcast->getId());
+            $this->redirect($podcast->getUri());
         }
     }
   }
@@ -39,7 +39,7 @@ class podcastActions extends sfActions
         {
             $podcast=$this->form->save();
             $podcast->save();
-            $this->redirect('podcast/view?id='.$podcast->getId());
+            $this->redirect($podcast->getUri());
         }
     }
   }

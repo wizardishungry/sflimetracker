@@ -19,7 +19,7 @@ class episodeActions extends sfActions
         {
             $episode=$this->form->save();
             // redirect to default feed
-            $this->redirect('episode/view?id='.$episode->getId());
+            $this->redirect($episode->getUri());
         } 
         else
           return;
@@ -39,7 +39,7 @@ class episodeActions extends sfActions
         if($this->form->isValid())
         {
             $episode=$this->form->save();
-            $this->redirect('episode/view?id='.$episode->getId());
+            $this->redirect($episode->getUri());
         } 
         else
           return sfView::ERROR;
@@ -48,13 +48,17 @@ class episodeActions extends sfActions
 
   public function executeView($request)
   {
-    $id=$request->getParameter('id');
+    $slug=$request->getParameter('slug');
+    $podcast_slug=$request->getParameter('podcast_slug');
 
-    $this->episode=$episode=EpisodePeer::retrieveByPK($id);
+    $this->podcast=$podcast=CommonBehavior::retrieveBySlug('PodcastPeer',$podcast_slug);
+    $this->forward404Unless($podcast); 
+
+    $c = new Criteria();
+    $c->add(EpisodePeer::PODCAST_ID,$podcast->getId());
+    $this->episode=$episode=CommonBehavior::retrieveBySlug('EpisodePeer',$slug,$c);
     $this->forward404Unless($episode); 
 
-    $this->podcast=$podcast=$episode->getPodcast();
-    $this->forward404Unless($podcast); 
 
     $this->torrents=$torrents=$episode->getTorrentsJoinFeed();
     $this->feeds=$feeds=$podcast->getFeeds();
@@ -78,6 +82,6 @@ class episodeActions extends sfActions
     $this->forward404Unless($episode); 
     $this->getUser()->setFlash('notice','Deleted episode'.$episode->getTitle());
     $episode->delete();
-    $this->redirect('podcast/view?id='.$episode->getPodcastId());
+    $this->redirect($episode->getPodcast()->getUri());
   }
 }

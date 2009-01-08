@@ -3,12 +3,12 @@
   <?php foreach($podcasts as $podcast): ?>
     <h3>
       <?php echo
-        link_to($podcast->getTitle(),'podcast/view?slug='.$podcast->getSlug());
+        link_to($podcast->getTitle(),$podcast->getUri());
       ?>
     </h3>
     <ul>
       <li>
-        <?php $url= url_for('podcast/view?slug='.$podcast->getSlug(),true); ?>
+        <?php $url= url_for($podcast->getUri(),true); ?>
         <?php echo link_to_with_icon($url, "web", $url); ?>
       <?php if($sf_user->isAuthenticated()): ?>
         <div> &nbsp; 

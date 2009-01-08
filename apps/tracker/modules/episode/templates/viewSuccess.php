@@ -1,5 +1,5 @@
 <?php use_helper('ApacheConfig'); ?>
-<h2><?php echo 'Episode "', $episode->getTitle(),'" - ',link_to($podcast->getTitle(),'podcast/view?id='.$podcast->getId()) ?></h2>
+<h2><?php echo 'Episode "', $episode->getTitle(),'" - ',link_to($podcast->getTitle(),$podcast->getUri()) ?></h2>
 
 <?php if($sf_user->isAuthenticated()): ?>
 <form action="<?php echo url_for('episode/edit') ?>" method="POST" enctype="multipart/form-data">

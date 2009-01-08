@@ -32,7 +32,7 @@ class torrentActions extends sfActions
             $torrent->setEpisodeId($request->getParameter('episode_id'));
             $torrent->setFeedId($request->getParameter('feed_id'));
             $torrent->save();
-            $this->redirect('episode/view?id='.$request->getParameter('episode_id'));
+            $this->redirect($torrent->getEpisode()->getUri());
         } 
         else
           return sfView::ERROR;
@@ -51,6 +51,6 @@ class torrentActions extends sfActions
     $this->forward404Unless($torrent); 
     $this->getUser()->setFlash('notice','Deleted torrent '.$torrent->getFileName());
     $torrent->delete();
-    $this->redirect('episode/view?id='.$torrent->getEpisodeId());
+    $this->redirect($torrent->getEpisode()->getUri());
   }
 }
