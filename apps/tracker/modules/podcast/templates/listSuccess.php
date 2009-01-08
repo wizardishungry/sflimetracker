@@ -3,7 +3,7 @@
   <?php foreach($podcasts as $podcast): ?>
     <h3>
       <?php echo
-        link_to($podcast->getTitle(),'podcast/view?id='.$podcast->getId());
+        link_to($podcast->getTitle(),'podcast/view?slug='.$podcast->getSlug());
       ?>
     </h3>
     <ul>

@@ -46,8 +46,7 @@ class podcastActions extends sfActions
 
   public function executeView($request)
   {
-    $id=$request->getParameter('id');
-    $this->podcast=$podcast=PodcastPeer::retrieveByPK($id);
+    $this->podcast=$podcast=CommonBehavior::retrieveBySlug('PodcastPeer',$request->getParameter('slug'));
     $this->forward404Unless($this->podcast); 
     $this->form=new PodcastForm($podcast);
     $this->episodes=$this->podcast->getEpisodes();
