@@ -26,6 +26,11 @@ class Feed extends BaseFeed
       return $this->getTags();
     }
 
+    public function getUri()
+    {
+        return 'feed/feed?slug='.$this->getSlug().'&podcast_slug='.$this->getPodcast()->getSlug();
+    }
+
     public function setRssUrl($url,$validate=true)
     {
         $old_url=$this->getRssUrl();

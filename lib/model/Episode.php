@@ -14,6 +14,11 @@ class Episode extends BaseEpisode
     return $this->getTitle();
   }
 
+  public function getUri()
+  {
+    return 'episode/view?slug='.$this->getSlug().'&podcast_slug='.$this->getPodcast()->getSlug();
+  }
+
   public function delete($con = null)
   {
     $torrents=$this->getTorrents();

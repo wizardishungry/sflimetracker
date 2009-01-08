@@ -14,6 +14,11 @@ class Podcast extends BasePodcast
     return $this->getTitle();
   }
 
+  public function getUri()
+  {
+    return 'podcast/view?slug='.$this->getSlug();
+  }
+
   public function delete($con = null)
   {
     $episodes=$this->getEpisodes();
