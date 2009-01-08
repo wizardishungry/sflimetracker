@@ -7,9 +7,21 @@ default_symfony:
   url:   /symfony/:action/*
   param: { module: default }
 
-default_index:
-  url:   /:module
-  param: { action: index }
-
 default:
-  url:   /:module/:action/*
+  url:   /admin/:module/:action/*
+
+podcast:
+  url:   /:slug
+  param: { module: podcast, action: view }
+
+feed_default:
+  url:   /feed/:podcast_slug
+  param: { module: feed, action: feed, slug: default }
+
+feed:
+  url:   /feed/:podcast_slug/:slug
+  param: { module: feed, action: feed }
+
+episode:
+  url:   /:podcast_slug/:slug
+  param: { module: episode, action: view }

@@ -23,7 +23,7 @@
 <ul>
   <li>
   <?php
-    $url = url_for($sf_context->getRouting()->getCurrentInternalUri(), true);
+    $url = url_for($podcast->getUri(), true);
     echo link_to_with_icon($url, 'web', $url);
   ?> (All feeds)
     
