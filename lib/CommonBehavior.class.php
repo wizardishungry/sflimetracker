@@ -8,9 +8,9 @@
     */
 class CommonBehavior
 {
-    public static function retrieveBySlug($class,$slug)
+    public static function retrieveBySlug($class,$slug,$criteria=null)
     {
-        $c = new Criteria();
+        $c = is_null($criteria) ? new Criteria() : clone $criteria;
 
         // $class::FIELD is php 5.3.0+ only, let's hack around that
         $col_name=call_user_func(Array($class,'translateFieldname'),'slug', BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_COLNAME);
