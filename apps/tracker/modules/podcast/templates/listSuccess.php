@@ -8,7 +8,7 @@
     </h3>
     <ul>
       <li>
-        <?php $url= url_for('podcast/view?id='.$podcast->getId(),true); ?>
+        <?php $url= url_for('podcast/view?slug='.$podcast->getSlug(),true); ?>
         <?php echo link_to_with_icon($url, "web", $url); ?>
       <?php if($sf_user->isAuthenticated()): ?>
         <div> &nbsp; 
