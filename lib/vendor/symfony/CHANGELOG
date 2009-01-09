@@ -1,0 +1,171 @@
+Version 1.1.6
+-------------
+
+* fixed PHP could segfault when parsing large SQL queries in web debug toolbar
+* fixed PHP warning with symfony binary out of a project
+* fixed i18n wrong i18n directories management
+* fixed sfRequest::getUri() when using Microsoft IIS
+* fixed i18n:extract checks and saves to lib/symfony/plugins/sfPropelPlugin/i18n instead of the apps i18n folder
+* fixed i18n tasks doesn't generate valid XLIFF files
+
+Version 1.1.5
+-------------
+
+* sfValidatorAnd and sfValidatorOr validators are now required by default, which is the normal expected behavior
+* fixed a weird bug when using cache with layout in an environment with the web_debug setting turned on
+* decreased symfony response time when using the command line interface, especially under Microsoft® Windows™
+* fixed global cache never cleared
+* fixed symfony was using a wrong propel version by misusing the set_include_path function
+* fixed bug in sfNumberFormat when handling large numbers
+* the HTTP version used to send the response can now be configured
+
+Version 1.1.4
+-------------
+
+* fixed XSS vulnerability in error messages if they embed the value submitted by the user
+* fixed default charset encoding for validator to the one defined in settings.yml
+* fixed functional tests fail when compression is enabled (#4019)
+
+Version 1.1.3
+-------------
+
+* fixed locking problem with symfony `cache:clear` task (#4470)
+
+Version 1.1.2
+-------------
+
+* The symfony 1.1.1 broken cache-clear task has been fixed, and updated to work as expected in a muli-application project
+* The command line interface was broken on Microsoft® Windows™ when using arguments. This has been fixed
+* sfYaml now handles long numeric values correctly
+* A bug with autoloading and nested tasks has been fixed
+* Fixed the propel:data-load task doesn't behave correctly with composite primary key
+* The three events available in `sfBaseTask` (`command.filter_options`, `command.pre_command`, and `command.post_command`) are now usable
+* The `sfValidatorChoice` and `sfValidatorChoiceMany` validators now correctly validates if a given value is part of the available choices
+* The `sfForm::mergeForm()` method now also merges widget schema labels
+* It's now possible to set the "value" attribute of a checkbox by using a new `value_attribute_value` option available in `sfWidgetFormInputCheckbox`
+* The `sfValidatorPropelChoice` and `sfValidatorPropelChoiceMany` are now able to use a same Criteria to restrict choices without them being altered in certain circumstances
+* The application configuration class now automatically changes the charset used by widgets to the one set in the `settings.yml` configuration file
+* Now the `sfValidatorTime` validators accept the `00:00:00` time value
+* The `sfWidgetFormSelectRadio` is now able to deal with names that already has the empty square brackets (`[]`) at the end
+* The `sfValidatorNumber` as now increased float precision handling
+* The `sfWidgetFormDate` displays empty values for negative timestamps, so now we can use dates before 1970
+* The `sfValidatorSchemaFilter` now throws an error bound to the filtered field
+* `sfBrowser::setField()` can now deal with an array of fields containing a 0 index
+* `sfDomCssSelector` is now able to target attribute names containing "-" (dash) characters
+* `sfBrowser::restart()` now resets the session as expected
+* `sfBrowser` now sends checked checkboxes with the `value` attributes correctly
+* `sfYaml` now handles long numeric values correctly
+* Exceptions thrown by sfYaml now references the correct line number 
+* The default `propel.ini` file of the sandbox has been fixed. The sandbox is now fully working again without any tweak
+* The mysqli Creole driver is now handling the `0000-00-00` date correctly
+* The autoloading of Model classes autoload now handles ordering correctly
+* Propel tasks are no more broken when Phing is installed as an independent PEAR package
+
+Version 1.1.1
+-------------
+
+* The symfony available database based session storage backends are now able to handle session id regeneration
+* Some Propel related tasks failed with a "No connection params set for propel" error message because they didn't initialize the database manager. We've fixed this too.
+* The cache now works as expected for component
+* The sfYaml dumper can now dump ordered hashes
+* Plugin Model classes overriding now works in every case
+
+Version 1.1.0
+-------------
+
+* Fixed gpc_magic_qutes and array in cookie
+* Fixed convertUrlStringToParameters breaks urlencoded parameter
+* Fixed 404 page when raised by a non existant route
+* Fixed sfForm::toString() silence exceptions
+* Added sfSession::regenerate and added calls on authentication/credential change to protect against session fixation attacks
+* Fixed addSortCriteria case sensitive problem
+* Added the widget when calling the formatter for the sfWidgetDormSelectRadio widget
+* Added debug output from Phing when using -t
+* Fixed genurl() with relative_url_root parameter set
+* Fixed m2m propel data loading
+* Added a min and a max option for sfValidatorDate
+* Fixed PHPMailer issue with UTF-8 subject being wrapped in middle of utf-8 char
+* Fixed locking issues with the cache:clear, project:disable, project:enable, and log:rotate tasks
+* Fixed Propel behavior registration when using functional tests or built-in tasks
+* Added a retry mechanism to sfMessageSource_XLIFF->save() that will recreate incorrect xml files
+* Renamed sfForm::getFormField() to sfForm::getFormFieldSchema()
+* Fixed getColumnFilterTag() component type
+* Fixed identifier name length check for Propel Generator
+* Fixed CRUD templates when using the --with-show option 
+* Fixed generated admin returning to first page regardless on which page the edit was started
+* Fixed I18N timestamp handling
+* Added generation of a .zip file when creating a sandbox
+* Added sfValidatorTime
+* sfWebRequest->isSecure now recognizes HTTP_SSL_HTTPS
+* Fixed issue with incorrect calculation of uri prefix
+* Fixed i18n XLIFF do not handle entities correctly
+* Fixed sfMemcacheCache ignores multi-memcache-server configuration and defaults to localhost
+* Fixed symfony 1.1 task argument value of 0
+* Fixed error reporting value for the test environment and added a migration task
+* Re-added getCurrentRouteName to sfPatternRouting class
+* Fixed autoload paths on windows
+* Added extension depedencies to pear package
+* Disabled the autoloadAgain feature
+* Removed noXSD attribute from Propel
+* Fixed I18N-Bug in form_error() helper
+* Fixed custom schema for plugins are not found in Win32 environments
+* Added a throw_global_error to sfPropelValidatorUnique
+* Fixed session database storage classes
+* Fixed sfValidatorDate
+* Fixed propel:build-forms when using behaviors
+
+Version 1.1.0 RC2
+------------------
+
+* Added the ability to merge forms
+* Secured non-production controllers by default by inserting an IP check for 127.0.0.1 into those controllers.
+* Refactored renderPartial() and renderComponent() in sfAction (code has been splitted to create a getPartial() and a getComponent() method)
+* Fixed sfForm cannot handle sfValidatorFile in embed form
+* Fixed internal URI when a route has some default parameters not present in the pattern
+* Fixed cloning unbound sfForm triggers unnecessary validation
+* Fixed I18n forms saving twice the i18n objects, once with empty default objects and once with bound objects
+* Fixed sfWidgetFormSchema rendering when there are only hidden fields
+* Fixed yml validator file can be overriden by a remote attacker
+* Propel schema inheritance is now supported by Yaml schema syntax
+* Syck extension support has been removed
+* Better phpdoc for the whole code
+
+Version 1.1.0 RC1
+------------------
+
+* The `sfValidatorPropelChoice` validator doesn't use the ''PHP name'' format anymore to reference table columns, but directly the column name, to be coherent with the way everything else works. Also, the `sfValidatorPropelUnique` validator has been added and is now used by the `propel:build-forms` task.
+* Also regarding the forms framework, the possibility has been added to pass HTML attributes for each field when rendering a form or a widget schema, to ease forms templating and output customization. 
+* The `plugin:install` task now checks the license of the plugin. If the plugin is not licensed under a LGPL, MIT, BSD, Apache, or PHP license, the task won't install it except if you pass a `--force-license` option.
+* Support has been added to the schema YAML format for Propel 1.2 inheritance.
+* Paths were incorrect when uploading a file. This has been fixed.
+* Tests has been updated to ensure they work under both case-sensitive and unsensitive filesystems.
+* Fabian Lange has provided a huge work to ensure the fillin filter works as expected in any case.
+* The autoloading performance problem which was occuring in dev environment in certain very rare circumstances has been fixed
+
+Version 1.1.0 beta4
+-------------------
+
+* The new forms framework now handles field names based on Propel phpName since r8508. You'll need to regenerate your base forms using the `symfony propel:build-forms` command after having upgraded your project
+* You can now define an i18n translations catalogue for each of your forms
+* Components are now rendered correctly (beta3 broked them)
+* File upload used with a Propel form now works as expected
+* You can now generate task classes using the `generate:task` command
+* The checkbox widget now works correctly when the checkbox value is 0
+
+Version 1.1.0 beta3
+-------------------
+
+* r8414: made admin generator work even if sf_compat is off (closes #3286)
+* r8415: fixed Propel vendor dir inclusion
+* r8410: fixed broken alias support in YAML parser
+* r8408: i18n for forms framework
+
+Version 1.1.0 alpha
+-------------------
+
+WARNING: See the UPGRADE file for more information about upgrading your projects from 1.0 to 1.1
+
+* r3742: added sfAction::renderPartial() method
+* All bug fixes from 1.0.0 -> 1.0.X
+* r5707: web responses now served as HTTP 1.1, not 1.0.
+

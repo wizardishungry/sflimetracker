@@ -1,0 +1,3 @@
+[submodule "lib/vendor/lime"]
+	path = lib/vendor/lime
+	url = git://github.com/WIZARDISHUNGRY/lime_test.git
