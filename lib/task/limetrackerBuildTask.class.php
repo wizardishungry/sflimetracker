@@ -49,13 +49,18 @@ EOF;
       $tasks[]=Array(new limetrackerZipTask($this->dispatcher, $this->formatter),
         Array('file'=>$arguments['file']) , Array('verbose'=>@$options['verbose']) );
       $tasks[]=Array(new limetrackerMetaTask($this->dispatcher, $this->formatter),
-        Array('version'=>null), Array('verbose'=>@$options['verbose']) );
+        Array('version'=>null), Array('verbose'=>@$options['verbose']) ); // restores the version
     }
     foreach($tasks as $list)
     {
       list($task,$args,$opts)=$list;
       $task->setCommandApplication($this->commandApplication);
       $task->run($args,$opts);
+    }
+
+    if(@$arguments['file'])
+    {
+      $this->log("Development VERSION information restored.");
     }
   }
 
