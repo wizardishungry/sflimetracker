@@ -31,8 +31,47 @@ EOF;
     $this->verbose=$options['verbose'];
 
     $this->log("Saving zip to $this->path, please wait…",true);
-    if($this->zip->open($this->path,ZipArchive::OVERWRITE)!==TRUE)
-      throw new sfException("Can't make a zip");
+
+    if(file_exists($this->path))
+        throw new sfException("Zip exists. Won't overwrite.");
+
+    $code=$this->zip->open($this->path,ZipArchive::CREATE); // this was having trouble accepting and &-ed mask
+    if($code!==TRUE)
+    {
+        switch($code)
+        {
+            case ZIPARCHIVE::ER_EXISTS:
+            $e="exists"; // should never happen since Overwrite is set
+            break;
+            case ZIPARCHIVE::ER_INCONS:
+            $e="incos";
+            break;
+            case ZIPARCHIVE::ER_INVAL:
+            $e="inval";
+            break;
+            case ZIPARCHIVE::ER_MEMORY:
+            $e="mem";
+            break;
+            case ZIPARCHIVE::ER_NOENT:
+            $e="noent";
+            break;
+            case ZIPARCHIVE::ER_NOZIP:
+            $e="nozip";
+            break;
+            case ZIPARCHIVE::ER_OPEN:
+            $e="open";
+            break;
+            case ZIPARCHIVE::ER_READ:
+            $e="read";
+            break;
+            case ZIPARCHIVE::ER_SEEK:
+            $e="seek";
+            break;
+            default:
+            $e="unknown";
+        }
+      throw new sfException("Can't make a zip -- $code $e");
+    }
     $this->root=realpath(dirname(__FILE__).'/../..');
     $this->generateExcludes($this->root);
     $this->processFiles($this->root);
