@@ -40,29 +40,31 @@ class torrentActions extends sfActions
     {
         return sfView::ERROR;
     }
+
     // is this an upload
     $files=$request->getFiles();
     if(isset($files['file']))
-        return $this->doUpload($request);
+        $file=$files['file'];
 
     if($request->hasParameter('web_url'))
-        return $this->doAddByUrl($request);
+    {
+        if(isset($file)&& $file['size']>0)
+            throw new sfException("Either add by file or by upload not both.");
+        $file=new sfValidatedFileFromUrl($request->getParameter('web_url'));
+    }
 
-    throw new sfException('Form valdation passed but somehow we do not have anything to do with it');
-  }
-
-  protected function doAddByUrl($request)
-  {
-    throw new sfException('NOT IMPLEMENTED');
-  }
-
-  protected function doUpload($request)
-  {
-    $torrent=new Torrent($this->form->getValue('file'));
+    $torrent=new Torrent($file);
     $torrent->setEpisodeId($request->getParameter('episode_id'));
     $torrent->setFeedId($request->getParameter('feed_id'));
     $torrent->save();
     $this->redirect($torrent->getEpisode()->getUri());
+
+    throw new sfException('Form valdation passed but somehow we do not have anything to do with it');
+  }
+
+  protected function doUpload($request)
+  {
+
   }
 
   public function executeDelete($request)
