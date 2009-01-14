@@ -19,31 +19,50 @@ class torrentActions extends sfActions
   {
   }
 
-  public function executeUpload($request)
+  public function executeAdd($request)
   {
     $this->form=new TorrentForm();
-    if ($request->isMethod('post'))
+
+    // setup defaults
+    $this->form->setDefaults(Array(
+        'episode_id'=>$request->getParameter('episode_id'),
+        'feed_id'=>$request->getParameter('feed_id')
+    ),Array());
+
+    if(!$request->isMethod('post'))
     {
-        $params=$request->getPostParameters();
-        $files=$request->getFiles();
-        if(isset($files['file']))
-          $params['file']=$files['file'];
-        $this->form->bind($request->getPostParameters(),$request->getFiles());
-        if ( $this->form->isValid())
-        {
-            $torrent=new Torrent($this->form->getValue('file'));
-            $torrent->setEpisodeId($request->getParameter('episode_id'));
-            $torrent->setFeedId($request->getParameter('feed_id'));
-            $torrent->save();
-            $this->redirect($torrent->getEpisode()->getUri());
-        } 
-        else
-          return sfView::ERROR;
+        // Should be a POST;
+        return;
     }
-      $this->form->setDefaults(Array(
-            'episode_id'=>$request->getParameter('episode_id'),
-            'feed_id'=>$request->getParameter('feed_id')
-      ),Array());
+
+    $this->form->bind($request->getPostParameters(),$request->getFiles());
+    if(!$this->form->isValid())
+    {
+        return sfView::ERROR;
+    }
+    // is this an upload
+    $files=$request->getFiles();
+    if(isset($files['file']))
+        return $this->doUpload($request);
+
+    if($request->hasParameter('web_url'))
+        return $this->doAddByUrl($request);
+
+    throw new sfException('Form valdation passed but somehow we do not have anything to do with it');
+  }
+
+  protected function doAddByUrl($request)
+  {
+    throw new sfException('NOT IMPLEMENTED');
+  }
+
+  protected function doUpload($request)
+  {
+    $torrent=new Torrent($this->form->getValue('file'));
+    $torrent->setEpisodeId($request->getParameter('episode_id'));
+    $torrent->setFeedId($request->getParameter('feed_id'));
+    $torrent->save();
+    $this->redirect($torrent->getEpisode()->getUri());
   }
 
   public function executeDelete($request)

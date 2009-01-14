@@ -15,7 +15,6 @@ class TorrentForm extends BaseTorrentForm
         'episode_id' => new sfWidgetFormInputHidden(),
         'feed_id' => new sfWidgetFormInputHidden(),
         'web_url'=> new sfWidgetFormInput(),
-        'server_path' => new sfWidgetFormInput(),
         'file'=> new sfWidgetFormInputFile(),
     ));
 
@@ -24,10 +23,9 @@ class TorrentForm extends BaseTorrentForm
         'episode_id' => new sfValidatorInteger(array('required' => true)),
         'feed_id' => new sfValidatorInteger(array('required' => true)),
 
-        // three oprions
+        // two oprions
         'web_url' => new sfValidatorUrl(Array('required' => false)),
         'file' => new sfValidatorFile(Array('required' => false)),
-        'server_path' => new sfValidatorString(Array('required' => false)),
     ));
 
     $options=Array('required' => false);
@@ -37,7 +35,6 @@ class TorrentForm extends BaseTorrentForm
       new sfValidatorOr(array(
         new sfValidatorSchemaFilter('web_url', new sfValidatorUrl($options,$messages)),
         new sfValidatorSchemaFilter('file', new sfValidatorFile($options,$messages)),
-        new sfValidatorSchemaFilter('server_path', new sfValidatorString($options,$messages)),
       )
     ));
     
