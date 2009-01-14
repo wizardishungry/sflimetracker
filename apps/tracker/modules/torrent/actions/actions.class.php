@@ -7,15 +7,18 @@
  */
 class torrentActions extends sfActions
 {
+
   public function executeReap($request)
   {
     $id=$request->getParameter('id');
     $torrent=TorrentPeer::retrieveByPK($id);
     $torrent->reap(3);
   }
+
   public function executeDetails($request)
   {
   }
+
   public function executeUpload($request)
   {
     $this->form=new TorrentForm();
@@ -42,6 +45,7 @@ class torrentActions extends sfActions
             'feed_id'=>$request->getParameter('feed_id')
       ),Array());
   }
+
   public function executeDelete($request)
   {
     $this->forward404Unless($request->getMethod () == sfRequest::POST); 
