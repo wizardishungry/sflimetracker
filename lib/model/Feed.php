@@ -40,7 +40,7 @@ class Feed extends BaseFeed
         $formats=Array('web','magnet','torrent'); // todo constantify
         $ret=Array();
         foreach($formats as $format)
-            $ret[]=$this->getUri($format);
+            $ret[$format]=$this->getUri($format);
         return $ret;
     }
 
