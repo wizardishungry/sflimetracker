@@ -41,14 +41,12 @@ class torrentActions extends sfActions
         return sfView::ERROR;
     }
 
-    // is this an upload
-    $files=$request->getFiles();
-    if(isset($files['file']))
-        $file=$files['file'];
+    // is there an upload
+    $file=$this->form->getValue('file');
 
-    if($request->hasParameter('web_url'))
+    if($request->getParameter('web_url')!='') // it is blank but exists
     {
-        if(isset($file)&& $file['size']>0)
+        if($file)
             throw new sfException("Either add by file or by upload not both.");
         $file=new sfValidatedFileFromUrl($request->getParameter('web_url'));
     }
