@@ -28,10 +28,10 @@
   ?> (All feeds)
     
   </li>
-  <?php foreach($feeds as $feed): ?>
+  <?php foreach($feeds as $feed) foreach($feed->getUris() as $uri): ?>
     <li>
       <?php 
-        $url = url_for($feed->getUri(),true); // make this use a slug todo
+        $url = url_for($uri,true);
         echo link_to_with_icon($url, 'rss', $url);
       ?>
     </li>
@@ -64,9 +64,9 @@
   ?>
 </ul>
 <?php slot('feed');
-foreach($feeds as $feed) 
+foreach($feeds as $feed)  foreach($feed->getUris() as $uri) 
 {
-  echo auto_discovery_link_tag ('rss','feed/feed?slug='.$feed->getSlug()); // make this use a slug todo
+  echo auto_discovery_link_tag ('rss',$uri);
 }
 end_slot();
 ?>

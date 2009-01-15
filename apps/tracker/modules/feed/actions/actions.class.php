@@ -30,9 +30,13 @@ class feedActions extends sfActions
       $link=$podcast->getUri();
     }
 
+    $format=$request->getParameter('format'); // not "content format" but "delivery method enclosure format"
+
     $feed->initialize(array(
-        'title'       => $podcast->getTitle(),
-        'link'        => $link,
+        'title'       => $podcast->getTitle().
+            ($podcast_feed->getTags()=='default'?'':'['.$podcast_feed->getTags().']').
+            ($format=='web'?'':" - via $format"),
+            'link'        => $link,
 //        'authorEmail' => 'herman@example.com',
 //        'authorName'  => 'T. Herman Zweibel'
     ));
@@ -41,10 +45,14 @@ class feedActions extends sfActions
     $pager->init();
 
 
-    $torrent_items = sfFeedPeer::convertObjectsToItems($pager->getResults(),Array(
-        
-        
-    ));
+    $result_set=$pager->getResults();
+
+    foreach($result_set as $torrent)
+    {
+        $torrent->setFeedEnclosure($format);
+    }
+
+    $torrent_items = sfFeedPeer::convertObjectsToItems($result_set);
     $feed->addItems($torrent_items);
 
     $this->feed = $feed;
@@ -54,6 +62,7 @@ class feedActions extends sfActions
   protected function getPager($request)
   {
     $pager = new sfPropelPager('Torrent', 20);
+    $pager->setPeerMethod('doSelectJoinAll');
     $c = new Criteria();
     $c->addAscendingOrderByColumn(TorrentPeer::UPDATED_AT);
     $c->addAscendingOrderByColumn(TorrentPeer::CREATED_AT);

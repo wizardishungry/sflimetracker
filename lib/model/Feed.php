@@ -26,11 +26,22 @@ class Feed extends BaseFeed
       return $this->getTags();
     }
 
-    public function getUri()
+    public function getUri($format='web')
     {
-        return '@feed' .
-            ($this->getSlug()=='default' ? '_default' : '')
-            . '?slug='.$this->getSlug().'&podcast_slug='.$this->getPodcast()->getSlug();
+    return '@feed' . 
+    ($this->getSlug()=='default' ? '_default' : '')
+    . '?slug='.$this->getSlug().'&podcast_slug='.$this->getPodcast()->getSlug()
+    . "&format=$format";
+
+    }
+
+    public function getUris()
+    {
+        $formats=Array('web','magnet','torrent'); // todo constantify
+        $ret=Array();
+        foreach($formats as $format)
+            $ret[]=$this->getUri($format);
+        return $ret;
     }
 
     public function setRssUrl($url,$validate=true)

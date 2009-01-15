@@ -67,8 +67,14 @@ class Torrent extends BaseTorrent
         }
     }
 
-    public function getUrl($torrent=true)
+    public function getUrl($torrent=true) // for convenience for now, fixme
     {
+        return $this->getUri($torrent);
+    }
+    public function getUri($torrent=true)
+    {
+        if(isset($this->enclosure))
+            return $this->enclosure->getUrl();
         return _compute_public_path($this->getFileName().($torrent?'.torrent':''),'uploads','',true);
     }
 
@@ -83,15 +89,53 @@ class Torrent extends BaseTorrent
 
     public function getFeedEnclosure()
     {
-      $e=new sfFeedEnclosure();
-      return $e->initialize(Array(
-            'url'=>$this->getUrl(),
-            'length'=>filesize($this->getTorrentPath()),
-            'mimeType'=>'application/x-bittorrent',
-        ));
+      if(!isset($this->enclosure))
+        return $this->setFeedEnclosure();
+      else
+        return $this->enclosure;
     }
 
-    public function getGuid()
+
+
+    public function setFeedEnclosure($enclosure=null)
+    {
+        if($enclosure instanceof FeedEnclosure)
+        {
+            $this->enclosure=$enclosure;
+            return $enclosure;
+        }
+
+        $type=($enclosure==null?'web':$enclosure);
+
+        $params=Array();
+
+        switch($type)
+        {
+            case 'web':
+                $params['url']=$this->getUri(false);
+                $params['length']=$this->getFileSize();
+                $params['mimeType']=$this->getMimeType();
+                break;
+            case 'magnet':
+                $params['url']=$this->getMagnet();
+                $params['length']=$this->getFileSize();
+                $params['mimeType']=$this->getMimeType();
+                break;
+            case 'torrent':
+                $params['url']=$this->getUri(true);
+                $params['length']=filesize($this->getTorrentPath());
+                $params['mimeType']='application/x-bittorrent';
+                break;
+            default:
+                throw new sfException("Unsupported enclosure type $type");
+        }
+
+        $this->enclosure =new sfFeedEnclosure();
+        return $this->enclosure->initialize($params);
+
+    }
+
+    public function getGuid() //fixme this isn't migration to real feed guid
     {
         $components = Array();
         if($podcast=$this->getPodcast())
@@ -175,5 +219,10 @@ class Torrent extends BaseTorrent
         // todo remote files need to have this information cached
         // NB: this will look negative if >= 2**31 use sprintf 
         return filesize($this->getOriginalFilePath());
+    }
+
+    public function getTitle() // convenience method for sfFeed2Plugin
+    {
+        return $this->getEpisode()->getTitle();
     }
 }
