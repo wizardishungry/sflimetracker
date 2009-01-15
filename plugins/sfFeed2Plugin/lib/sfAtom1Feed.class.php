@@ -93,16 +93,16 @@ class sfAtom1Feed extends sfFeed
         $categories[] = (string) $category['term'];
       }
       $url = (string) $itemXml->link['href'];
-      $pubdate = strtotime(str_replace(array('UT', 'Z'), '', (string) $itemXml->published));
+      $pubdate = strtotime((string) $itemXml->published);
       if(!$pubdate)
       {
         if((string) $itemXml->updated)
         {
-          $pubdate = strtotime(str_replace(array('UT', 'Z'), '', (string) $itemXml->updated));
+          $pubdate = strtotime((string) $itemXml->updated);
         }
         else if((string) $itemXml->modified)
         {
-          $pubdate = strtotime(str_replace(array('UT', 'Z'), '', (string) $itemXml->modified));
+          $pubdate = strtotime((string) $itemXml->modified);
         }
         else if(preg_match('/\d{4}\/\d{2}\/\d{2}/', $url, $matches))
         {
