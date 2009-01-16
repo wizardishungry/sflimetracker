@@ -1,9 +1,18 @@
+[submodule "lib/vendor/symfony"]
+	path = lib/vendor/symfony
+	url = git://github.com/WIZARDISHUNGRY/symfony.git
+[submodule "lib/vendor/symfony/lib/vendor/lime"]
+	path = lib/vendor/symfony/lib/vendor/lime
+	url = git://github.com/WIZARDISHUNGRY/lime_test.git
 [submodule "plugins/File_Bittorrent2"]
 	path = plugins/File_Bittorrent2
 # public 
 	url = git://github.com/WIZARDISHUNGRY/file_bittorrent2.git
 # private
 #	url = git@github.com:WIZARDISHUNGRY/file_bittorrent2.git
-[submodule "lib/vendor/symfony"]
-	path = lib/vendor/symfony
-	url = git://github.com/WIZARDISHUNGRY/symfony.git
+[submodule "plugins/sfPropelActAsSluggableBehaviorPlugin"]
+    path = plugins/sfPropelActAsSluggableBehaviorPlugin
+# public 
+	url = git://github.com/WIZARDISHUNGRY/sfpropelactassluggablebehaviorplugin.git
+# private
+#	url = git@github.com:WIZARDISHUNGRY/sfpropelactassluggablebehaviorplugin.git
