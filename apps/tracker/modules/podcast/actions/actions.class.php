@@ -49,6 +49,12 @@ class podcastActions extends sfActions
     $this->podcast=$podcast=CommonBehavior::retrieveBySlug('PodcastPeer',$request->getParameter('slug'));
     $this->forward404Unless($this->podcast); 
     $this->form=new PodcastForm($podcast);
+
+    $this->podcast_feed_form=new FeedForm();
+    $this->podcast_feed_form->setDefaults(Array(
+        'podcast_id'=>$podcast->getId(),
+    ),Array());
+
     $this->episodes=$this->podcast->getEpisodes();
     $this->feeds=$this->podcast->getFeeds();
   }

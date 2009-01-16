@@ -41,6 +41,27 @@
   <p><i>No feeds yet.</i></p>
 <?php endif; ?>
 
+
+<?php if($sf_user->isAuthenticated()): ?>
+    <h3>Add a new format for feeds</h3>
+
+    <p>These feeds generally correspond to a media format like "mp3 high quality".</p>
+    <form action="<?php echo url_for('podcast_feed/add') ?>" method="POST">
+        <table>
+        <?php echo $podcast_feed_form; ?>
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+            <input type="submit" value="Add"/>
+            </td>
+            <td>
+
+            </td>
+        </tr>
+        </table>
+    </form>
+<?php endif; ?>
+
 <h2>Episodes</h2>
 <ul>
   <?php if($episodes): ?>
