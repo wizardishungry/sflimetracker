@@ -32,4 +32,4 @@ class Episode extends BaseEpisode
 $columns_map = array('from'   => EpisodePeer::TITLE,
                        'to'     => EpisodePeer::SLUG);
  
-sfPropelBehavior::add('Episode', array('sfPropelActAsSluggableBehavior' => array('columns' => $columns_map, 'separator' => '_', 'permanent' => true)));
+sfPropelBehavior::add('Episode', array('sfPropelActAsSluggableBehavior' => array('scope' => Array(EpisodePeer::PODCAST_ID), 'columns' => $columns_map, 'separator' => '_', 'permanent' => true)));

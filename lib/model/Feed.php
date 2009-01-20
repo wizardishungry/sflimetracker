@@ -235,5 +235,5 @@ class Feed extends BaseFeed
 }
 $columns_map = array('from'   => FeedPeer::TAGS,
                        'to'     => FeedPeer::SLUG);
- 
-sfPropelBehavior::add('Feed', array('sfPropelActAsSluggableBehavior' => array('columns' => $columns_map, 'separator' => '_', 'permanent' => true)));
+
+sfPropelBehavior::add('Feed', array('sfPropelActAsSluggableBehavior' => array('scope' => Array(FeedPeer::PODCAST_ID), 'columns' => $columns_map, 'separator' => '_', 'permanent' => true)));
