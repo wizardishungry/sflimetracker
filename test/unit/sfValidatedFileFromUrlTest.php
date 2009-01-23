@@ -3,7 +3,7 @@
 include(dirname(__FILE__).'/../bootstrap/unit.php');
 
 
-$t = new lime_test(3, new lime_output_color());
+$t = new lime_test(4, new lime_output_color());
 
 $web_fixtures=file_exists("$sf_root_dir/web/fixtures");
 if($web_fixtures)
@@ -31,9 +31,18 @@ $t->diag("Fixture url is $url");
 $t->isa_ok($file=new sfValidatedFileFromUrl($url),'sfValidatedFileFromUrl','new sfValidatedFileFromUrl()');
 $t->is(file_get_contents($file->getTempName()), file_get_contents($url), 'Fixture content is equal' );
 if(!$web_fixtures)
-  $t->skip(1,"Skipping tests that need web fixtures");
+  $t->skip(2,"Skipping tests that need web fixtures");
 else
 {
   $t->diag("Beginning tests that need local web fixtures");
   $t->like($file->getType(),'#xml#','mime type correctly shown as being xml');
+
+  try {
+    $missing = new sfValidatedFileFromUrl($url.'ASTRINGTOMAKETHIS404');
+    $t->fail("Fetching a missing file didn't throw an exception");
+  }
+  catch(Exception $e)
+  {
+    $t->pass("Fetching a missing file threw an exception; that's what we expected");
+  }
 }
