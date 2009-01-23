@@ -10,6 +10,11 @@ class disconnectedCurl
         CURLOPT_BINARYTRANSFER=>true,
         CURLOPT_FILETIME=>true,
         CURLOPT_FOLLOWLOCATION=>true,
+        CURLOPT_MAXREDIRS=>20,
+        CURLOPT_NOSIGNAL=>true,
+        CURLOPT_CONNECTTIMEOUT=>60,
+        CURLOPT_LOW_SPEED_LIMIT=>1024,
+        CURLOPT_LOW_SPEED_TIME=>300,
         CURLOPT_HEADER=>false,
         CURLOPT_RETURNTRANSFER=>false,
     );
@@ -29,7 +34,7 @@ class disconnectedCurl
         $this->temp_name=$this->generateTempName();
         $this->temp_name_h=$this->generateTempName();
 
-        $options=array_merge($this->curl_options,$options);
+        $options=$this->curl_options + $options;
 
         $this->fp=fopen($this->temp_name,'w');
         if(!$this->fp) throw new sfException('Tempfile not writeable');
