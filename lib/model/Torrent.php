@@ -39,7 +39,7 @@ class Torrent extends BaseTorrent
         $fi->close();*/
         //$mime_type=mime_content_type($file->getSavedName());
         $mime_content_type='text/plain'; // just to have something fixme
-        $this->setMimeType($mime_type);
+        $this->setMimeType($file->getType());
         
 
         $MakeTorrent = new File_Bittorrent2_MakeTorrent($file->getSavedName());

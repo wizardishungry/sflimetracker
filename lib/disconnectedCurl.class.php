@@ -92,7 +92,7 @@ class disconnectedCurl
         {
             if($line!='')
             {
-                list($k,$v)=explode(':',$line,2);
+                list($k,$v)=explode(': ',$line,2);
                 $this->headers[$k]=$v;
             }
         }

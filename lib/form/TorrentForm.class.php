@@ -29,7 +29,7 @@ class TorrentForm extends BaseTorrentForm
     ));
 
     $options=Array('required' => false);
-    $messages=Array('required'=>'You must pick at least a file, a url, or a server path');
+    $messages=Array('required'=>'You must pick at least a file or a url');
 
     $this->validatorSchema->setPostValidator(
       new sfValidatorOr(array(

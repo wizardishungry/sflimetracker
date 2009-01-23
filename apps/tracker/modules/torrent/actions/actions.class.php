@@ -51,7 +51,7 @@ class torrentActions extends sfActions
         $file=new sfValidatedFileFromUrl($request->getParameter('web_url'));
     }
 
-    $torrent=new Torrent($file);
+    $torrent=new Torrent($file); // we should try using the sfForm object we used earlier todo
     $torrent->setEpisodeId($request->getParameter('episode_id'));
     $torrent->setFeedId($request->getParameter('feed_id'));
     $torrent->save();
