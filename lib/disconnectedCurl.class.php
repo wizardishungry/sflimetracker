@@ -26,6 +26,7 @@ class disconnectedCurl
     protected $fp;
     protected $temp_name_h;
     protected $fp_h;
+    protected $headers=null;
 
     function __construct($url,$options=array())
     {
@@ -41,7 +42,7 @@ class disconnectedCurl
         if(!$this->fp) throw new sfException('Tempfile not writeable');
         $options[CURLOPT_FILE]=$this->fp;
 
-        $this->fp_h=fopen($this->temp_name_h,'w');
+        $this->fp_h=fopen($this->temp_name_h,'w+');
         if(!$this->fp_h) throw new sfException('Tempfile not writeable');
         $options[CURLOPT_WRITEHEADER]=$this->fp_h;
 
@@ -78,6 +79,20 @@ class disconnectedCurl
         if($lambda)
             $ret =  call_user_func($lambda,$this);
 
+
+        rewind($this->fp_h);
+        $lines = explode("\r\n",stream_get_contents($this->fp_h));
+        array_shift($lines); // get rid of http status code line
+        $this->headers=Array();
+        foreach($lines as $line)
+        {
+            if($line!='')
+            {
+                list($k,$v)=explode(':',$line,2);
+                $this->headers[$k]=$v;
+            }
+        }
+
         curl_multi_remove_handle($this->mh, $this->ch);
         curl_multi_close($this->mh);
         fclose($this->fp);
@@ -98,5 +113,14 @@ class disconnectedCurl
         unlink($this->temp_name);
       if(file_exists($this->temp_name_h))
         unlink($this->temp_name_h);
+    }
+
+    function getHeaders()
+    {
+        return $this->headers;
+    }
+    function getHeader($name)
+    {
+        return @$this->headers[$name];
     }
 }
