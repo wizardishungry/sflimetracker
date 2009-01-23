@@ -55,7 +55,7 @@ class disconnectedCurl
 
     protected function generateTempName()
     {
-        return tempnam(sys_get_temp_dir(),sfConfig::get('app_version_name')); // todo do we need to remove sflimetrackerism?
+        return tempnam(sys_get_temp_dir(),'dcurl');
     }
 
     public function isRunning()
