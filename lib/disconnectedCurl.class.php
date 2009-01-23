@@ -27,6 +27,8 @@ class disconnectedCurl
     protected $temp_name_h;
     protected $fp_h;
     protected $headers=null;
+    protected $info;
+    protected $status_line;
 
     function __construct($url,$options=array())
     {
@@ -74,7 +76,9 @@ class disconnectedCurl
             if($lambda)
                 call_user_func($lambda,$this);
         } while($this->running>0);
-        
+       
+        $this->info=curl_getinfo($this->ch);
+
         
         if($lambda)
             $ret =  call_user_func($lambda,$this);
@@ -82,7 +86,7 @@ class disconnectedCurl
 
         rewind($this->fp_h);
         $lines = explode("\r\n",stream_get_contents($this->fp_h));
-        array_shift($lines); // get rid of http status code line
+        $this->status_line=array_shift($lines); // get rid of http status code line
         $this->headers=Array();
         foreach($lines as $line)
         {
@@ -97,6 +101,9 @@ class disconnectedCurl
         curl_multi_close($this->mh);
         fclose($this->fp);
         fclose($this->fp_h);
+
+        if($this->info['http_code']!=200)
+            throw new Exception("Curl status code not 200; line follows:\n".$this->status_line);
 
         return $ret;
     }

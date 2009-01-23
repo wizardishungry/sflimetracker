@@ -22,8 +22,14 @@ class sfValidatedFileFromUrl extends sfValidatedFile
 
     $b = new disconnectedCurl($url,$options);
     // probably want to have a way to gather statistics here
-    $b->run(null);
+    try {
+        $b->run(null);
     // we should HEAD this first
+    }
+    catch(Exception $e)
+    {
+        throw sfException::createFromException($e);
+    }
     
     if($b->isRunning()) throw new sfException('still running');
 
