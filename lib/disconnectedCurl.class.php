@@ -11,28 +11,45 @@ class disconnectedCurl
         CURLOPT_FILETIME=>true,
         CURLOPT_FOLLOWLOCATION=>true,
         CURLOPT_HEADER=>false,
+        CURLOPT_RETURNTRANSFER=>false,
     );
 
     protected $running=null;
     protected $ch=null;
     protected $mh=null;
     protected $temp_name;
+    protected $fp;
+    protected $temp_name_h;
+    protected $fp_h;
 
     function __construct($url,$options=array())
     {
         $ch=curl_init($url);
 
-        $this->temp_name=tempnam(sys_get_temp_dir(),sfConfig::get('app_version_name')); // todo do we need to remove symfonyism?
+        $this->temp_name=$this->generateTempName();
+        $this->temp_name_h=$this->generateTempName();
 
         $options=array_merge($this->curl_options,$options);
-        $options[CURLOPT_FILE]=$this->temp_name;
+
+        $this->fp=fopen($this->temp_name,'w');
+        if(!$this->fp) throw new sfException('Tempfile not writeable');
+        $options[CURLOPT_FILE]=$this->fp;
+
+        $this->fp_h=fopen($this->temp_name_h,'w');
+        if(!$this->fp_h) throw new sfException('Tempfile not writeable');
+        $options[CURLOPT_WRITEHEADER]=$this->fp_h;
 
         curl_setopt_array($ch,$options);
 
         $mh=curl_multi_init();
-        curl_multi_add_handle($ch);
+        curl_multi_add_handle($mh,$ch);
         $this->ch=$ch;
         $this->mh=$mh;
+    }
+
+    protected function generateTempName()
+    {
+        return tempnam(sys_get_temp_dir(),sfConfig::get('app_version_name')); // todo do we need to remove sflimetrackerism?
     }
 
     public function isRunning()
@@ -43,14 +60,23 @@ class disconnectedCurl
     public function run($lambda)
     {
         do {
-            curl_multi_exec($this->mh,$this->running);
+            $ret = curl_multi_exec($this->mh,$this->running);
+            $e=curl_error($this->ch);
+            if($e)
+                throw new sfException("ERROR $e\n");
             if($lambda)
                 call_user_func($lambda,$this);
         } while($this->running>0);
         
-        $ret =  call_user_func($lambda,$this);
+        
+        if($lambda)
+            $ret =  call_user_func($lambda,$this);
+
         curl_multi_remove_handle($this->mh, $this->ch);
         curl_multi_close($this->mh);
+        fclose($this->fp);
+        fclose($this->fp_h);
+
         return $ret;
     }
 
