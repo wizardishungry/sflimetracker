@@ -10,12 +10,6 @@ class disconnectedCurl
         CURLOPT_BINARYTRANSFER=>true,
         CURLOPT_FILETIME=>true,
         CURLOPT_FOLLOWLOCATION=>true,
-        CURLOPT_MAXREDIRS=>20,
-        CURLOPT_NOSIGNAL=>true, // suspicious?
-        CURLOPT_CONNECTTIMEOUT=>60,
-        CURLOPT_LOW_SPEED_LIMIT=>1024,
-        CURLOPT_LOW_SPEED_TIME=>300,
-        CURLOPT_USERAGENT=>'fixme',
         CURLOPT_HEADER=>false,
     );
 
