@@ -29,6 +29,7 @@ class disconnectedCurl
 
     function __construct($url,$options=array())
     {
+        register_shutdown_function(array(&$this, "__destruct"));
         $ch=curl_init($url);
 
         $this->temp_name=$this->generateTempName();
@@ -90,5 +91,12 @@ class disconnectedCurl
         if($this->isRunning())
             return null;
         return $this->temp_name;
+    }
+    function __destruct()
+    {
+      if(file_exists($this->temp_name))
+        unlink($this->temp_name);
+      if(file_exists($this->temp_name_h))
+        unlink($this->temp_name_h);
     }
 }
