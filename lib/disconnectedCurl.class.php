@@ -72,16 +72,16 @@ class disconnectedCurl
             $ret = curl_multi_exec($this->mh,$this->running);
             $e=curl_error($this->ch);
             if($e)
-                throw new sfException("ERROR $e\n");
+                throw new Exception("ERROR $e\n");
+            $this->info=curl_getinfo($this->ch);
             if($lambda)
-                call_user_func($lambda,$this);
+                call_user_func($lambda,$this,false);
         } while($this->running>0);
        
-        $this->info=curl_getinfo($this->ch);
 
         
         if($lambda)
-            $ret =  call_user_func($lambda,$this);
+            $ret =  call_user_func($lambda,$this,true);
 
 
         rewind($this->fp_h);
@@ -126,8 +126,16 @@ class disconnectedCurl
     {
         return $this->headers;
     }
+
     function getHeader($name)
     {
         return @$this->headers[$name];
     }
+
+    function getInfo()
+    {
+        return $this->info;
+    }
+
+
 }

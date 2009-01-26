@@ -7,7 +7,7 @@ class sfValidatedFileFromUrl extends sfValidatedFile
 {
   protected $original_url=null;
 
-  public function __construct($url)
+  public function __construct($url,$callback=null)
   {
     register_shutdown_function(array(&$this, "__destruct"));
 
@@ -23,7 +23,7 @@ class sfValidatedFileFromUrl extends sfValidatedFile
     $b = new disconnectedCurl($url,$options);
     // probably want to have a way to gather statistics here
     try {
-        $b->run(null);
+        $b->run($callback);
     // we should HEAD this first
     }
     catch(Exception $e)
