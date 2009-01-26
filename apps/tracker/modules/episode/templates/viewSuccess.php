@@ -51,23 +51,8 @@
     <li>
       <?php echo $feed ?>
       <?php if($sf_user->isAuthenticated()): ?>
-        <form action="<?php echo url_for('torrent/add') ?>" method="POST" enctype="multipart/form-data">
-          <table>
-            <?php echo $form ?>
-            <tr>
-              <td>&nbsp;</td>
-              <td colspan="2">
-                <input type="submit" value="add"/>
-                You should be able to upload up to about 
-                <?php
-                    $bytes=file_upload_max_size(); 
-                    echo "<span title='$bytes bytes'>",pretty_size($bytes),'</span>.';
-                ?>
-              </td>
-            </tr>
-          </table>
-        </form>
-      <?php endif; ?>
+           <?php include_partial('torrent/add',Array('form'=>$form)); ?>
+       <?php endif; ?>
     </li>
   <?php endforeach; ?>
 <?php endif; ?>
