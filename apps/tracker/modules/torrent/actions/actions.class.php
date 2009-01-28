@@ -65,7 +65,14 @@ class torrentActions extends sfActions
     $torrent=new Torrent($file); // we should try using the sfForm object we used earlier todo
     $torrent->setEpisodeId($request->getParameter('episode_id'));
     $torrent->setFeedId($request->getParameter('feed_id'));
+    if($file instanceof sfValidatedFileFromUrl)
+    {
+        @unlink($file->getSavedName());
+        $torrent->setWebUrl($request->getParameter('web_url'));
+    }
     $torrent->save();
+
+
     if(!$is_replace)
         $this->redirect($torrent->getEpisode()->getUri());
     else
