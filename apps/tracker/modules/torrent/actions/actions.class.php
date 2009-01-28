@@ -21,6 +21,10 @@ class torrentActions extends sfActions
 
   public function executeAdd($request)
   {
+    $request=$this->getRequest();
+    $request->setTimeLimit(0); // ∞
+    $request->setIgnoreUserAbort(TRUE);
+
     $this->form=new TorrentForm();
 
     // setup defaults
