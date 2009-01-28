@@ -47,7 +47,10 @@ class Torrent extends BaseTorrent
         $MakeTorrent->setComment('TODO');
         $MakeTorrent->setPieceLength(256); // KiB
         $meta = $MakeTorrent->buildTorrent();
-        $this->setFileSha1(sha1_file($file->getSavedName())); // todo: perhaps we should add profiling code?
+        $sha1=method_exists($file,'getFileSha1')?$file->getFileSha1():sha1_file($file->getSavedName());
+        if(!$sha1)
+            throw new sfException('Error retrieving Sha1 hash');
+        $this->setFileSha1($sha1);
         if($meta && file_put_contents($torrent_file,$meta))
         {
             $File_Bittorrent2_Decode = new File_Bittorrent2_Decode();

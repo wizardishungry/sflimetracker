@@ -29,6 +29,7 @@ class disconnectedCurl
     protected $headers=null;
     protected $info;
     protected $status_line;
+    protected $hash_context;
 
     function __construct($url,$options=array())
     {
@@ -41,11 +42,23 @@ class disconnectedCurl
         $options=$this->curl_options + $options;
 
         $this->fp=fopen($this->temp_name,'w');
-        if(!$this->fp) throw new sfException('Tempfile not writeable');
-        $options[CURLOPT_FILE]=$this->fp;
+        if(!$this->fp) throw new Exception('Tempfile not writeable');
+        if($this->canHash())
+        {
+            $this->hash_context=hash_init('sha1');
+            if(!$this->hash_context)
+                throw new Exception('Hash context creation failed');
+            $options[CURLOPT_WRITEFUNCTION]=Array($this,'write');
+        }
+        else
+        {
+            // need to hash in some other way here
+            throw new Exception('Hash context unavailable');
+            $options[CURLOPT_FILE]=$this->fp;
+        }
 
         $this->fp_h=fopen($this->temp_name_h,'w+');
-        if(!$this->fp_h) throw new sfException('Tempfile not writeable');
+        if(!$this->fp_h) throw new Exception('Tempfile not writeable');
         $options[CURLOPT_WRITEHEADER]=$this->fp_h;
 
         curl_setopt_array($ch,$options);
@@ -122,20 +135,45 @@ class disconnectedCurl
         unlink($this->temp_name_h);
     }
 
-    function getHeaders()
+    public function getHeaders()
     {
         return $this->headers;
     }
 
-    function getHeader($name)
+    public function getHeader($name)
     {
         return @$this->headers[$name];
     }
 
-    function getInfo()
+    public function getInfo()
     {
         return $this->info;
     }
 
+    protected function canHash()
+    {
+        return function_exists('hash_init');
+    }
 
+    public function write($curl_resource,$data)
+    {
+        hash_update($this->hash_context,$data);
+        return fwrite($this->fp,$data);
+    }
+
+    public function getSha1()
+    {
+       if($this->isRunning()==FALSE)
+       {
+        if($this->canHash())
+        {
+            return hash_final($this->hash_context);
+        }
+        else
+        {
+            return sha1_file($this->temp_name); // fallback approach
+        }
+       }
+       return null; // xfer not finished
+    }
 }

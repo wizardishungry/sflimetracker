@@ -6,6 +6,7 @@
 class sfValidatedFileFromUrl extends sfValidatedFile
 {
   protected $original_url=null;
+  protected $b; // curl object
 
   public function __construct($url,$callback=null)
   {
@@ -20,7 +21,7 @@ class sfValidatedFileFromUrl extends sfValidatedFile
     $original_url=$url;
     $original_name=preg_replace('#^.*/#','',$original_url); // we'll need to do this for redirects fixme
 
-    $b = new disconnectedCurl($url,$options);
+    $this->b = $b = new disconnectedCurl($url,$options);
     // probably want to have a way to gather statistics here
     try {
         $b->run($callback);
@@ -43,6 +44,14 @@ class sfValidatedFileFromUrl extends sfValidatedFile
   {
     if(file_exists($this->tempName))
       unlink($this->tempName);
+  }
+
+  public function getFileSha1()
+  {
+    $v =$this->b->getSha1();
+    if(!$v)
+        throw new sfException('Unable to retrieve Sha1 from disconnectedCurl instance');
+    return $v;
   }
 }
 ?>
