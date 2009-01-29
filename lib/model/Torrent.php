@@ -13,7 +13,7 @@ sfLoader::loadHelpers(Array('Asset','Url'));
 class Torrent extends BaseTorrent
 {
 
-    function __construct($file=null) // todo -- abstract the validatedfile stuff out
+    function __construct($file=null,$store_original_file=true) // todo -- abstract the validatedfile stuff out
     {
         if($file==null){return;}
 
@@ -32,25 +32,15 @@ class Torrent extends BaseTorrent
             throw new sfException("$torrent_file already exists");
         }
 
-        $this->setSize(filesize($file->getSavedName()));
-
-        /*$fi = new finfo(FILEINFO_MIME);
-        $mime_type = $fi->file($file->getSavedName());
-        $fi->close();*/
-        //$mime_type=mime_content_type($file->getSavedName());
-        $mime_content_type='text/plain'; // just to have something fixme
-        $this->setMimeType($file->getType());
-        
+        if($store_original_file)
+            $file->save(sfConfig::get('sf_upload_dir').'/'.$filename,0644);
 
         $MakeTorrent = new File_Bittorrent2_MakeTorrent($file->getSavedName());
         $MakeTorrent->setAnnounce(url_for('client/announce',true));
         $MakeTorrent->setComment('TODO');
         $MakeTorrent->setPieceLength(256); // KiB
         $meta = $MakeTorrent->buildTorrent();
-        $sha1=method_exists($file,'getFileSha1')?$file->getFileSha1():sha1_file($file->getSavedName());
-        if(!$sha1)
-            throw new sfException('Error retrieving Sha1 hash');
-        $this->setFileSha1($sha1);
+
         if($meta && file_put_contents($torrent_file,$meta))
         {
             $File_Bittorrent2_Decode = new File_Bittorrent2_Decode();
@@ -67,6 +57,12 @@ class Torrent extends BaseTorrent
         {
             $this->cleanupFiles();
             throw new sfException('Unable to generate torrent');
+        }
+
+        if($file instanceof sfValidatedFileFromUrl)
+        {
+            @unlink($file->getSavedName());
+            $torrent->setWebUrl($request->getParameter('web_url'));
         }
     }
 
