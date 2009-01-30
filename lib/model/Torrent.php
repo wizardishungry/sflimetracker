@@ -22,8 +22,12 @@ class Torrent extends BaseTorrent
         $filename = $file->getOriginalName();
         $extension = $file->getOriginalExtension();
         $this->setFileName($filename);
-        $file->save(sfConfig::get('sf_upload_dir').'/'.$filename,0644); // todo abstract filemode out
-                    
+
+        $this->setSize($file->getSize());
+        $this->setMimeType($file->getType());
+        $sha1=method_exists($file,'getFileSha1')?$file->getFileSha1():sha1_file($file->getSavedName());
+        $this->setFileSha1($sha1);       
+
         $torrent_file=$this->getTorrentPath();
 
         if(file_exists($torrent_file))
@@ -72,15 +76,15 @@ class Torrent extends BaseTorrent
     }
     public function getUri($torrent=true)
     {
+        // todo this needs to be refactored to make Uri and enclosure methods less dependent on call order
         if(isset($this->enclosure))
             return $this->enclosure->getUrl();
-        return _compute_public_path($this->getFileName().($torrent?'.torrent':''),'uploads','',true);
+        return $this->setFeedEnclosure($torrent?'torrent':'web')->getUrl();
     }
 
     public function getMagnet()
     {
       // TODO: add web sources to magnets
-      // TODO: blocked on http://trac.symfony-project.org/ticket/4624
         return 'magnet:?xt=urn:sha1:'.$this->getFileSha1().
         '&dn='.urlencode($this->getFileName());
     }
@@ -111,7 +115,7 @@ class Torrent extends BaseTorrent
         switch($type)
         {
             case 'web':
-                $params['url']=$this->getUri(false);
+                $params['url']=_compute_public_path($this->getFileName(),'uploads','',true);
                 $params['length']=$this->getFileSize();
                 $params['mimeType']=$this->getMimeType();
                 break;
@@ -121,7 +125,7 @@ class Torrent extends BaseTorrent
                 $params['mimeType']=$this->getMimeType();
                 break;
             case 'torrent':
-                $params['url']=$this->getUri(true);
+                $params['url']=_compute_public_path($this->getFileName().'.torrent','uploads','',true);
                 $params['length']=filesize($this->getTorrentPath());
                 $params['mimeType']='application/x-bittorrent';
                 break;
