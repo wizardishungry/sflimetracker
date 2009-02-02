@@ -32,8 +32,6 @@ class myWebRequest extends sfWebRequest
   {
     parent::initialize($dispatcher, $parameters, $attributes, $options);
 
-    if(!$ret) return false;
-
     if(!$this->getUser()->isAuthenticated())
     {
       $params=Array();
