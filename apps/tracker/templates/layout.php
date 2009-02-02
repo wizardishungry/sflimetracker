@@ -23,7 +23,7 @@
         
         <div id="title">
             <span>
-              <?php echo link_to_with_icon(sfConfig::get('app_version_name'), 'lime_sm', 'http://limecast.com/tracker'); ?>
+              <?php echo image_tag('icons/lime_sm'),' ',sfConfig::get('app_version_name'); ?>
             </span> 
         </div>
         
