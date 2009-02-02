@@ -109,7 +109,7 @@ class accountActions extends sfActions
     else
     {
       $value=$request->getPostParameter('password');
-      $expire=time()+sfConfig::get('app_admin_remember_me_time');
+      $expire=time()+sfConfig::get('app_admin_remember_me_time',3600);
     }
     $response->setCookie($this->cookie_name,$value,$expire,$path,'',false);
   }
