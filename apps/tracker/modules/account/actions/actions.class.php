@@ -8,7 +8,6 @@
  */
 class accountActions extends sfActions
 {
-  protected $cookie_name='remember_me';
 
   public function executeLogin($request)
   {
@@ -17,16 +16,10 @@ class accountActions extends sfActions
 
     if($user->isAuthenticated())
       $this->redirect('@homepage');
-    if(($request->getMethod () == sfRequest::POST||$request->getCookie($this->cookie_name))
-      && !$this->getUser()->isAuthenticated())
+
+    if($request->getMethod () == sfRequest::POST)
     {
       $params=$request->getPostParameters();
-
-      if($request->getCookie($this->cookie_name)&&!isset($params['password']))
-      {
-       $params['password']=$request->getCookie($this->cookie_name);
-       sfForm::disableCSRFProtection();
-      }
 
       $form = $this->form = new LoginForm($this->getUser());
       $form->bind($params);
@@ -34,10 +27,12 @@ class accountActions extends sfActions
       if($form->isValid())
       {
         $this->getUser()->setAuthenticated(true);
+
         if($form->getValue('remember_me'))
         {
           $this->remember();
         }
+
         if($request->getReferer())
         {
           $this->redirect($request->getReferer());
@@ -45,6 +40,7 @@ class accountActions extends sfActions
         {
           $this->redirect('@homepage');
         }
+
       }
       else
       {
@@ -90,27 +86,5 @@ class accountActions extends sfActions
       }
     }
   }
-  protected function remember($cookie_eraser=false)
-  {
-    $response=$this->getResponse();
-    $request=$this->getRequest();
-    if($request->getCookie($this->cookie_name) && !$cookie_eraser)
-    {
-      return;
-    }
 
-    $path='/';
-
-    if($cookie_eraser)
-    {
-      $value='';
-      $expire=null;
-    }
-    else
-    {
-      $value=$request->getPostParameter('password');
-      $expire=time()+sfConfig::get('app_admin_remember_me_time',3600);
-    }
-    $response->setCookie($this->cookie_name,$value,$expire,$path,'',false);
-  }
 }

@@ -46,4 +46,26 @@ class myWebRequest extends sfWebRequest
 
     return $ret;
   }
+  public function remember($cookie_eraser=false)
+  {
+    $response=$this->getResponse();
+    if($this->getCookie($this->cookie_name) && !$cookie_eraser)
+    {
+      return;
+    }
+
+    $path='/'; // should be symfony root fixme
+
+    if($cookie_eraser)
+    {
+      $value='';
+      $expire=null;
+    }
+    else
+    {
+      $value=$this->getPostParameter('password');
+      $expire=time()+sfConfig::get('app_admin_remember_me_time',3600);
+    }
+    $response->setCookie($this->cookie_name,$value,$expire,$path,'',false);
+  }
  }
