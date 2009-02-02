@@ -16,3 +16,4 @@ config/generated*
 VERSION
 web/sf
 .htpasswd
+lib/filter/base
