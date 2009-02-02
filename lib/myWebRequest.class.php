@@ -26,6 +26,8 @@ class myWebRequest extends sfWebRequest
     return ignore_user_abort($setting);
   }
 
+  // FIXME I probably really need to move the code under here to trackerUser
+
   public function initialize(sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array())
   {
     $ret = parent::initialize($dispatcher,$parameters,$attributes);
@@ -48,7 +50,7 @@ class myWebRequest extends sfWebRequest
   }
   public function remember($cookie_eraser=false)
   {
-    $response=$this->getResponse();
+    $response=sfContext::getInstance()->getResponse();
     if($this->getCookie($this->cookie_name) && !$cookie_eraser)
     {
       return;
