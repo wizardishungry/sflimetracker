@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: DBMySQL.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: DBMySQL.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -20,8 +20,6 @@
  * <http://propel.phpdb.org>.
  */
 
-require_once 'propel/adapter/DBAdapter.php';
-
 /**
  * This is used in order to connect to a MySQL database.
  *
@@ -29,7 +27,7 @@ require_once 'propel/adapter/DBAdapter.php';
  * @author     Jon S. Stevens <jon@clearink.com> (Torque)
  * @author     Brett McLaughlin <bmclaugh@algx.net> (Torque)
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 989 $
  * @package    propel.adapter
  */
 class DBMySQL extends DBAdapter {
@@ -98,28 +96,25 @@ class DBMySQL extends DBAdapter {
 	 *
 	 * @param      Connection $con The Creole connection to use.
 	 * @param      string $table The name of the table to lock.
-	 * @throws     SQLException No Statement could be created or
+	 * @throws     PDOException No Statement could be created or
 	 * executed.
 	 */
-	public function lockTable(Connection $con, $table)
+	public function lockTable(PDO $con, $table)
 	{
-		$statement = $con->createStatement();
-		$sql = "LOCK TABLE " . $table . " WRITE";
-		$statement->executeUpdate($sql);
+		$con->exec("LOCK TABLE " . $table . " WRITE");
 	}
 
 	/**
 	 * Unlocks the specified table.
 	 *
-	 * @param      Connection $con The Creole connection to use.
+	 * @param      PDO $con The PDO connection to use.
 	 * @param      string $table The name of the table to unlock.
-	 * @throws     SQLException No Statement could be created or
+	 * @throws     PDOException No Statement could be created or
 	 * executed.
 	 */
-	public function unlockTable(Connection $con, $table)
+	public function unlockTable(PDO $con, $table)
 	{
-		$statement = $con->createStatement();
-		$statement->executeUpdate("UNLOCK TABLES");
+		$statement = $con->exec("UNLOCK TABLES");
 	}
 
 	/**
@@ -128,6 +123,34 @@ class DBMySQL extends DBAdapter {
 	public function quoteIdentifier($text)
 	{
 		return '`' . $text . '`';
+	}
+
+	/**
+	 * @see        DBAdapter::useQuoteIdentifier()
+	 */
+	public function useQuoteIdentifier()
+	{
+		return true;
+	}
+
+	/**
+	 * @see        DBAdapter::applyLimit()
+	 */
+	public function applyLimit(&$sql, $offset, $limit)
+	{
+		if ( $limit > 0 ) {
+			$sql .= " LIMIT " . ($offset > 0 ? $offset . ", " : "") . $limit;
+		} else if ( $offset > 0 ) {
+			$sql .= " LIMIT " . $offset . ", 18446744073709551615";
+		}
+	}
+
+	/**
+	 * @see        DBAdapter::random()
+	 */
+	public function random($seed = null)
+	{
+		return 'rand('.((int) $seed).')';
 	}
 
 }

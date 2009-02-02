@@ -1,7 +1,7 @@
 <?php
 
 /*
- * $Id$
+ * $Id: AdhocTypedefTask.php 144 2007-02-05 15:19:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -65,7 +65,7 @@ class AdhocTypedefTask extends AdhocTask {
             throw new BuildException("The adhoc class you defined must be an instance of phing.ProjectComponent", $this->location);
         }
         
-        $this->log("Datatype " . $this->name . " will be handled by class " . $classname, PROJECT_MSG_VERBOSE);
+        $this->log("Datatype " . $this->name . " will be handled by class " . $classname, Project::MSG_VERBOSE);
         $this->project->addDataTypeDefinition($this->name, $classname);        
     }
 }

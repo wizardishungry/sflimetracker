@@ -37,8 +37,50 @@ abstract class sfWidgetForm extends sfWidget
     $this->addOption('id_format', '%s');
     $this->addOption('is_hidden', false);
     $this->addOption('needs_multipart', false);
+    $this->addOption('default', null);
+    $this->addOption('label', null);
 
     parent::__construct($options, $attributes);
+  }
+
+  /**
+   * Sets the default value for the widget.
+   *
+   * @param string The default value
+   */
+  public function setDefault($value)
+  {
+    $this->setOption('default', $value);
+  }
+
+  /**
+   * Returns the default value for the widget.
+   *
+   * @return string The default value
+   */
+  public function getDefault()
+  {
+    return $this->getOption('default');
+  }
+
+  /**
+   * Sets the label for the widget.
+   *
+   * @param string The label
+   */
+  public function setLabel($value)
+  {
+    $this->setOption('label', $value);
+  }
+
+  /**
+   * Returns the label for the widget.
+   *
+   * @return string The label
+   */
+  public function getLabel()
+  {
+    return $this->getOption('label');
   }
 
   /**
@@ -111,7 +153,7 @@ abstract class sfWidgetForm extends sfWidget
 
     $attributes = $this->fixFormId($attributes);
 
-    return sprintf('<%s%s%s', $tag, $this->attributesToHtml($attributes), self::$xhtml ? ' />' : (strtolower($tag) == 'input' ? '>' : sprintf('></%s>', $tag)));
+    return parent::renderTag($tag, $attributes);
   }
 
   /**

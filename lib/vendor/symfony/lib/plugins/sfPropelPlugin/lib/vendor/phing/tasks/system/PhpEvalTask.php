@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: PhpEvalTask.php 144 2007-02-05 15:19:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -94,7 +94,7 @@ class PhpEvalTask extends Task {
         
         $this->log("Calling PHP function: " . $h_func . "()");
         foreach($params as $p) {
-            $this->log("  param: " . $p, PROJECT_MSG_VERBOSE);
+            $this->log("  param: " . $p, Project::MSG_VERBOSE);
         } 
         
         $return = call_user_func_array($user_func, $params);

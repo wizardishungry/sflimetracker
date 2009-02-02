@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: EchoTask.php 144 2007-02-05 15:19:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ include_once 'phing/Task.php';
  *
  *  @author   Michiel Rook <michiel.rook@gmail.com>
  *  @author   Andreas Aderhold, andi@binarycloud.com
- *  @version  $Revision: 1.5 $ $Date: 2006-07-07 20:15:35 +0200 (Fri, 07 Jul 2006) $
+ *  @version  $Revision: 1.5 $ $Date: 2007-02-05 10:19:00 -0500 (Mon, 05 Feb 2007) $
  *  @package  phing.tasks.system
  */
 
@@ -43,11 +43,11 @@ class EchoTask extends Task {
     function main() {		
 		switch ($this->level)
 		{
-			case "error": $loglevel = PROJECT_MSG_ERR; break;
-			case "warning": $loglevel = PROJECT_MSG_WARN; break;
-			case "info": $loglevel = PROJECT_MSG_INFO; break;
-			case "verbose": $loglevel = PROJECT_MSG_VERBOSE; break;
-			case "debug": $loglevel = PROJECT_MSG_DEBUG; break;
+			case "error": $loglevel = Project::MSG_ERR; break;
+			case "warning": $loglevel = Project::MSG_WARN; break;
+			case "info": $loglevel = Project::MSG_INFO; break;
+			case "verbose": $loglevel = Project::MSG_VERBOSE; break;
+			case "debug": $loglevel = Project::MSG_DEBUG; break;
 		}
 		
 		if (empty($this->file))

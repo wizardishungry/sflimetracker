@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id$  
+ *  $Id: PhingTask.php 303 2007-11-08 20:39:33Z hans $  
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -159,7 +159,6 @@ class PhingTask extends Task {
         $savedDir = $this->dir;
         $savedPhingFile = $this->phingFile;
         $savedTarget = $this->newTarget;
-        $buildFailed = false;
 
         // set no specific target for files in filesets
         // [HL] I'm commenting this out; I don't know why this should not be supported!
@@ -199,7 +198,8 @@ class PhingTask extends Task {
      * @return void
      */
     private function processFile()  {
-            
+
+    	$buildFailed = false;
         $savedDir = $this->dir;
         $savedPhingFile = $this->phingFile;
         $savedTarget = $this->newTarget;
@@ -276,8 +276,13 @@ class PhingTask extends Task {
             
         } catch (Exception $e) {
             $buildFailed = true;
-            $this->log($e->getMessage(), PROJECT_MSG_ERR);
-            
+            $this->log($e->getMessage(), Project::MSG_ERR);
+        	if (Phing::getMsgOutputLevel() <= Project::MSG_DEBUG) { 
+				$lines = explode("\n", $e->getTraceAsString());
+				foreach($lines as $line) {
+					$this->log($line, Project::MSG_DEBUG);
+				}
+            }
             // important!!! continue on to perform cleanup tasks.    
 		}
         
@@ -414,7 +419,7 @@ class PhingTask extends Task {
                 if (!isset($projReferences[$refid])) {
                     $this->log("Parent project doesn't contain any reference '"
                         . $refid . "'",
-                        PROJECT_MSG_WARN);
+                        Project::MSG_WARN);
                     continue;
                 }
                 

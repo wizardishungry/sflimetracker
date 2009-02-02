@@ -10,7 +10,7 @@
 
 require_once(dirname(__FILE__).'/../../bootstrap/unit.php');
 
-$t = new lime_test(71, new lime_output_color());
+$t = new lime_test(82, new lime_output_color());
 
 $w1 = new sfWidgetFormInput(array(), array('class' => 'foo1'));
 $w2 = new sfWidgetFormInput();
@@ -140,7 +140,7 @@ $t->is($company->getParent(), $author, '->getParent() returns the parent widget 
 
 // ->setLabels() ->setLabel() ->getLabels() ->getLabel() ->generateLabelName()
 $t->diag('->setLabels() ->setLabel() ->getLabels() ->getLabel() ->generateLabelName()');
-$w = new sfWidgetFormSchema();
+$w = new sfWidgetFormSchema(array('first_name' => new sfWidgetFormInput()));
 $w->setLabel('first_name', 'A first name');
 $t->is($w->getLabels(), array('first_name' => 'A first name'), '->getLabels() returns all current labels');
 
@@ -157,6 +157,26 @@ $w->setHelps(array('first_name', 'Please, provide your first name'));
 $t->is($w->getHelps(), array('first_name', 'Please, provide your first name'), '->setHelps() changes all help messages');
 $w->setHelp('last_name', 'Please, provide your last name');
 $t->is($w->getHelp('last_name'), 'Please, provide your last name', '->setHelp() changes one help message');
+
+// ->getLabel() ->setLabel() ->getLabels() ->setLabels()
+$t->diag('->getLabel() ->setLabel() ->getLabels() ->setLabels()');
+$w = new sfWidgetFormSchema(array('w1' => $w1, 'w2' => $w2));
+$w->setLabels(array('w1' => 'foo'));
+$t->is($w->getLabels(), array('w1' => 'foo', 'w2' => null), '->getLabels() returns the labels');
+$t->is($w->getLabel('w1'), 'foo', '->getLabel() returns the label for a given field');
+$w->setLabel('w2', 'foo');
+$t->is($w->getLabels(), array('w1' => 'foo', 'w2' => 'foo'), '->setLabel() sets a label for a given field');
+$w->setLabel('foo');
+$t->is($w->getLabel(), 'foo', '->setLabel() can also set the label for the widget schema');
+
+// ->getDefault() ->setDefault() ->getDefaults() ->setDefaults()
+$t->diag('->getDefault() ->setDefault() ->getDefaults() ->setDefaults()');
+$w = new sfWidgetFormSchema(array('w1' => $w1, 'w2' => $w2));
+$w->setDefaults(array('w1' => 'foo'));
+$t->is($w->getDefaults(), array('w1' => 'foo', 'w2' => null), '->getDefaults() returns the default values');
+$t->is($w->getDefault('w1'), 'foo', '->getDefault() returns the default value for a given field');
+$w->setDefault('w2', 'foo');
+$t->is($w->getDefaults(), array('w1' => 'foo', 'w2' => 'foo'), '->setDefault() sets a default value for a given field');
 
 // ->needsMultipartForm()
 $t->diag('->needsMultipartForm()');
@@ -349,6 +369,9 @@ $t->is(str_replace("\n", '', preg_replace('/^ +/m', '', $w->render(null))), str_
 // __clone()
 $t->diag('__clone()');
 $w = new sfWidgetFormSchema(array('w1' => $w1, 'w2' => $w2));
+$format1 = new sfWidgetFormSchemaFormatterList($w);
+$format1->setTranslationCatalogue('english');
+$w->addFormFormatter('testFormatter', $format1);
 $w1 = clone $w;
 $f1 = $w1->getFields();
 $f = $w->getFields();
@@ -358,6 +381,10 @@ foreach ($f1 as $name => $widget)
   $t->ok($widget !== $f[$name], '__clone() clones embedded widgets');
   $t->ok($widget == $f[$name], '__clone() clones embedded widgets');
 }
+$format1->setTranslationCatalogue('french');
+$formatters = $w1->getFormFormatters();
+$t->is(count($formatters), 1 , '__clone() returns a sfWidgetFormSchema that has the Formatters attached');
+$t->is($formatters['testFormatter']->getTranslationCatalogue(), 'english', '__clone() clones formatters, so that changes to the original one have no effect to the cloned formatter.');
 
 $w = new sfWidgetFormSchema();
 $w->addFormFormatter('table', new sfWidgetFormSchemaFormatterTable($w));
@@ -383,3 +410,35 @@ $t->isa_ok($w->getFormFormatter(), 'sfWidgetFormSchemaFormatterTable', 'setDefau
 sfWidgetFormSchema::setDefaultFormFormatterName('list');
 $w = new sfWidgetFormSchema(array('w1' => $w1, 'w2' => $w2));
 $t->isa_ok($w->getFormFormatter(), 'sfWidgetFormSchemaFormatterList', 'setDefaultFormFormatterName() changes the default form formatter name correctly');
+
+class MyWidget extends sfWidgetForm
+{
+  protected function configure($options = array(), $attributes = array())
+  {
+    $this->addRequiredOption('name');
+  }
+
+  public function render($name, $value = null, $attributes = array(), $errors = array())
+  {
+    return null;
+  }
+
+  public function getJavaScripts()
+  {
+    return array('/path/to/a/'.$this->getOption('name').'.js');
+  }
+
+  public function getStylesheets()
+  {
+    return array('/path/to/a/'.$this->getOption('name').'.css' => 'all');
+  }
+}
+
+// ->getJavaScripts() ->getStylesheets()
+$t->diag('->getJavaScripts() ->getStylesheets()');
+$w = new sfWidgetFormSchema(array(
+  'foo' => new MyWidget(array('name' => 'foo')),
+  'bar' => new MyWidget(array('name' => 'bar')),
+));
+$t->is($w->getJavaScripts(), array('/path/to/a/foo.js', '/path/to/a/bar.js'), '->getJavaScripts() returns an array of stylesheets');
+$t->is($w->getStylesheets(), array('/path/to/a/foo.css' => 'all', '/path/to/a/bar.css' => 'all'), '->getStylesheets() returns an array of JavaScripts');

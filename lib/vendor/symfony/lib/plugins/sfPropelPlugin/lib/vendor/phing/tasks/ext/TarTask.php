@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: TarTask.php 220 2007-08-21 00:03:13Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -156,7 +156,7 @@ class TarTask extends MatchingTask {
                 $this->compression = null;
                 break;
             default:
-                $this->log("Ignoring unknown compression mode: ".$mode, PROJECT_MSG_WARN);
+                $this->log("Ignoring unknown compression mode: ".$mode, Project::MSG_WARN);
                 $this->compression = null;
         }
     }
@@ -217,12 +217,12 @@ class TarTask extends MatchingTask {
 	                }
 	            }
 	            if ($upToDate) {
-	                $this->log("Nothing to do: " . $this->tarFile->__toString() . " is up to date.", PROJECT_MSG_INFO);
+	                $this->log("Nothing to do: " . $this->tarFile->__toString() . " is up to date.", Project::MSG_INFO);
 	                return;
 	            }
 			}
 			
-            $this->log("Building tar: " . $this->tarFile->__toString(), PROJECT_MSG_INFO);
+            $this->log("Building tar: " . $this->tarFile->__toString(), Project::MSG_INFO);
             
             $tar = new Archive_Tar($this->tarFile->getAbsolutePath(), $this->compression);
             
@@ -241,7 +241,8 @@ class TarTask extends MatchingTask {
                     $filesToTar = array();
                     for ($i=0, $fcount=count($files); $i < $fcount; $i++) {
                         $f = new PhingFile($fsBasedir, $files[$i]);
-                        $filesToTar[] = $f->getAbsolutePath();                        
+                        $filesToTar[] = $f->getAbsolutePath();
+                        $this->log("Adding file " . $f->getPath() . " to archive.", Project::MSG_VERBOSE);                
                     }                    
                     $tar->addModify($filesToTar, '', $fsBasedir->getAbsolutePath());            
             }

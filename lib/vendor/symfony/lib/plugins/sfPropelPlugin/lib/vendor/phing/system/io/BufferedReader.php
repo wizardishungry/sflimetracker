@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: BufferedReader.php 227 2007-08-28 02:17:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,7 +25,7 @@ include_once 'phing/system/io/Reader.php';
  * Convenience class for reading files.
  *
  * @author    <a href="mailto:yl@seasonfive.com">Yannick Lecaillez</a>
- * @version   $Revision: 1.6 $ $Date: 2005/12/27 19:12:13 $
+ * @version   $Revision: 1.6 $ $Date: 2007-08-27 22:17:00 -0400 (Mon, 27 Aug 2007) $
  * @access    public
  * @see       FilterReader
  * @package   phing.system.io
@@ -53,17 +53,16 @@ class BufferedReader extends Reader {
     }
 
     /**
-     * Reads and returns $_bufferSize chunk of data.
+     * Reads and returns a chunk of data.
+     * @param int $len Number of bytes to read.  Default is to read configured buffer size number of bytes.
      * @return mixed buffer or -1 if EOF.
      */
     function read($len = null) {
-        // ignore $len param, not sure how to hanlde it, since 
-        // this should only read bufferSize amount of data.
-        if ($len !== null) {
-            $this->currentPosition = ftell($this->fd);
-        }
         
-        if ( ($data = $this->in->read($this->bufferSize)) !== -1 ) {
+    	// if $len is specified, we'll use that; otherwise, use the configured buffer size.
+    	if ($len === null) $len = $this->bufferSize; 
+        
+        if ( ($data = $this->in->read($len)) !== -1 ) {
 		
 			// not all files end with a newline character, so we also need to check EOF
 			if (!$this->in->eof()) {
@@ -73,7 +72,7 @@ class BufferedReader extends Reader {
 	        
 	            if ( $notValidPartSize > 1 ) {
 	                // Block doesn't finish on a EOL
-	                // Find the last EOL and forgot all following stuff
+	                // Find the last EOL and forget all following stuff
 	                $dataSize = strlen($data);
 	                $validSize = $dataSize - $notValidPartSize + 1;
 	            
@@ -167,4 +166,3 @@ class BufferedReader extends Reader {
         return $this->in->getResource();
     }    
 }
-?>

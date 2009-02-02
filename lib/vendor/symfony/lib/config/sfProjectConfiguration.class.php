@@ -19,8 +19,13 @@
 class sfProjectConfiguration
 {
   protected
-    $rootDir       = null,
-    $symfonyLibDir = null;
+    $rootDir               = null,
+    $symfonyLibDir         = null,
+    $plugins               = array('sfPropelPlugin'),
+    $pluginPaths           = array(),
+    $overriddenPluginPaths = array(),
+    $pluginConfigurations  = array(),
+    $pluginsLoaded         = false;
 
   static protected
     $active = null;
@@ -39,13 +44,7 @@ class sfProjectConfiguration
     }
 
     $this->rootDir = is_null($rootDir) ? self::guessRootDir() : realpath($rootDir);
-
     $this->symfonyLibDir = realpath(dirname(__FILE__).'/..');
-
-    // initializes autoloading for symfony core classes
-    require_once $this->symfonyLibDir.'/autoload/sfCoreAutoload.class.php';
-    sfCoreAutoload::register();
-
     $this->dispatcher = is_null($dispatcher) ? new sfEventDispatcher() : $dispatcher;
 
     ini_set('magic_quotes_runtime', 'off');
@@ -56,6 +55,8 @@ class sfProjectConfiguration
     $this->setRootDir($this->rootDir);
 
     $this->setup();
+
+    $this->loadPlugins();
   }
 
   /**
@@ -65,6 +66,35 @@ class sfProjectConfiguration
    */
   public function setup()
   {
+  }
+
+  /**
+   * Loads the project's plugin configurations.
+   */
+  public function loadPlugins()
+  {
+    foreach ($this->getPluginPaths() as $path)
+    {
+      if (false === $plugin = array_search($path, $this->overriddenPluginPaths))
+      {
+        $plugin = basename($path);
+      }
+      $class = $plugin.'Configuration';
+
+      if (is_readable($file = sprintf('%s/config/%s.class.php', $path, $class)))
+      {
+        require_once $file;
+        $configuration = new $class($this, $path, $plugin);
+      }
+      else
+      {
+        $configuration = new sfPluginConfigurationGeneric($this, $path, $plugin);
+      }
+
+      $this->pluginConfigurations[$plugin] = $configuration;
+    }
+
+    $this->pluginsLoaded = true;
   }
 
   /**
@@ -145,16 +175,10 @@ class sfProjectConfiguration
    */
   public function getModelDirs()
   {
-    $dirs = array();
-
-    if ($pluginDirs = glob(sfConfig::get('sf_plugins_dir').'/*/lib/model'))                                   // plugins
-    {
-      $dirs = array_merge($dirs, $pluginDirs);
-    }
-
-    $dirs[] = sfConfig::get('sf_lib_dir').'/model';                                                           // project
-
-    return $dirs;
+    return array_merge(
+      $this->getPluginSubPaths('/lib/model'),     // plugins
+      array(sfConfig::get('sf_lib_dir').'/model') // project
+    );
   }
 
   /**
@@ -167,19 +191,12 @@ class sfProjectConfiguration
    */
   public function getGeneratorTemplateDirs($class, $theme)
   {
-    $dirs = array(sfConfig::get('sf_data_dir').'/generator/'.$class.'/'.$theme.'/template');                  // project
-
-    if ($pluginDirs = glob(sfConfig::get('sf_plugins_dir').'/*/data/generator/'.$class.'/'.$theme.'/template'))
-    {
-      $dirs = array_merge($dirs, $pluginDirs);                                                                // plugin
-    }
-
-    if ($bundledPluginDirs = glob(sfConfig::get('sf_symfony_lib_dir').'/plugins/*/data/generator/'.$class.'/'.$theme.'/template'))
-    {
-      $dirs = array_merge($dirs, $bundledPluginDirs);                                                         // bundled plugin
-    }
-
-    return $dirs;
+    return array_merge(
+      array(sfConfig::get('sf_data_dir').'/generator/'.$class.'/'.$theme.'/template'), // project
+      $this->getPluginSubPaths('/data/generator/'.$class.'/'.$theme.'/template'),      // plugins
+      array(sfConfig::get('sf_data_dir').'/generator/'.$class.'/default/template'),    // project (default theme)
+      $this->getPluginSubPaths('/data/generator/'.$class.'/default/template')          // plugins (default theme)
+    );
   }
 
   /**
@@ -192,19 +209,12 @@ class sfProjectConfiguration
    */
   public function getGeneratorSkeletonDirs($class, $theme)
   {
-    $dirs = array(sfConfig::get('sf_data_dir').'/generator/'.$class.'/'.$theme.'/skeleton');                  // project
-
-    if ($pluginDirs = glob(sfConfig::get('sf_plugins_dir').'/*/data/generator/'.$class.'/'.$theme.'/skeleton'))
-    {
-      $dirs = array_merge($dirs, $pluginDirs);                                                                // plugin
-    }
-
-    if ($bundledPluginDirs = glob(sfConfig::get('sf_symfony_lib_dir').'/plugins/*/data/generator/'.$class.'/'.$theme.'/skeleton'))
-    {
-      $dirs = array_merge($dirs, $bundledPluginDirs);                                                         // bundled plugin
-    }
-
-    return $dirs;
+    return array_merge(
+      array(sfConfig::get('sf_data_dir').'/generator/'.$class.'/'.$theme.'/skeleton'), // project
+      $this->getPluginSubPaths('/data/generator/'.$class.'/'.$theme.'/skeleton'),      // plugins
+      array(sfConfig::get('sf_data_dir').'/generator/'.$class.'/default/skeleton'),    // project (default theme)
+      $this->getPluginSubPaths('/data/generator/'.$class.'/default/skeleton')          // plugins (default theme)
+    );
   }
 
   /**
@@ -233,41 +243,264 @@ class sfProjectConfiguration
   }
 
   /**
+   * Gets the configuration file paths for a given relative configuration path.
+   *
+   * @param string $configPath The configuration path
+   *
+   * @return array An array of paths
+   */
+  public function getConfigPaths($configPath)
+  {
+    $globalConfigPath = basename(dirname($configPath)).'/'.basename($configPath);
+
+    $files = array(
+      sfConfig::get('sf_symfony_lib_dir').'/config/'.$globalConfigPath,              // symfony
+    );
+
+    foreach ($this->getPluginPaths() as $path)
+    {
+      if (is_file($file = $path.'/'.$globalConfigPath))
+      {
+        $files[] = $file;                                                            // plugins
+      }
+    }
+
+    $files = array_merge($files, array(
+      sfConfig::get('sf_root_dir').'/'.$globalConfigPath,                            // project
+      sfConfig::get('sf_root_dir').'/'.$configPath,                                  // project
+    ));
+
+    foreach ($this->getPluginPaths() as $path)
+    {
+      if (is_file($file = $path.'/'.$configPath))
+      {
+        $files[] = $file;                                                            // plugins
+      }
+    }
+
+    $configs = array();
+    foreach (array_unique($files) as $file)
+    {
+      if (is_readable($file))
+      {
+        $configs[] = $file;
+      }
+    }
+
+    return $configs;
+  }
+
+  /**
+   * Sets the enabled plugins.
+   *
+   * @param array An array of plugin names
+   * 
+   * @throws LogicException If plugins have already been loaded
+   */
+  public function setPlugins(array $plugins)
+  {
+    if ($this->pluginsLoaded)
+    {
+      throw new LogicException('Plugins have already been loaded.');
+    }
+
+    $this->plugins = $plugins;
+
+    $this->pluginPaths = array();
+  }
+
+  /**
+   * Enables a plugin or a list of plugins.
+   *
+   * @param array|string A plugin name or a plugin list
+   */
+  public function enablePlugins($plugins)
+  {
+    $this->setPlugins(array_merge($this->plugins, is_array($plugins) ? $plugins : array($plugins)));
+  }
+
+  /**
+   * Disables a plugin.
+   *
+   * @param array|string A plugin name or a plugin list
+   * 
+   * @throws LogicException If plugins have already been loaded
+   */
+  public function disablePlugins($plugins)
+  {
+    if ($this->pluginsLoaded)
+    {
+      throw new LogicException('Plugins have already been loaded.');
+    }
+
+    if (!is_array($plugins))
+    {
+      $plugins = array($plugins);
+    }
+
+    foreach ($plugins as $plugin)
+    {
+      if (false !== $pos = array_search($plugin, $this->plugins))
+      {
+        unset($this->plugins[$pos]);
+      }
+      else
+      {
+        throw new InvalidArgumentException(sprintf('The plugin "%s" does not exist.', $plugin));
+      }
+    }
+
+    $this->pluginPaths = array();
+  }
+
+  /**
+   * Enabled all installed plugins except the one given as argument.
+   *
+   * @param array|string A plugin name or a plugin list
+   * 
+   * @throws LogicException If plugins have already been loaded
+   */
+  public function enableAllPluginsExcept($plugins = array())
+  {
+    if ($this->pluginsLoaded)
+    {
+      throw new LogicException('Plugins have already been loaded.');
+    }
+
+    $this->plugins = array();
+    foreach ($this->getAllPluginPaths() as $plugin => $path)
+    {
+      $this->plugins[] = $plugin;
+    }
+
+    $this->disablePlugins($plugins);
+  }
+
+  /**
+   * Gets the list of enabled plugins.
+   *
+   * @return array An array of enabled plugins
+   */
+  public function getPlugins()
+  {
+    return $this->plugins;
+  }
+
+  /**
+   * Gets the paths plugin sub-directories, minding overloaded plugins.
+   *
+   * @param  string $subPath The subdirectory to look for
+   *
+   * @return array The plugin paths.
+   */
+  public function getPluginSubPaths($subPath = '')
+  {
+    if (array_key_exists($subPath, $this->pluginPaths))
+    {
+      return $this->pluginPaths[$subPath];
+    }
+
+    $this->pluginPaths[$subPath] = array();
+    $pluginPaths = $this->getPluginPaths();
+    foreach ($pluginPaths as $pluginPath)
+    {
+      if (is_dir($pluginPath.$subPath))
+      {
+        $this->pluginPaths[$subPath][] = $pluginPath.$subPath;
+      }
+    }
+
+    return $this->pluginPaths[$subPath];
+  }
+
+  /**
    * Gets the paths to plugins root directories, minding overloaded plugins.
    *
    * @return array The plugin root paths.
    */
   public function getPluginPaths()
   {
-    $pluginPaths = array();
-
-    $finder = sfFinder::type('dir')->maxdepth(0)->follow_link()->relative();
-
-    $bundledPlugins = $finder->discard('.*')->prune('.*')->in(sfConfig::get('sf_symfony_lib_dir').'/plugins');
-    $projectPlugins = $finder->discard('.*')->prune('.*')->in(sfConfig::get('sf_plugins_dir'));
-
-    // bundled plugins
-    foreach ($bundledPlugins as $plugin)
+    if (array_key_exists('', $this->pluginPaths))
     {
-      // plugins can override bundle plugins
-      if (false !== $pos = array_search($plugin, $projectPlugins))
+      return $this->pluginPaths[''];
+    }
+
+    $pluginPaths = $this->getAllPluginPaths();
+
+    $this->pluginPaths[''] = array();
+    foreach ($this->getPlugins() as $plugin)
+    {
+      if (isset($pluginPaths[$plugin]))
       {
-        $pluginPaths[] = sfConfig::get('sf_plugins_dir').'/'.$plugin;
-        unset($projectPlugins[$pos]);
+        $this->pluginPaths[''][] = $pluginPaths[$plugin];
       }
       else
       {
-        $pluginPaths[] = sfConfig::get('sf_symfony_lib_dir').'/plugins/'.$plugin;
+        throw new InvalidArgumentException(sprintf('The plugin "%s" does not exist.', $plugin));
       }
     }
 
-    // project plugins
-    foreach ($projectPlugins as $plugin)
+    return $this->pluginPaths[''];
+  }
+
+  /**
+   * Returns an array of paths for all available plugins.
+   * 
+   * @return array
+   */
+  public function getAllPluginPaths()
+  {
+    $pluginPaths = array();
+
+    $finder = sfFinder::type('dir')->maxdepth(0)->follow_link()->name('*Plugin');
+    $dirs = array(
+      sfConfig::get('sf_symfony_lib_dir').'/plugins',
+      sfConfig::get('sf_plugins_dir'),
+    );
+
+    foreach ($finder->in($dirs) as $path)
     {
-      $pluginPaths[] = sfConfig::get('sf_plugins_dir').'/'.$plugin;
+      $pluginPaths[basename($path)] = $path;
+    }
+
+    foreach ($this->overriddenPluginPaths as $plugin => $path)
+    {
+      $pluginPaths[$plugin] = $path;
     }
 
     return $pluginPaths;
+  }
+
+  /**
+   * Manually sets the location of a particular plugin.
+   * 
+   * This method can be used to ease functional testing of plugins. It is not
+   * intended to support sharing plugins between projects, as many plugins
+   * save project specific code (to /lib/form/base, for example).
+   * 
+   * @param string $plugin
+   * @param string $path
+   */
+  public function setPluginPath($plugin, $path)
+  {
+    $this->overriddenPluginPaths[$plugin] = realpath($path);
+  }
+
+  /**
+   * Returns the configuration for the requested plugin.
+   * 
+   * @param   string $name
+   * 
+   * @return  sfPluginConfiguration
+   */
+  public function getPluginConfiguration($name)
+  {
+    if (!isset($this->pluginConfigurations[$name]))
+    {
+      throw new InvalidArgumentException(sprintf('There is no configuration object for the "%s" object.', $name));
+    }
+
+    return $this->pluginConfigurations[$name];
   }
 
   /**

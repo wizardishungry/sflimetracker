@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: MapBuilder.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: MapBuilder.php 521 2007-01-05 13:29:36Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -46,7 +46,7 @@
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     John D. McNally <jmcnally@collab.net> (Torque)
  * @author     Hans Lellelid <hans@xmpl.org> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 521 $
  * @package    propel.map
  */
 interface MapBuilder {

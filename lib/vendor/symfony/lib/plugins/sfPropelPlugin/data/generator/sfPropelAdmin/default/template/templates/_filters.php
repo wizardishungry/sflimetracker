@@ -6,7 +6,7 @@
 
   <fieldset>
     <h2>[?php echo __('filters') ?]</h2>
-<?php foreach ($this->getColumns('list.filters') as $column): $type = $column->getCreoleType() ?>
+<?php foreach ($this->getColumns('list.filters') as $column): $type = $column->getType() ?>
 <?php $credentials = $this->getParameterValue('list.fields.'.$column->getName().'.credentials') ?>
 <?php if ($credentials): $credentials = str_replace("\n", ' ', var_export($credentials, true)) ?>
     [?php if ($sf_user->hasCredential(<?php echo $credentials ?>)): ?]

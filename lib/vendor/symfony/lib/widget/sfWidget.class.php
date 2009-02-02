@@ -221,6 +221,30 @@ abstract class sfWidget
   }
 
   /**
+   * Gets the stylesheet paths associated with the widget.
+   *
+   * The array keys are files and values are the media names (separated by a ,):
+   *
+   *   array('/path/to/file.css' => 'all', '/another/file.css' => 'screen,print')
+   *
+   * @return array An array of stylesheet paths
+   */
+  public function getStylesheets()
+  {
+    return array();
+  }
+
+  /**
+   * Gets the JavaScript paths associated with the widget.
+   *
+   * @return array An array of JavaScript paths
+   */
+  public function getJavaScripts()
+  {
+    return array();
+  }
+
+  /**
    * Sets the charset to use when rendering widgets.
    *
    * @param string $charset  The charset
@@ -275,7 +299,7 @@ abstract class sfWidget
       return '';
     }
 
-    return sprintf('<%s%s%s', $tag, $this->attributesToHtml($attributes), self::$xhtml ? ' />' : ('input' != $tag ? sprintf('></%s>', $tag) : '>'));
+    return sprintf('<%s%s%s', $tag, $this->attributesToHtml($attributes), self::$xhtml ? ' />' : (strtolower($tag) == 'input' ? '>' : sprintf('></%s>', $tag)));
   }
 
   /**
@@ -338,6 +362,8 @@ abstract class sfWidget
   /**
    * Prepares an attribute key and value for HTML representation.
    *
+   * It removes empty attributes, except for the value one.
+   *
    * @param  string $k  The attribute key
    * @param  string $v  The attribute value
    *
@@ -345,6 +371,6 @@ abstract class sfWidget
    */
   protected function attributesToHtmlCallback($k, $v)
   {
-    return is_null($v) || '' === $v ? '' : sprintf(' %s="%s"', $k, $this->escapeOnce($v));
+    return false === $v || is_null($v) || ('' === $v && 'value' != $k) ? '' : sprintf(' %s="%s"', $k, $this->escapeOnce($v));
   }
 }

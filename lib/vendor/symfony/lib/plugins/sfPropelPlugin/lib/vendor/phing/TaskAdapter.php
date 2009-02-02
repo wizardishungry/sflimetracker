@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: TaskAdapter.php 144 2007-02-05 15:19:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -45,7 +45,7 @@ class TaskAdapter extends Task {
             try {  // try to set project
                 $this->proxy->setProject($this->project);
             } catch (Exception $ex) {
-                $this->log("Error setting project in " . get_class($this->proxy) . PROJECT_MSG_ERR);
+                $this->log("Error setting project in " . get_class($this->proxy) . Project::MSG_ERR);
                 throw new BuildException($ex);
             }
         } else {
@@ -56,7 +56,7 @@ class TaskAdapter extends Task {
             try { //try to call main
                 $this->proxy->main($this->project);
             } catch (Exception $ex) {
-                $this->log("Error in " . get_class($this->proxy), PROJECT_MSG_ERR);
+                $this->log("Error in " . get_class($this->proxy), Project::MSG_ERR);
                 throw new BuildException($ex->getMessage());
             }
         } else {

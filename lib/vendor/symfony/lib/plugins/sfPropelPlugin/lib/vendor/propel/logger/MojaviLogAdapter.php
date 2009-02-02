@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: MojaviLogAdapter.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: MojaviLogAdapter.php 521 2007-01-05 13:29:36Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -19,14 +19,11 @@
  * <http://propel.phpdb.org>.
  */
 
-// include BasicLogger from include path
-require_once('propel/logger/BasicLogger.php');
-
 /**
  * Mojavi logging adapter for propel
  *
  * @author     Brandon Keepers <brandon@opensoul.org>
- * @version    $Revision: 536 $
+ * @version    $Revision: 521 $
  * @package    propel.logger
  */
 class MojaviLogAdapter implements BasicLogger {
@@ -134,7 +131,7 @@ class MojaviLogAdapter implements BasicLogger {
 	 */
 	public function log($message, $severity = null)
 	{
-		if(is_null($this->logger))
+		if (is_null($this->logger))
 			$this->logger = LogManager::getLogger('propel');
 
 		switch($severity)

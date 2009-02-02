@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: NotCondition.php 43 2006-03-10 14:31:51Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,7 +29,7 @@ require_once 'phing/tasks/system/condition/ConditionBase.php';
  *
  *  @author    Andreas Aderhold <andi@binarycloud.com>
  *  @copyright © 2001,2002 THYRELL. All rights reserved
- *  @version   $Revision: 1.6 $ $Date: 2006-04-28 16:49:47 +0200 (Fri, 28 Apr 2006) $
+ *  @version   $Revision: 1.6 $ $Date: 2006-03-10 09:31:51 -0500 (Fri, 10 Mar 2006) $
  *  @access    public
  *  @package   phing.tasks.system.condition
  */

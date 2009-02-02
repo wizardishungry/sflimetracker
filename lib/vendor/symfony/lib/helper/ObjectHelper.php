@@ -1,6 +1,6 @@
 <?php
 
-use_helper('Form');
+require_once dirname(__FILE__).'/FormHelper.php';
 
 /*
  * This file is part of the symfony package.
@@ -72,13 +72,15 @@ function objects_for_select($options, $value_method, $text_method = null, $selec
   foreach ($options as $option)
   {
     // text method exists?
-    if ($text_method && !is_callable(array($option, $text_method)))
+    $method_exists = ($text_method == '__toString') ? method_exists($option, $text_method) : is_callable(array($option, $text_method));
+    if ($text_method && !$method_exists)
     {
       throw new sfViewException(sprintf('Method "%s" doesn\'t exist for object of class "%s".', $text_method, _get_class_decorated($option)));
     }
 
     // value method exists?
-    if (!is_callable(array($option, $value_method)))
+    $method_exists = ($value_method == '__toString') ? method_exists($option, $value_method) : is_callable(array($option, $value_method));
+    if (!$method_exists)
     {
       throw new sfViewException(sprintf('Method "%s" doesn\'t exist for object of class "%s".', $value_method, _get_class_decorated($option)));
     }
@@ -167,7 +169,7 @@ function _get_options_from_objects($objects, $text_method = null, $key_method = 
         $methodToCall = '';
         foreach (array($text_method, '__toString', 'toString', $key_method) as $method)
         {
-          if (is_callable(array($tmp_object, $method)))
+          if (method_exists($tmp_object, $method))
           {
             $methodToCall = $method;
             break;
@@ -295,7 +297,7 @@ function _get_object_value($object, $method, $default_value = null, $param = nul
     $param = ($param == null ? array() : array($param));
     $method = array($method, $param);
   }
-  
+
   // method exists?
   if (!is_callable(array($object, $method[0])))
   {
@@ -325,3 +327,4 @@ function _get_class_decorated($object)
     return get_class($object);
   }
 }
+

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: FileList.php 209 2007-08-01 22:42:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -142,9 +142,10 @@ class FileList extends DataType {
     
     /**
      * Get the source "list" file that contains file names.
+     * @param Project $p
      * @return PhingFile
      */
-    function getListFile() {
+    function getListFile(Project $p) {
         if ($this->isReference()) {
             $ref = $this->getRef($p);
             return $ref->getListFile($p);

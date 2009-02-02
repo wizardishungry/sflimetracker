@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id$
+ * $Id: Target.php 175 2007-03-14 13:52:03Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,8 +26,8 @@ include_once 'phing/TaskContainer.php';
  *  abstract class {@link TaskContainer}
  *
  *  @author    Andreas Aderhold <andi@binarycloud.com>
- *  @copyright © 2001,2002 THYRELL. All rights reserved
- *  @version   $Revision: 1.10 $ $Date: 2005/10/04 19:13:44 $
+ *  @copyright ï¿½ 2001,2002 THYRELL. All rights reserved
+ *  @version   $Revision: 1.10 $ $Date: 2007-03-14 09:52:03 -0400 (Wed, 14 Mar 2007) $
  *  @access    public
  *  @see       TaskContainer
  *  @package   phing
@@ -244,9 +244,9 @@ class Target implements TaskContainer {
                 }
             }
         } elseif (!$this->testIfCondition()) {
-            $this->project->log("Skipped target '".$this->name."' because property '".$this->ifCondition."' not set.", PROJECT_MSG_VERBOSE);
+            $this->project->log("Skipped target '".$this->name."' because property '".$this->ifCondition."' not set.", Project::MSG_VERBOSE);
         } else {
-            $this->project->log("Skipped target '".$this->name."' because property '".$this->unlessCondition."' set.", PROJECT_MSG_VERBOSE);
+            $this->project->log("Skipped target '".$this->name."' because property '".$this->unlessCondition."' set.", Project::MSG_VERBOSE);
         }
     }
 
@@ -262,7 +262,7 @@ class Target implements TaskContainer {
             $this->project->fireTargetStarted($this);
             $this->main();
             $this->project->fireTargetFinished($this, $null=null);
-        } catch (Exception $exc) {
+        } catch (BuildException $exc) {
             // log here and rethrow
             $this->project->fireTargetFinished($this, $exc);
             throw $exc;

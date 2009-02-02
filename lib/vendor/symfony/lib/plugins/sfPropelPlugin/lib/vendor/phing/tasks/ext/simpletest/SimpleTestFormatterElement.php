@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id$
+ * $Id: SimpleTestFormatterElement.php 357 2008-02-26 08:51:59Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -21,14 +21,14 @@
 
 require_once 'phing/tasks/ext/simpletest/SimpleTestPlainResultFormatter.php';
 require_once 'phing/tasks/ext/simpletest/SimpleTestSummaryResultFormatter.php';
-require_once 'phing/tasks/ext/phpunit2/FormatterElement.php';
+require_once 'phing/tasks/ext/phpunit/FormatterElement.php';
 
 /**
  * Child class of "FormatterElement", overrides setType to provide other
  * formatter classes for SimpleTest
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id$
+ * @version $Id: SimpleTestFormatterElement.php 357 2008-02-26 08:51:59Z mrook $
  * @package phing.tasks.ext.simpletest
  * @since 2.2.0
  */
@@ -59,4 +59,3 @@ class SimpleTestFormatterElement extends FormatterElement
 		}
 	}
 }
-?>

@@ -9,7 +9,7 @@
  * the business logic from display / output logic.
  * 
  * @author Hans Lellelid <hans@xmpl.org>
- * @version $Revision: 1.9 $ $Date: 2004/08/31 20:12:02 $
+ * @version $Revision: 1.9 $ $Date: 2006-09-14 16:19:08 -0400 (Thu, 14 Sep 2006) $
  */
 class Capsule {
     

@@ -3,7 +3,7 @@
 /*
  * This file is part of the symfony package.
  * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
- * 
+ *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -14,7 +14,7 @@ require_once(dirname(__FILE__).'/sfPropelBaseTask.class.php');
  * Creates a schema.xml from an existing database.
  *
  * @package    symfony
- * @subpackage command
+ * @subpackage propel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @version    SVN: $Id$
  */
@@ -26,7 +26,11 @@ class sfPropelBuildSchemaTask extends sfPropelBaseTask
   protected function configure()
   {
     $this->addOptions(array(
+      new sfCommandOption('application', null, sfCommandOption::PARAMETER_OPTIONAL, 'The application name', true),
+      new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'cli'),
+      new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', null),
       new sfCommandOption('xml', null, sfCommandOption::PARAMETER_NONE, 'Creates an XML schema instead of a YML one'),
+      new sfCommandOption('phing-arg', null, sfCommandOption::PARAMETER_REQUIRED | sfCommandOption::IS_ARRAY, 'Arbitrary phing argument'),
     ));
 
     $this->aliases = array('propel-build-schema');
@@ -52,7 +56,29 @@ EOF;
    */
   protected function execute($arguments = array(), $options = array())
   {
-    $this->callPhing('creole', self::DO_NOT_CHECK_SCHEMA);
+    $databaseManager = new sfDatabaseManager($this->configuration);
+
+    foreach ($databaseManager->getNames() as $connection)
+    {
+      if (!is_null($options['connection']) && $options['connection'] != $connection)
+      {
+        continue;
+      }
+
+      $this->reverseDatabase($databaseManager, $connection, $options);
+    }
+  }
+
+  protected function reverseDatabase($databaseManager, $connection, $options)
+  {
+    $properties = $this->getPhingPropertiesForConnection($databaseManager, $connection);
+
+    $ret = $this->callPhing('reverse', self::DO_NOT_CHECK_SCHEMA, $properties);
+
+    if (!$ret)
+    {
+      return 1;
+    }
 
     $xmlSchemaPath = sfConfig::get('sf_config_dir').'/schema.xml';
     $ymlSchemaPath = sfConfig::get('sf_config_dir').'/schema.yml';

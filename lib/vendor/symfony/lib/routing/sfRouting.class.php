@@ -22,8 +22,6 @@ abstract class sfRouting
     $dispatcher        = null,
     $cache             = null,
     $defaultParameters = array(),
-    $defaultModule     = 'default',
-    $defaultAction     = 'index',
     $options           = array();
 
   /**
@@ -42,6 +40,16 @@ abstract class sfRouting
   }
 
   /**
+   * Returns the routing cache object.
+   *
+   * @return sfCache A sfCache instance or null
+   */
+  public function getCache()
+  {
+    return $this->cache;
+  }
+
+  /**
    * Initializes this sfRouting instance.
    *
    * Available options:
@@ -50,6 +58,7 @@ abstract class sfRouting
    *  * default_action: The default action name
    *  * logging:        Whether to log or not (false by default)
    *  * debug:          Whether to cache or not (false by default)
+   *  * context:        An array of context variables to help URL matching and generation
    *
    * @param sfEventDispatcher $dispatcher  An sfEventDispatcher instance
    * @param sfCache           $cache       An sfCache instance
@@ -64,19 +73,17 @@ abstract class sfRouting
     // disable caching when in debug mode
     $this->cache = $options['debug'] ? null : $cache;
 
-    if (isset($options['default_module']))
-    {
-      $this->defaultModule = $options['default_module'];
-    }
-
-    if (isset($options['default_action']))
-    {
-      $this->defaultAction = $options['default_action'];
-    }
+    $this->setDefaultParameter('module', isset($options['default_module']) ? $options['default_module'] : 'default');
+    $this->setDefaultParameter('action', isset($options['default_action']) ? $options['default_action'] : 'index');
 
     if (!isset($options['logging']))
     {
       $options['logging'] = false;
+    }
+
+    if (!isset($options['context']))
+    {
+      $options['context'] = array();
     }
 
     $this->options = $options;
@@ -85,6 +92,16 @@ abstract class sfRouting
     $this->dispatcher->connect('request.filter_parameters', array($this, 'filterParametersEvent'));
 
     $this->loadConfiguration();
+  }
+
+  /**
+   * Returns the options.
+   *
+   * @return array An array of options
+   */
+  public function getOptions()
+  {
+    return $this->options;
   }
 
   /**
@@ -138,28 +155,46 @@ abstract class sfRouting
  /**
   * Generates a valid URLs for parameters.
   *
-  * @param  string $name      The route name
-  * @param  array  $params    The parameter values
-  * @param  string $querydiv  The divider between URI and query string
-  * @param  string $divider   The divider between key/value pairs
-  * @param  string $equals    The equal sign to use between key and value
+  * @param  string  $name      The route name
+  * @param  array   $params    The parameter values
+  * @param  Boolean $absolute  Whether to generate an absolute URL
   *
   * @return string The generated URL
   */
-  abstract public function generate($name, $params = array(), $querydiv = '/', $divider = '/', $equals = '/');
+  abstract public function generate($name, $params = array(), $absolute = false);
 
  /**
   * Parses a URL to find a matching route and sets internal state.
   *
-  * Throws a sfError404Exception if no route match the URL.
+  * Returns false if no route match the URL.
   *
   * @param  string $url  URL to be parsed
   *
-  * @return array  An array of parameters
-  *
-  * @throws sfError404Exception if the url is not parseable by the sfRouting object
+  * @return array|false  An array of parameters or false if the route does not match
   */
   abstract public function parse($url);
+
+  /**
+   * Gets the default parameters for URL generation.
+   *
+   * @return array  An array of default parameters
+   */
+  public function getDefaultParameters()
+  {
+    return $this->defaultParameters;
+  }
+
+  /**
+   * Gets a default parameter.
+   *
+   * @param  string $key    The key
+   *
+   * @return string The value
+   */
+  public function getDefaultParameter($key)
+  {
+    return isset($this->defaultParameters[$key]) ? $this->defaultParameters[$key] : null;
+  }
 
   /**
    * Sets a default parameter.
@@ -180,21 +215,6 @@ abstract class sfRouting
   public function setDefaultParameters($parameters)
   {
     $this->defaultParameters = $parameters;
-  }
-
-  protected function fixDefaults($arr)
-  {
-    if (empty($arr['module']))
-    {
-      $arr['module'] = $this->defaultModule;
-    }
-
-    if (empty($arr['action']))
-    {
-      $arr['action'] = $this->defaultAction;
-    }
-
-    return $arr;
   }
 
   protected function mergeArrays($arr1, $arr2)
@@ -222,20 +242,44 @@ abstract class sfRouting
   /**
    * Listens to the request.filter_parameters event.
    *
-   * @param sfEvent $event       An sfEvent instance
-   * @param array   $parameters  An array of parameters for the event
+   * @param  sfEvent $event       An sfEvent instance
    *
+   * @return array   $parameters  An array of parameters for the event
    */
   public function filterParametersEvent(sfEvent $event, $parameters)
   {
-    try
-    {
-      return array_merge($parameters, $this->parse($event['path_info']));
-    }
-    catch (sfError404Exception $e)
+    $context = $event->getParameters();
+
+    $this->options['context'] = $context;
+
+    if (false === $params = $this->parse($event['path_info']))
     {
       return $parameters;
     }
+
+    return array_merge($parameters, $params);
+  }
+
+  protected function fixGeneratedUrl($url, $absolute = false)
+  {
+    if (isset($this->options['context']['prefix']))
+    {
+      if (0 === strpos($url, 'http'))
+      {
+        $url = preg_replace('#https?\://[^/]+#', '$0'.$this->options['context']['prefix'], $url);
+      }
+      else
+      {
+        $url = $this->options['context']['prefix'].$url;
+      }
+    }
+
+    if ($absolute && isset($this->options['context']['host']))
+    {
+      $url = 'http'.(isset($this->options['context']['is_secure']) && $this->options['context']['is_secure'] ? 's' : '').'://'.$this->options['context']['host'].$url;
+    }
+
+    return $url;
   }
 
   /**

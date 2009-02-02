@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: PgsqlPlatform.php 844 2007-12-02 17:57:36Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'propel/engine/platform/DefaultPlatform.php';
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Martin Poeschl <mpoeschl@marmot.at> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 844 $
  * @package    propel.engine.platform
  */
 class PgsqlPlatform extends DefaultPlatform {
@@ -56,7 +56,7 @@ class PgsqlPlatform extends DefaultPlatform {
 	 */
 	public function getNativeIdMethod()
 	{
-		return Platform::SEQUENCE;
+		return Platform::SERIAL;
 	}
 
 	/**
@@ -80,8 +80,13 @@ class PgsqlPlatform extends DefaultPlatform {
 	 * @param      string $text
 	 * @return     string
 	 */
-	public function escapeText($text) {
-		return pg_escape_string($text);
+	public function disconnectedEscapeText($text)
+	{
+		if (function_exists('pg_escape_string')) {
+			return pg_escape_string($text);
+		} else {
+			return parent::disconnectedEscapeText($text);
+		}
 	}
 
 	/**
@@ -110,5 +115,14 @@ class PgsqlPlatform extends DefaultPlatform {
 	public function hasSize($sqlType)
 	{
 		return !("BYTEA" == $sqlType || "TEXT" == $sqlType);
+	}
+
+	/**
+	 * Whether the underlying PDO driver for this platform returns BLOB columns as streams (instead of strings).
+	 * @return     boolean
+	 */
+	public function hasStreamBlobImpl()
+	{
+		return true;
 	}
 }

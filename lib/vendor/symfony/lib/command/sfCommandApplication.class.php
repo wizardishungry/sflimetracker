@@ -264,13 +264,14 @@ abstract class sfCommandApplication
   public function help()
   {
     $messages = array(
-      sprintf("%s [options] task_name [arguments]\n", $this->getName()),
-      "\nAvailable options:\n",
+      $this->formatter->format('Usage:', 'COMMENT'),
+      sprintf("  %s [options] task_name [arguments]\n", $this->getName()),
+      $this->formatter->format('Options:', 'COMMENT'),
     );
 
     foreach ($this->commandManager->getOptionSet()->getOptions() as $option)
     {
-      $messages[] = sprintf("  %-10s (%s) %s\n", $option->getName(), $option->getShortcut(), $option->getHelp());
+      $messages[] = sprintf('  %-24s %s  %s', $this->formatter->format('--'.$option->getName(), 'INFO'), $this->formatter->format('-'.$option->getShortcut(), 'INFO'), $option->getHelp());
     }
 
     $this->dispatcher->notify(new sfEvent($this, 'command.log', $messages));
@@ -473,17 +474,18 @@ abstract class sfCommandApplication
     }
 
     $abbrev = $this->getAbbreviations($aliases);
-    if (!isset($abbrev[$name]))
+    $fullName = $namespace ? $namespace.':'.$name : $name;
+    if (!isset($abbrev[$fullName]))
     {
-      throw new sfCommandException(sprintf('Task "%s" is not defined.', $name));
+      throw new sfCommandException(sprintf('Task "%s" is not defined.', $fullName));
     }
-    else if (count($abbrev[$name]) > 1)
+    else if (count($abbrev[$fullName]) > 1)
     {
-      throw new sfCommandException(sprintf('Task "%s" is ambiguous (%s).', $name, implode(', ', $abbrev[$name])));
+      throw new sfCommandException(sprintf('Task "%s" is ambiguous (%s).', $fullName, implode(', ', $abbrev[$fullName])));
     }
     else
     {
-      return $this->getTask($abbrev[$name][0]);
+      return $this->getTask($abbrev[$fullName][0]);
     }
   }
 

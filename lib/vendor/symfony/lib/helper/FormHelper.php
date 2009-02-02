@@ -58,10 +58,13 @@ function options_for_select($options = array(), $selected = '', $html_options = 
 {
   $html_options = _parse_attributes($html_options);
 
-  if (is_array($selected))
+  if (!is_array($selected))
   {
-    $selected = array_map('strval', array_values($selected));
+    $selected = array($selected);
   }
+
+  $selected = array_map('strval', array_values($selected));
+  $selected_set = array_flip($selected);
 
   $html = '';
 
@@ -84,12 +87,7 @@ function options_for_select($options = array(), $selected = '', $html_options = 
     {
       $option_options = array('value' => $key);
 
-      if (
-          (is_array($selected) && in_array(strval($key), $selected, true))
-          ||
-          (strval($key) == strval($selected))
-         )
-      {
+      if (isset($selected_set[strval($key)])) {
         $option_options['selected'] = 'selected';
       }
 
@@ -124,10 +122,8 @@ function form_tag($url_for_options = '', $options = array())
   $options = _parse_attributes($options);
 
   $html_options = $options;
-  if (!isset($html_options['method']))
-  {
-    $html_options['method'] = 'post';
-  }
+
+  $html_options['method'] = isset($html_options['method']) ? strtolower($html_options['method']) : 'post';
 
   if (_get_option($html_options, 'multipart'))
   {
@@ -136,7 +132,14 @@ function form_tag($url_for_options = '', $options = array())
 
   $html_options['action'] = url_for($url_for_options);
 
-  return tag('form', $html_options, true);
+  $html = '';
+  if (!in_array($html_options['method'], array('get', 'post')))
+  {
+    $html = tag('input', array('type' => 'hidden', 'name' => 'sf_method', 'value' => $html_options['method']));
+    $html_options['method'] = 'post';
+  }
+
+  return tag('form', $html_options, true).$html;
 }
 
 /**
@@ -223,13 +226,7 @@ function select_country_tag($name, $selected = null, $options = array())
 
   if ($country_option = _get_option($options, 'countries'))
   {
-    foreach ($countries as $key => $value)
-    {
-      if (!in_array($key, $country_option))
-      {
-        unset($countries[$key]);
-      }
-    }
+    $countries = array_intersect_key($countries, array_flip($country_option)); 
   }
 
   asort($countries);
@@ -275,13 +272,7 @@ function select_language_tag($name, $selected = null, $options = array())
 
   if ($language_option = _get_option($options, 'languages'))
   {
-    foreach ($languages as $key => $value)
-    {
-      if (!in_array($key, $language_option))
-      {
-        unset($languages[$key]);
-      }
-    }
+    $languages = array_intersect_key($languages, array_flip($language_option)); 
   }
 
   asort($languages);
@@ -323,25 +314,23 @@ function select_language_tag($name, $selected = null, $options = array())
 function select_currency_tag($name, $selected = null, $options = array())
 {
   $c = sfCultureInfo::getInstance(sfContext::getInstance()->getUser()->getCulture());
-  $currencies = $c->getCurrencies();
+  $currencies = $c->getCurrencies(null, true);
 
   $currency_option = _get_option($options, 'currencies');
+  if ($currency_option)
+  {
+      $currencies = array_intersect_key($currencies, array_flip($currency_option)); 
+  }
+
   $display_option = _get_option($options, 'display');
-  
+
   foreach ($currencies as $key => $value)
   {
-    if ($currency_option && !in_array($key, $currency_option))
+    switch ($display_option)
     {
-      unset($currencies[$key]);
-    }
-    else
-    {
-      switch ($display_option)
-      {
-        case 'symbol' : $currencies[$key] = $value[0];          break;
-        case 'code'   : $currencies[$key] = $key;               break;
-        default       : $currencies[$key] = ucfirst($value[1]); break;
-      }
+      case 'symbol' : $currencies[$key] = $value[0];          break;
+      case 'code'   : $currencies[$key] = $key;               break;
+      default       : $currencies[$key] = ucfirst($value[1]); break;
     }
   }
 
@@ -497,7 +486,7 @@ function textarea_tag($name, $content = null, $options = array())
 
   if ($size = _get_option($options, 'size'))
   {
-    list($options['cols'], $options['rows']) = split('x', $size, 2);
+    list($options['cols'], $options['rows']) = explode('x', $size, 2);
   }
 
   // rich control?
@@ -709,7 +698,7 @@ function input_date_tag($name, $value = null, $options = array())
   // rich control?
   if (!_get_option($options, 'rich', false))
   {
-    use_helper('DateForm');
+    require_once dirname(__FILE__).'/DateFormHelper.php';
 
     // set culture for month tag
     $options['culture'] = $culture;

@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: ColumnMap.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: ColumnMap.php 784 2007-11-08 10:15:50Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -19,8 +19,6 @@
  * and is licensed under the LGPL. For more information please see
  * <http://propel.phpdb.org>.
  */
-
-include_once 'propel/map/ValidatorMap.php';
 
 /**
  * ColumnMap is used to model a column of a table in a database.
@@ -40,16 +38,13 @@ include_once 'propel/map/ValidatorMap.php';
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     John D. McNally <jmcnally@collab.net> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 784 $
  * @package    propel.map
  */
 class ColumnMap {
 
-	/** @var        int Creole type for this column. */
-	private $creoleType;
-
-	/** @var        string Native PHP type of the column. */
-	private $type = null;
+	/** @var        string Propel type of the column. */
+	private $type;
 
 	/** Size of the column. */
 	private $size = 0;
@@ -59,6 +54,9 @@ class ColumnMap {
 
 	/** Is null value allowed ?*/
 	private $notNull = false;
+
+	/** The default value for this column. */
+	private $defaultValue;
 
 	/** Name of the table that this column is related to. */
 	private $relatedTableName = "";
@@ -91,13 +89,33 @@ class ColumnMap {
 	}
 
 	/**
+	 * Gets column name (DEPRECATED).
+	 * @return     string
+	 * @deprecated Use getName() instead.
+	 */
+	public function getColumnName()
+	{
+		return $this->getName();
+	}
+
+	/**
 	 * Get the name of a column.
 	 *
 	 * @return     string A String with the column name.
 	 */
-	public function getColumnName()
+	public function getName()
 	{
 		return $this->columnName;
+	}
+
+	/**
+	 * Get the name of a column.
+	 *
+	 * @return     string A String with the column name.
+	 */
+	public function getPhpName()
+	{
+		return $this->phpName;
 	}
 
 	/**
@@ -109,16 +127,6 @@ class ColumnMap {
 	public function setPhpName($phpName)
 	{
 		$this->phpName = $phpName;
-	}
-
-	/**
-	 * Get the name of a column.
-	 *
-	 * @return     string A String with the column name.
-	 */
-	public function getPhpName()
-	{
-		return $this->phpName;
 	}
 
 	/**
@@ -151,9 +159,19 @@ class ColumnMap {
 	}
 
 	/**
-	 * Set the type of this column.
+	 * Get the Propel type of this column.
 	 *
-	 * @param      string $type A string representing the PHP native type.
+	 * @return     string A string representing the Propel type (e.g. PropelColumnTypes::DATE).
+	 */
+	public function getType()
+	{
+		return $this->type;
+	}
+
+	/**
+	 * Set the Propel type of this column.
+	 *
+	 * @param      string $type A string representing the Propel type (e.g. PropelColumnTypes::DATE).
 	 * @return     void
 	 */
 	public function setType($type)
@@ -161,15 +179,77 @@ class ColumnMap {
 		$this->type = $type;
 	}
 
-	 /**
-	 * Set the Creole type of this column.
+	/**
+	 * Get the PHP type of this column.
 	 *
-	 * @param      int $type An int representing Creole type for this column.
-	 * @return     void
+	 * @return     int The PDO::PARMA_* value
 	 */
-	public function setCreoleType($type)
+	 /*
+	public function getPhpType()
 	{
-		$this->creoleType = $type;
+		return PropelColumnTypes::getPhpType($this->type);
+	}
+	*/
+	/**
+	 * Get the PDO type of this column.
+	 *
+	 * @return     int The PDO::PARMA_* value
+	 */
+	public function getPdoType()
+	{
+		return PropelColumnTypes::getPdoType($this->type);
+	}
+
+	/**
+	 * Whether this is a BLOB, LONGVARBINARY, or VARBINARY.
+	 * @return     boolean
+	 */
+	public function isLob()
+	{
+		return ($this->type == PropelColumnTypes::BLOB || $this->type == PropelColumnTypes::VARBINARY || $this->type == PropelColumnTypes::LONGVARBINARY);
+	}
+
+	/**
+	 * Whether this is a DATE/TIME/TIMESTAMP column that is post-epoch (1970).
+	 *
+	 * PHP cannot handle pre-epoch timestamps well -- hence the need to differentiate
+	 * between epoch and pre-epoch timestamps.
+	 *
+	 * @return     boolean
+	 * @deprecated Propel supports non-epoch dates
+	 */
+	public function isEpochTemporal()
+	{
+		return ($this->type == PropelColumnTypes::TIMESTAMP || $this->type == PropelColumnTypes::DATE || $this->type == PropelColumnTypes::TIME);
+	}
+
+	/**
+	 * Whether this column is numeric (int, decimal, bigint etc).
+	 * @return     boolean
+	 */
+	public function isNumeric()
+	{
+		return ($this->type == PropelColumnTypes::NUMERIC || $this->type == PropelColumnTypes::DECIMAL || $this->type == PropelColumnTypes::TINYINT || $this->type == PropelColumnTypes::SMALLINT || $this->type == PropelColumnTypes::INTEGER || $this->type == PropelColumnTypes::BIGINT || $this->type == PropelColumnTypes::REAL || $this->type == PropelColumnTypes::FLOAT || $this->type == PropelColumnTypes::DOUBLE);
+	}
+
+	/**
+	 * Whether this is a DATE/TIME/TIMESTAMP column.
+	 *
+	 * @return     boolean
+	 * @since      1.3
+	 */
+	public function isTemporal()
+	{
+		return ($this->type == PropelColumnTypes::TIMESTAMP || $this->type == PropelColumnTypes::DATE || $this->type == PropelColumnTypes::TIME || $this->type == PropelColumnTypes::BU_DATE  || $this->type == PropelColumnTypes::BU_TIMESTAMP);
+	}
+
+	/**
+	 * Whether this column is a text column (varchar, char, longvarchar).
+	 * @return     boolean
+	 */
+	public function isText()
+	{
+		return ($this->type == PropelColumnTypes::VARCHAR || $this->type == PropelColumnTypes::LONGVARCHAR || $this->type == PropelColumnTypes::CHAR);
 	}
 
 	/**
@@ -247,27 +327,6 @@ class ColumnMap {
 	  return $this->validators;
 	}
 
-
-	/**
-	 * Get the native PHP type of this column.
-	 *
-	 * @return     string A string specifying the native PHP type.
-	 */
-	public function getType()
-	{
-		return $this->type;
-	}
-
-	/**
-	 * Get the Creole type of this column.
-	 *
-	 * @return     string A string specifying the native PHP type.
-	 */
-	public function getCreoleType()
-	{
-		return $this->creoleType;
-	}
-
 	/**
 	 * Get the size of this column.
 	 *
@@ -291,7 +350,7 @@ class ColumnMap {
 	/**
 	 * Is null value allowed ?
 	 *
-	 * @return     boolean True if column may be null.
+	 * @return     boolean True if column may not be null.
 	 */
 	public function isNotNull()
 	{
@@ -340,5 +399,19 @@ class ColumnMap {
 	public function getRelatedColumnName()
 	{
 		return $this->relatedColumnName;
+	}
+
+	/**
+	 * Performs DB-specific ignore case, but only if the column type necessitates it.
+	 * @param      string $str The expression we want to apply the ignore case formatting to (e.g. the column name).
+	 * @param      DBAdapter $db
+	 */
+	public function ignoreCase($str, DBAdapter $db)
+	{
+		if ($this->isText()) {
+			return $db->ignoreCase($str);
+		} else {
+			return $str;
+		}
 	}
 }

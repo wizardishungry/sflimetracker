@@ -1,3 +1,15 @@
+article:
+  class:        sfPropelRouteCollection
+  type:         collection
+  options:      { model: Article, route_class: sfRequestRoute }
+  requirements: { id: \d+ }
+
+articles:
+  class:        sfPropelRouteCollection
+  type:         collection
+  options:      { model: Article, singular: article }
+  requirements: { id: \d+ }
+
 # default rules
 homepage:
   url:   /

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: ValidValuesValidator.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: ValidValuesValidator.php 964 2008-02-10 20:42:38Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -19,8 +19,6 @@
  * <http://propel.phpdb.org>.
  */
 
-require_once 'propel/validator/BasicValidator.php';
-
 /**
  * A validator for valid values (e.g. for enum fields)
  *
@@ -33,7 +31,7 @@ require_once 'propel/validator/BasicValidator.php';
  * </code>
  *
  * @author     Michael Aichler <aichler@mediacluster.de>
- * @version    $Revision: 536 $
+ * @version    $Revision: 964 $
  * @package    propel.validator
  */
 class ValidValuesValidator implements BasicValidator
@@ -41,6 +39,6 @@ class ValidValuesValidator implements BasicValidator
 
 	public function isValid (ValidatorMap $map, $str)
 	{
-		return in_array($str, explode("|", $map->getValue()));
+		return in_array($str, preg_split("/[|,]/", $map->getValue()));
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: Inheritance.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: Inheritance.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,7 +27,7 @@ require_once 'propel/engine/database/model/XMLElement.php';
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     John McNally <jmcnally@collab.net> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 989 $
  * @package    propel.engine.database.model
  */
 class Inheritance extends XMLElement {
@@ -141,24 +141,18 @@ class Inheritance extends XMLElement {
 	}
 
 	/**
-	 * String representation of the foreign key. This is an xml representation.
+	 * @see        XMLElement::appendXml(DOMNode)
 	 */
-	public function toString()
+	public function appendXml(DOMNode $node)
 	{
-		$result = " <inheritance key=\""
-			  . $this->key
-			  . "\" class=\""
-			  . $this->className
-			  . '"';
+		$doc = ($node instanceof DOMDocument) ? $node : $node->ownerDocument;
+
+		$inherNode = $node->appendChild($doc->createElement('inheritance'));
+		$inherNode->setAttribute('key', $this->key);
+		$inherNode->setAttribute('class', $this->className);
 
 		if ($this->ancestor !== null) {
-			$result .= " extends=\""
-				  . $this->ancestor
-				  . '"';
+			$inherNode->setAttribute('extends', $this->ancestor);
 		}
-
-		$result .= "/>";
-
-		return $result;
 	}
 }

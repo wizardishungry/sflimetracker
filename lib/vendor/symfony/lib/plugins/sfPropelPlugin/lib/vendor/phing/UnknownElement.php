@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: UnknownElement.php 205 2007-07-29 21:04:42Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -130,15 +130,19 @@ class UnknownElement extends Task {
                 $realChild = $this->makeTask($child, $childWrapper, false);
                 $parent->addTask($realChild);
             } else {
-                $realChild = $ih->createElement($this->project, $parent, $child->getTag());
+				$project = $this->project === null ? $parent->project : $this->project;
+				$realChild = $ih->createElement($project, $parent, $child->getTag());
             }
 
             $childWrapper->setProxy($realChild);
             if ($realChild instanceof Task) {
                 $realChild->setRuntimeConfigurableWrapper($childWrapper);
             }
-
-            $child->handleChildren($realChild, $childWrapper);
+			
+            if ($realChild instanceof ProjectComponent) {
+            	$child->handleChildren($realChild, $childWrapper);
+            }
+            
             if ($realChild instanceof Task) {
                 $realChild->maybeConfigure();
             }

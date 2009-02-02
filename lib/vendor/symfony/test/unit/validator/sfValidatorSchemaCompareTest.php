@@ -10,7 +10,7 @@
 
 require_once(dirname(__FILE__).'/../../bootstrap/unit.php');
 
-$t = new lime_test(43, new lime_output_color());
+$t = new lime_test(84, new lime_output_color());
 
 $v = new sfValidatorSchemaCompare('left', sfValidatorSchemaCompare::EQUAL, 'right');
 
@@ -25,6 +25,15 @@ foreach (array(
   array(array('left' => 2, 'right' => 1), sfValidatorSchemaCompare::GREATER_THAN),
   array(array('left' => 2, 'right' => 2), sfValidatorSchemaCompare::GREATER_THAN_EQUAL),
   array(array('left' => 'foo', 'right' => 'bar'), sfValidatorSchemaCompare::NOT_EQUAL),
+
+  array(array('left' => 'foo', 'right' => 'foo'), '=='),
+  array(array(), '=='),
+  array(null, '=='),
+  array(array('left' => 1, 'right' => 2), '<'),
+  array(array('left' => 2, 'right' => 2), '<='),
+  array(array('left' => 2, 'right' => 1), '>'),
+  array(array('left' => 2, 'right' => 2), '>='),
+  array(array('left' => 'foo', 'right' => 'bar'), '!='),
 ) as $values)
 {
   $v->setOption('operator', $values[1]);
@@ -40,6 +49,15 @@ foreach (array(
   array(array('left' => 2, 'right' => 1), sfValidatorSchemaCompare::LESS_THAN),
   array(array('left' => 3, 'right' => 2), sfValidatorSchemaCompare::LESS_THAN_EQUAL),
   array(array('left' => 'foo', 'right' => 'bar'), sfValidatorSchemaCompare::EQUAL),
+
+  array(array('left' => 'foo', 'right' => 'foo'), '!='),
+  array(array(), '!='),
+  array(null, '!='),
+  array(array('left' => 1, 'right' => 2), '>'),
+  array(array('left' => 2, 'right' => 3), '>='),
+  array(array('left' => 2, 'right' => 1), '<'),
+  array(array('left' => 3, 'right' => 2), '<='),
+  array(array('left' => 'foo', 'right' => 'bar'), '=='),
 ) as $values)
 {
   $v->setOption('operator', $values[1]);
@@ -71,10 +89,21 @@ catch (InvalidArgumentException $e)
   $t->pass('->clean() throws an InvalidArgumentException exception if the first argument is not an array of value');
 }
 
+$v = new sfValidatorSchemaCompare('left', 'foo', 'right');
+try
+{
+  $v->clean(array());
+  $t->fail('->clean() throws an InvalidArgumentException exception if the operator does not exist');
+}
+catch (InvalidArgumentException $e)
+{
+  $t->pass('->clean() throws an InvalidArgumentException exception if the operator does not exist');
+}
+
 // ->asString()
 $t->diag('->asString()');
 $v = new sfValidatorSchemaCompare('left', sfValidatorSchemaCompare::EQUAL, 'right');
-$t->is($v->asString(), 'left equal right', '->asString() returns a string representation of the validator');
+$t->is($v->asString(), 'left == right', '->asString() returns a string representation of the validator');
 
 $v = new sfValidatorSchemaCompare('left', sfValidatorSchemaCompare::EQUAL, 'right', array(), array('required' => 'This is required.'));
-$t->is($v->asString(), 'left equal({}, { required: \'This is required.\' }) right', '->asString() returns a string representation of the validator');
+$t->is($v->asString(), 'left ==({}, { required: \'This is required.\' }) right', '->asString() returns a string representation of the validator');

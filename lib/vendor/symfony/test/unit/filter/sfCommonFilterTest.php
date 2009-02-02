@@ -24,7 +24,7 @@ class myRequest
     return '';
   }
 
-  public function getMethodName()
+  public function getMethod()
   {
     return 'GET';
   }
@@ -80,10 +80,24 @@ class lastTestFilter extends sfFilter
   }
 }
 
+class ProjectConfiguration extends sfProjectConfiguration
+{
+}
+
+class TestConfiguration extends sfApplicationConfiguration
+{
+  public function getI18NGlobalDirs()
+  {
+    return array(dirname(__FILE__).'/fixtures');
+  }
+}
+
 $context = sfContext::getInstance(array(
   'request'  => 'myRequest',
   'response' => 'sfWebResponse',
 ));
+
+$context->configuration = new TestConfiguration('test', true, sfToolkit::getTmpDir().'/sf_test_project');
 
 $response = $context->response;
 

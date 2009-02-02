@@ -10,7 +10,7 @@
 
 require_once(dirname(__FILE__).'/../../bootstrap/unit.php');
 
-$t = new lime_test(25, new lime_output_color());
+$t = new lime_test(28, new lime_output_color());
 
 // widgets
 $authorSchema = new sfWidgetFormSchema(array(
@@ -38,8 +38,9 @@ $f = $parent['title'];
 $child = $parent['author'];
 
 // ->getValue() ->getWidget() ->getParent() ->getError() ->hasError()
-$t->diag('->getValue() ->getWidget() ->getParent() ->getError() ->hasError()');
+$t->diag('->getValue() ->getName() ->getWidget() ->getParent() ->getError() ->hasError()');
 $t->ok($f->getWidget() == $titleWidget, '->getWidget() returns the form field widget');
+$t->is($f->getName(), 'title', '->getName() returns the form field name');
 $t->is($f->getValue(), 'symfony', '->getValue() returns the form field value');
 $t->is($f->getParent(), $parent, '->getParent() returns the form field parent');
 $t->is($f->getError(), $titleError, '->getError() returns the form field error');
@@ -162,6 +163,11 @@ catch (LogicException $e)
   $t->pass('->renderLabelName() throws an LogicException if the form field has no parent');
 }
 
+// ->renderId()
+$t->diag('->renderId()');
+$t->is($f->renderId(), 'article_title', '->renderId() renders the id attribute of the field');
+$t->is($child['name']->renderId(), 'article_author_name', '->renderId() renders the id attribute of the field');
+
 // ->isHidden()
 $t->diag('->isHidden()');
 $t->is($f->isHidden(), false, '->isHidden() is a proxy method to the isHidden() method of the widget');
@@ -214,4 +220,3 @@ $output = <<<EOF
 
 EOF;
 $t->is($child->renderError(), $output, '->renderError() renders global errors as expected (global errors, hidden field errors, non existent field errors)');
-

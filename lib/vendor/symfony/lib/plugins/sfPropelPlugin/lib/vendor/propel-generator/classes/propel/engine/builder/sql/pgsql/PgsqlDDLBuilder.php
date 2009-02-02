@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id$
+ *  $Id: PgsqlDDLBuilder.php 1000 2008-03-15 21:22:47Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -41,6 +41,35 @@ class PgsqlDDLBuilder extends DDLBuilder {
 	protected static $addedSchemas = array();
 
 	/**
+	 * Queue of constraint SQL that will be added to script at the end.
+	 *
+	 * PostgreSQL seems (now?) to not like constraints for tables that don't exist,
+	 * so the solution is to queue up the statements and execute it at the end.
+	 *
+	 * @var        array
+	 */
+	protected static $queuedConstraints = array();
+
+	/**
+	 * Reset static vars between db iterations.
+	 */
+	public static function reset()
+	{
+		self::$addedSchemas = array();
+		self::$queuedConstraints = array();
+	}
+
+	/**
+	 * Returns all the ALTER TABLE ADD CONSTRAINT lines for inclusion at end of file.
+	 * @return     string DDL
+	 */
+	public static function getDatabaseEndDDL()
+	{
+		$ddl = implode("", self::$queuedConstraints);
+		return $ddl;
+	}
+
+	/**
 	 * Get the schema for the current table
 	 *
 	 * @author     Markus Lervik <markus.lervik@necora.fi>
@@ -50,15 +79,12 @@ class PgsqlDDLBuilder extends DDLBuilder {
 	 **/
 	protected function getSchema()
 	{
-
 		$table = $this->getTable();
-		$schema = $table->getVendorSpecificInfo();
-		if (!empty($schema) && isset($schema['schema'])) {
-			return $schema['schema'];
+		$vi = $table->getVendorInfoForType($this->getPlatform()->getDatabaseType());
+		if ($vi->hasParameter('schema')) {
+			return $vi->getParameter('schema');
 		}
-
 		return null;
-
 	}
 
 	/**
@@ -97,11 +123,12 @@ class PgsqlDDLBuilder extends DDLBuilder {
 		$platform = $this->getPlatform();
 
 		$script .= "
-DROP TABLE ".$this->quoteIdentifier($table->getName())." CASCADE;
+DROP TABLE ".$this->quoteIdentifier($this->prefixTablename($table->getName()))." CASCADE;
 ";
-		if ($table->getIdMethod() == "native") {
+
+		if ($table->getIdMethod() == IDMethod::NATIVE && $table->getIdMethodParameters()) {
 			$script .= "
-DROP SEQUENCE ".$this->quoteIdentifier(strtolower($table->getSequenceName())).";
+DROP SEQUENCE ".$this->quoteIdentifier($this->prefixTablename(strtolower($this->getSequenceName()))).";
 ";
 		}
 	}
@@ -133,14 +160,23 @@ DROP SEQUENCE ".$this->quoteIdentifier(strtolower($table->getSequenceName())).";
 
 		$script .= "
 
-CREATE TABLE ".$this->quoteIdentifier($table->getName())."
+CREATE TABLE ".$this->quoteIdentifier($this->prefixTablename($table->getName()))."
 (
 	";
 
 		$lines = array();
 
 		foreach ($table->getColumns() as $col) {
-			$lines[] = $this->getColumnDDL($col);
+			/* @var $col Column */
+			$colDDL = $this->getColumnDDL($col);
+			if ($col->isAutoIncrement() && $table->getIdMethodParameters() == null) {
+				if ($col->getType() === PropelTypes::BIGINT) {
+					$colDDL = str_replace($col->getDomain()->getSqlType(), 'bigserial', $colDDL);
+				} else {
+					$colDDL = str_replace($col->getDomain()->getSqlType(), 'serial', $colDDL);
+				}
+			}
+			$lines[] = $colDDL;
 		}
 
 		if ($table->hasPrimaryKey()) {
@@ -157,7 +193,7 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 		$script .= "
 );
 
-COMMENT ON TABLE ".$this->quoteIdentifier($table->getName())." IS '" . $platform->escapeText($table->getDescription())."';
+COMMENT ON TABLE ".$this->quoteIdentifier($this->prefixTablename($table->getName()))." IS " . $platform->quote($table->getDescription()).";
 
 ";
 
@@ -177,12 +213,43 @@ COMMENT ON TABLE ".$this->quoteIdentifier($table->getName())." IS '" . $platform
 		$platform = $this->getPlatform();
 
 		foreach ($this->getTable()->getColumns() as $col) {
-			if( $col->getDescription() != '' ) {
+			if ( $col->getDescription() != '' ) {
 				$script .= "
-COMMENT ON COLUMN ".$this->quoteIdentifier($table->getName()).".".$this->quoteIdentifier($col->getName())." IS '".$platform->escapeText($col->getDescription()) ."';
+COMMENT ON COLUMN ".$this->quoteIdentifier($this->prefixTablename($table->getName())).".".$this->quoteIdentifier($col->getName())." IS ".$platform->quote($col->getDescription()) .";
 ";
 			}
 		}
+	}
+
+	/**
+	 * Override to provide sequence names that conform to postgres' standard when
+	 * no id-method-parameter specified.
+	 *
+	 * @see        DataModelBuilder::getSequenceName()
+	 * @return     string
+	 */
+	public function getSequenceName()
+	{
+		$table = $this->getTable();
+		static $longNamesMap = array();
+		$result = null;
+		if ($table->getIdMethod() == IDMethod::NATIVE) {
+			$idMethodParams = $table->getIdMethodParameters();
+			if (empty($idMethodParams)) {
+				$result = null;
+				// We're going to ignore a check for max length (mainly
+				// because I'm not sure how Postgres would handle this w/ SERIAL anyway)
+				foreach ($table->getColumns() as $col) {
+					if ($col->isAutoIncrement()) {
+						$result = $table->getName() . '_' . $col->getName() . '_seq';
+						break; // there's only one auto-increment column allowed
+					}
+				}
+			} else {
+				$result = $idMethodParams[0]->getValue();
+			}
+		}
+		return $result;
 	}
 
 	/**
@@ -194,9 +261,9 @@ COMMENT ON COLUMN ".$this->quoteIdentifier($table->getName()).".".$this->quoteId
 		$table = $this->getTable();
 		$platform = $this->getPlatform();
 
-		if ($table->getIdMethod() == "native") {
+		if ($table->getIdMethod() == IDMethod::NATIVE && $table->getIdMethodParameters() != null) {
 			$script .= "
-CREATE SEQUENCE ".$this->quoteIdentifier(strtolower($table->getSequenceName())).";
+CREATE SEQUENCE ".$this->quoteIdentifier($this->prefixTablename(strtolower($this->getSequenceName()))).";
 ";
 		}
 	}
@@ -214,10 +281,10 @@ CREATE SEQUENCE ".$this->quoteIdentifier(strtolower($table->getSequenceName())).
 		foreach ($table->getIndices() as $index) {
 			$script .= "
 CREATE ";
-			if($index->getIsUnique()) {
+			if ($index->getIsUnique()) {
 				$script .= "UNIQUE";
 			}
-			$script .= "INDEX ".$this->quoteIdentifier($index->getName())." ON ".$this->quoteIdentifier($table->getName())." (".$this->getColumnList($index->getColumns()).");
+			$script .= "INDEX ".$this->quoteIdentifier($index->getName())." ON ".$this->quoteIdentifier($this->prefixTablename($table->getName()))." (".$this->getColumnList($index->getColumns()).");
 ";
 		}
 	}
@@ -232,16 +299,17 @@ CREATE ";
 		$platform = $this->getPlatform();
 
 		foreach ($table->getForeignKeys() as $fk) {
-			$script .= "
-ALTER TABLE ".$this->quoteIdentifier($table->getName())." ADD CONSTRAINT ".$this->quoteIdentifier($fk->getName())." FOREIGN KEY (".$this->getColumnList($fk->getLocalColumns()) .") REFERENCES ".$this->quoteIdentifier($fk->getForeignTableName())." (".$this->getColumnList($fk->getForeignColumns()).")";
+			$privscript = "
+ALTER TABLE ".$this->quoteIdentifier($this->prefixTablename($table->getName()))." ADD CONSTRAINT ".$this->quoteIdentifier($fk->getName())." FOREIGN KEY (".$this->getColumnList($fk->getLocalColumns()) .") REFERENCES ".$this->quoteIdentifier($this->prefixTablename($fk->getForeignTableName()))." (".$this->getColumnList($fk->getForeignColumns()).")";
 			if ($fk->hasOnUpdate()) {
-				$script .= " ON UPDATE ".$fk->getOnUpdate();
+				$privscript .= " ON UPDATE ".$fk->getOnUpdate();
 			}
 			if ($fk->hasOnDelete()) {
-				$script .= " ON DELETE ".$fk->getOnDelete();
+				$privscript .= " ON DELETE ".$fk->getOnDelete();
 			}
-			$script .= ";
+			$privscript .= ";
 ";
+			self::$queuedConstraints[] = $privscript;
 		}
 	}
 

@@ -71,7 +71,7 @@ class sfException extends Exception
         }
       }
 
-      ob_start(sfConfig::get('sf_compressed') ? 'ob_gzhandler' : '');
+      ob_start();
 
       header('HTTP/1.0 500 Internal Server Error');
     }
@@ -93,9 +93,13 @@ class sfException extends Exception
   /**
    * Gets the stack trace for this exception.
    */
-  static protected function outputStackTrace($exception)
+  static protected function outputStackTrace(Exception $exception)
   {
-    if (class_exists('sfContext', false) && sfContext::hasInstance())
+    $format = 'html';
+    $code   = '500';
+    $text   = 'Internal Server Error';
+
+    if (class_exists('sfContext', false) && sfContext::hasInstance() && is_object($request = sfContext::getInstance()->getRequest()) && is_object($response = sfContext::getInstance()->getResponse()))
     {
       $dispatcher = sfContext::getInstance()->getEventDispatcher();
 
@@ -109,36 +113,59 @@ class sfException extends Exception
       {
         return;
       }
+
+      if ($response->getStatusCode() < 300)
+      {
+        // status code has already been sent, but is included here for the purpose of testing
+        $response->setStatusCode(500);
+      }
+
+      $response->setContentType('text/html');
+
+      if (!sfConfig::get('sf_test'))
+      {
+        foreach ($response->getHttpHeaders() as $name => $value)
+        {
+          header($name.': '.$value);
+        }
+      }
+
+      $code = $response->getStatusCode();
+      $text = $response->getStatusText();
+
+      $format = $request->getRequestFormat();
+      if (!$format)
+      {
+        $format = 'html';
+      }
+
+      if ($mimeType = $request->getMimeType($format))
+      {
+        $response->setContentType($mimeType);
+      }
+    }
+    else
+    {
+      // a backward compatible default
+      if (!sfConfig::get('sf_test'))
+      {
+        header('Content-Type: text/html; charset='.sfConfig::get('sf_charset', 'utf-8'));
+      }
     }
 
     // send an error 500 if not in debug mode
     if (!sfConfig::get('sf_debug'))
     {
-      $files = array();
-
-      // first check for app/project specific error page, can only do this if we have a context
-      if (sfConfig::get('sf_app_config_dir'))
+      if ($template = self::getTemplatePathForError($format, false))
       {
-        $files[] = sfConfig::get('sf_app_config_dir').'/error_500.php';
-      }
-      $files[] = sfConfig::get('sf_config_dir').'/error_500.php';
-      $files[] = sfConfig::get('sf_web_dir').'/errors/error500.php';
-      $files[] = dirname(__FILE__).'/data/error500.php';
-
-      foreach ($files as $file)
-      {
-        if (is_readable($file))
-        {
-          include $file;
-          return;
-        }
+        include $template;
+        return;
       }
     }
 
-    $message = null !== $exception->getMessage() ? $exception->getMessage() : 'n/a';
+    $message = is_null($exception->getMessage()) ? 'n/a' : $exception->getMessage();
     $name    = get_class($exception);
-    $format  = 0 == strncasecmp(PHP_SAPI, 'cli', 3) ? 'plain' : 'html';
-    $traces  = self::getTraces($exception, $format);
+    $traces  = self::getTraces($exception, 'html' != $format || 0 == strncasecmp(PHP_SAPI, 'cli', 3) ? 'plain' : 'html');
 
     // dump main objects values
     $sf_settings = '';
@@ -153,7 +180,40 @@ class sfException extends Exception
       $globalsTable  = self::formatArrayAsHtml(sfDebug::globalsAsArray());
     }
 
-    include dirname(__FILE__).'/data/exception.'.($format == 'html' ? 'php' : 'txt');
+    if ($template = self::getTemplatePathForError($format, true))
+    {
+      include $template;
+      return;
+    }
+  }
+
+  /**
+   * Returns the path for the template error message.
+   *
+   * @param  string  $format The request format
+   * @param  Boolean $debug  Whether to return a template for the debug mode or not
+   *
+   * @return string|Boolean  false if the template cannot be found for the given format,
+   *                         the absolute path to the template otherwise
+   */
+  static public function getTemplatePathForError($format, $debug)
+  {
+    $templatePaths = array(
+      sfConfig::get('sf_app_config_dir').'/error',
+      sfConfig::get('sf_config_dir').'/error',
+      dirname(__FILE__).'/data',
+    );
+
+    $template = sprintf('%s.%s.php', $debug ? 'exception' : 'error', $format);
+    foreach ($templatePaths as $path)
+    {
+      if (!is_null($path) && is_readable($file = $path.'/'.$template))
+      {
+        return $file;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -164,7 +224,7 @@ class sfException extends Exception
    *
    * @return array An array of traces
    */
-  static public function getTraces($exception, $format = 'plain')
+  static protected function getTraces($exception, $format = 'plain')
   {
     $traceData = $exception->getTrace();
     array_unshift($traceData, array(
@@ -269,11 +329,11 @@ class sfException extends Exception
       }
       else if ($value === null)
       {
-        $result[] = '<em>null</em>';
+        $result[] = $format == 'html' ? '<em>null</em>' : 'null';
       }
       else if (!is_int($key))
       {
-        $result[] = "'$key' =&gt; '$value'";
+        $result[] = $format == 'html' ? "'$key' =&gt; '$value'" : "'$key' => '$value'";
       }
       else
       {

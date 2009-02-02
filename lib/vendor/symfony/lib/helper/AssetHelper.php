@@ -94,7 +94,7 @@ function javascript_path($source, $absolute = false)
  * @param  array additional HTML compliant <link> tag parameters
  *
  * @return string XHTML compliant <script> tag(s)
- * @see    javascript_path 
+ * @see    javascript_path
  */
 function javascript_include_tag()
 {
@@ -104,15 +104,21 @@ function javascript_include_tag()
   $html = '';
   foreach ($sources as $source)
   {
-    
     $absolute = false;
     if (isset($sourceOptions['absolute']))
     {
       unset($sourceOptions['absolute']);
       $absolute = true;
     }
-  
-    if(!isset($sourceOptions['raw_name']))
+
+    $condition = null;
+    if (isset($sourceOptions['condition']))
+    {
+      $condition = $sourceOptions['condition'];
+      unset($sourceOptions['condition']);
+    }
+
+    if (!isset($sourceOptions['raw_name']))
     {
       $source = javascript_path($source, $absolute);
     }
@@ -120,11 +126,19 @@ function javascript_include_tag()
     {
       unset($sourceOptions['raw_name']);
     }
+
     $options = array_merge(array('type' => 'text/javascript', 'src' => $source), $sourceOptions);
-    $html   .= content_tag('script', '', $options)."\n";
+    $tag = content_tag('script', '', $options);
+
+    if (!is_null($condition))
+    {
+      $tag = comment_as_conditional($condition, $tag);
+    }
+
+    $html .= $tag."\n";
   }
 
-  return $html;  
+  return $html;
 }
 
 /**
@@ -145,7 +159,7 @@ function javascript_include_tag()
  * @param  bool   $absolute  return absolute path ?
  *
  * @return string file path to the stylesheet file
- * @see    stylesheet_tag  
+ * @see    stylesheet_tag
  */
 function stylesheet_path($source, $absolute = false)
 {
@@ -178,7 +192,7 @@ function stylesheet_path($source, $absolute = false)
  * @param  array additional HTML compliant <link> tag parameters
  *
  * @return string XHTML compliant <link> tag(s)
- * @see    stylesheet_path 
+ * @see    stylesheet_path
  */
 function stylesheet_tag()
 {
@@ -194,8 +208,15 @@ function stylesheet_tag()
       unset($sourceOptions['absolute']);
       $absolute = true;
     }
-        
-    if(!isset($sourceOptions['raw_name']))
+
+    $condition = null;
+    if (isset($sourceOptions['condition']))
+    {
+      $condition = $sourceOptions['condition'];
+      unset($sourceOptions['condition']);
+    }
+
+    if (!isset($sourceOptions['raw_name']))
     {
       $source = stylesheet_path($source, $absolute);
     }
@@ -203,8 +224,16 @@ function stylesheet_tag()
     {
       unset($sourceOptions['raw_name']);
     }
+
     $options = array_merge(array('rel' => 'stylesheet', 'type' => 'text/css', 'media' => 'screen', 'href' => $source), $sourceOptions);
-    $html   .= tag('link', $options)."\n";
+    $tag = tag('link', $options);
+
+    if (!is_null($condition))
+    {
+      $tag = comment_as_conditional($condition, $tag);
+    }
+
+    $html .= $tag."\n";
   }
 
   return $html;
@@ -260,12 +289,12 @@ function decorate_with($layout)
  * - full path, like "/my_images/image.gif"
  * - file name, like "rss.gif", that gets expanded to "/images/rss.gif"
  * - file name without extension, like "logo", that gets expanded to "/images/logo.png"
- * 
+ *
  * @param  string $source    asset name
  * @param  bool   $absolute  return absolute path ?
  *
  * @return string file path to the image file
- * @see    image_tag  
+ * @see    image_tag
  */
 function image_path($source, $absolute = false)
 {
@@ -292,7 +321,7 @@ function image_path($source, $absolute = false)
  * @param  array  $options  additional HTML compliant <img> tag parameters
  *
  * @return string XHTML compliant <img> tag
- * @see    image_path 
+ * @see    image_path
  */
 function image_tag($source, $options = array())
 {
@@ -310,7 +339,7 @@ function image_tag($source, $options = array())
     $absolute = true;
   }
 
-  if(!isset($options['raw_name']))
+  if (!isset($options['raw_name']))
   {
     $options['src'] = image_path($source, $absolute);
   }
@@ -320,7 +349,21 @@ function image_tag($source, $options = array())
     unset($options['raw_name']);
   }
 
-  if (!isset($options['alt']))
+  if (isset($options['alt_title']))
+  {
+    // set as alt and title but do not overwrite explicitly set
+    if (!isset($options['alt']))
+    {
+      $options['alt'] = $options['alt_title'];
+    }
+    if (!isset($options['title']))
+    {
+      $options['title'] = $options['alt_title'];
+    }
+    unset($options['alt_title']);
+  }
+
+  if (!isset($options['alt']) && sfConfig::get('sf_compat_10'))
   {
     $path_pos = strrpos($source, '/');
     $dot_pos = strrpos($source, '.');
@@ -331,7 +374,7 @@ function image_tag($source, $options = array())
 
   if (isset($options['size']))
   {
-    list($options['width'], $options['height']) = split('x', $options['size'], 2);
+    list($options['width'], $options['height']) = explode('x', $options['size'], 2);
     unset($options['size']);
   }
 
@@ -394,7 +437,7 @@ function _compute_public_path($source, $dir, $ext, $absolute = false)
  * <b>Note:</b> Modify the view.yml or use sfWebResponse::addMeta() to change, add or remove metas.
  *
  * @return string XHTML compliant <meta> tag(s)
- * @see    include_http_metas 
+ * @see    include_http_metas
  * @see    sfWebResponse::addMeta()
  */
 function include_metas()
@@ -460,26 +503,10 @@ function get_javascripts()
   $response = sfContext::getInstance()->getResponse();
   sfConfig::set('symfony.asset.javascripts_included', true);
 
-  $already_seen = array();
   $html = '';
-
-  foreach ($response->getPositions() as $position)
+  foreach ($response->getJavascripts() as $file => $options)
   {
-    foreach ($response->getJavascripts($position) as $files => $options)
-    {
-      if (!is_array($files))
-      {
-        $files = array($files);
-      }
-
-      foreach ($files as $file)
-      {
-        if (isset($already_seen[$file])) continue;
-
-        $already_seen[$file] = 1;
-        $html .= javascript_include_tag($file, $options);
-      }
-    }
+    $html .= javascript_include_tag($file, $options);
   }
 
   return $html;
@@ -509,26 +536,10 @@ function get_stylesheets()
   $response = sfContext::getInstance()->getResponse();
   sfConfig::set('symfony.asset.stylesheets_included', true);
 
-  $already_seen = array();
   $html = '';
-
-  foreach ($response->getPositions() as $position)
+  foreach ($response->getStylesheets() as $file => $options)
   {
-    foreach ($response->getStylesheets($position) as $files => $options)
-    {
-      if (!is_array($files))
-      {
-        $files = array($files);
-      }
-
-      foreach ($files as $file)
-      {
-        if (isset($already_seen[$file])) continue;
-
-        $already_seen[$file] = 1;
-        $html .= stylesheet_tag($file, $options);
-      }
-    }
+    $html .= stylesheet_tag($file, $options);
   }
 
   return $html;
@@ -554,7 +565,7 @@ function include_stylesheets()
  * @param  array  $options   An array of options
  *
  * @return string  XHTML compliant <script> tag(s)
- * @see    javascript_include_tag 
+ * @see    javascript_include_tag
  */
 function dynamic_javascript_include_tag($uri, $absolute = false, $options = array())
 {
@@ -596,4 +607,56 @@ function use_dynamic_stylesheet($css, $position = '', $options = array())
 function _dynamic_path($uri, $format, $absolute = false)
 {
   return url_for($uri.(false === strpos($uri, '?') ? '?' : '&').'sf_format='.$format, $absolute);
+}
+
+/**
+ * Returns <script> tags for all javascripts associated with the given form.
+ *
+ * @return string <script> tags
+ */
+function get_javascripts_for_form(sfForm $form)
+{
+  $html = '';
+  foreach ($form->getJavascripts() as $file)
+  {
+    $html .= javascript_include_tag($file);
+  }
+
+  return $html;
+}
+
+/**
+ * Prints <script> tags for all javascripts associated with the given form.
+ *
+ * @see get_javascripts_for_form()
+ */
+function include_javascripts_for_form(sfForm $form)
+{
+  echo get_javascripts_for_form($form);
+}
+
+/**
+ * Returns <link> tags for all stylesheets associated with the given form.
+ *
+ * @return string <link> tags
+ */
+function get_stylesheets_for_form(sfForm $form)
+{
+  $html = '';
+  foreach ($form->getStylesheets() as $file => $media)
+  {
+    $html .= stylesheet_tag($file, array('media' => $media));
+  }
+
+  return $html;
+}
+
+/**
+ * Prints <link> tags for all stylesheets associated with the given form.
+ *
+ * @see get_stylesheets_for_form()
+ */
+function include_stylesheets_for_form(sfForm $form)
+{
+  echo get_stylesheets_for_form($form);
 }

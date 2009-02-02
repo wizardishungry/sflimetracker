@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: DataModelBuilder.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: DataModelBuilder.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,113 +27,15 @@
  * This could be extended by classes that build SQL DDL, PHP classes, configuration
  * files, input forms, etc.
  *
- * This class has a static method to return the correct builder subclass identified by
- * a given key.  Note that in order for this factory method to work, the properties have to have
- * been loaded first.  Usage should look something like this (from within a AbstractProelDataModelTask subclass):
- *
- * <code>
- * DataModelBuilder::setBuildProperties($this->getPropelProperties());
- * $builder = DataModelBuilder::builderFactory($table, 'peer');
- * // $builder (by default) instanceof PHP5ComplexPeerBuilder
- * </code>
+ * The GeneratorConfig needs to be set on this class in order for the builders
+ * to be able to access the propel generator build properties.  You should be
+ * safe if you always use the GeneratorConfig to get a configured builder class
+ * anyway.
  *
  * @author     Hans Lellelid <hans@xmpl.org>
  * @package    propel.engine.builder
  */
 abstract class DataModelBuilder {
-
-	// --------------------------------------------------------------
-	// Static properties & methods
-	// --------------------------------------------------------------
-
-	/**
-	 * Build properties (after they've been transformed from "propel.some.name" => "someName").
-	 * @var        array string[]
-	 */
-	private static $buildProperties = array();
-
-	/**
-	 * Sets the [name transformed] build properties to use.
-	 * @param      array Property values keyed by [transformed] prop names.
-	 */
-	public static function setBuildProperties($props)
-	{
-		self::$buildProperties = $props;
-	}
-
-	/**
-	 * Get a specific [name transformed] build property.
-	 * @param      string $name
-	 * @return     string
-	 */
-	public static function getBuildProperty($name)
-	{
-		return isset(self::$buildProperties[$name]) ? self::$buildProperties[$name] : null;
-	}
-
-	/**
-	 * Imports and returns the classname of the builder class for specified 'type'.
-	 * @param      $type The "key" for class to load.
-	 * @return     string The unqualified classname.
-	 */
-	public static function getBuilderClass($type)
-	{
-		if (empty(self::$buildProperties)) {
-			throw new BuildException("Cannot determine builder class when no build properties have been loaded (hint: Did you call DataModelBuilder::setBuildProperties(\$props) first?)");
-		}
-		$propname = 'builder' . ucfirst(strtolower($type)) . 'Class';
-		$classpath = self::getBuildProperty($propname);
-
-		if (empty($classpath)) {
-			throw new BuildException("Unable to find class path for '$propname' property.");
-		}
-
-		// This is a slight hack to workaround camel case inconsistencies for the DDL classes.
-		// Basically, we want to turn ?.?.?.sqliteDDLBuilder into ?.?.?.SqliteDDLBuilder
-		$lastdotpos = strrpos($classpath, '.');
-		if ($lastdotpos) $classpath{$lastdotpos+1} = strtoupper($classpath{$lastdotpos+1});
-		else ucfirst($classpath);
-
-		return Phing::import($classpath);
-	}
-
-	/**
-	 * Factory method to load a new builder instance based on specified type.
-	 * @param      Table $table
-	 * @param      $type The "key" for class to load.
-	 * @throws     BuildException if specified class cannot be found / loaded.
-	 */
-	public static function builderFactory(Table $table, $type)
-	{
-		$classname = self::getBuilderClass($type);
-		return new $classname($table);
-	}
-
-	/**
-	 * Utility function to build a path for use in include()/require() statement.
-	 *
-	 * Supports two function signatures:
-	 * (1) getFilePath($dotPathClass);
-	 * (2) getFilePath($dotPathPrefix, $className);
-	 *
-	 * @param      string $path dot-path to class or to package prefix.
-	 * @param      string $classname class name
-	 * @return     string
-	 */
-	public static function getFilePath($path, $classname = null, $extension = '.php')
-	{
-		$path = strtr(ltrim($path, '.'), '.', '/');
-		if ($classname !== null) {
-			if ($path !== "") { $path .= '/'; }
-			return $path . $classname . $extension;
-		} else {
-			return $path . $extension;
-		}
-	}
-
-	// --------------------------------------------------------------
-	// Non-static properties & methods inherited by subclasses
-	// --------------------------------------------------------------
 
 	/**
 	 * The current table.
@@ -142,10 +44,114 @@ abstract class DataModelBuilder {
 	private $table;
 
 	/**
+	 * The generator config object holding build properties, etc.
+	 *
+	 * @var        GeneratorConfig
+	 */
+	private $generatorConfig;
+
+	/**
 	 * An array of warning messages that can be retrieved for display (e.g. as part of phing build process).
 	 * @var        array string[]
 	 */
 	private $warnings = array();
+
+	/**
+	 * Peer builder class for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $peerBuilder;
+
+	/**
+	 * Stub Peer builder class for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $stubPeerBuilder;
+
+	/**
+	 * Object builder class for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $objectBuilder;
+
+	/**
+	 * Stub Object builder class for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $stubObjectBuilder;
+
+	/**
+	 * MapBuilder builder class for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $mapBuilderBuilder;
+
+	/**
+	 * Stub Interface builder class for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $interfaceBuilder;
+
+	/**
+	 * Stub child object for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $multiExtendObjectBuilder;
+
+	/**
+	 * Node object builder for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $nodeBuilder;
+
+	/**
+	 * Node peer builder for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $nodePeerBuilder;
+
+	/**
+	 * Stub node object builder for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $stubNodeBuilder;
+
+	/**
+	 * Stub node peer builder for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $stubNodePeerBuilder;
+
+	/**
+	 * NestedSet object builder for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $nestedSetBuilder;
+
+	/**
+	 * NestedSet peer builder for current table.
+	 * @var        DataModelBuilder
+	 */
+	private $nestedSetPeerBuilder;
+
+	/**
+	 * The DDL builder for current table.
+	 * @var        DDLBuilder
+	 */
+	private $ddlBuilder;
+
+	/**
+	 * The Data-SQL builder for current table.
+	 * @var        DataSQLBuilder
+	 */
+	private $dataSqlBuilder;
+
+	/**
+	 * The Pluralizer class to use.
+	 * @var        Pluralizer
+	 */
+	private $pluralizer;
+
 
 	/**
 	 * Creates new instance of DataModelBuilder subclass.
@@ -157,30 +163,297 @@ abstract class DataModelBuilder {
 	}
 
 	/**
-	 * Returns the Platform class for this table (database).
-	 * @return     Platform
+	 * Returns new or existing Peer builder class for this table.
+	 * @return     PeerBuilder
 	 */
-	protected function getPlatform()
+	public function getPeerBuilder()
 	{
-		return $this->getTable()->getDatabase()->getPlatform();
+		if (!isset($this->peerBuilder)) {
+			$this->peerBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'peer');
+		}
+		return $this->peerBuilder;
 	}
 
 	/**
-	 * Returns the database for current table.
-	 * @return     Database
+	 * Returns new or existing Pluralizer class.
+	 * @return     Pluralizer
 	 */
-	protected function getDatabase()
+	public function getPluralizer()
 	{
-		return $this->getTable()->getDatabase();
+		if (!isset($this->pluralizer)) {
+			$this->pluralizer = $this->getGeneratorConfig()->getConfiguredPluralizer();
+		}
+		return $this->pluralizer;
+	}
+
+	/**
+	 * Returns new or existing stub Peer builder class for this table.
+	 * @return     PeerBuilder
+	 */
+	public function getStubPeerBuilder()
+	{
+		if (!isset($this->stubPeerBuilder)) {
+			$this->stubPeerBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'peerstub');
+		}
+		return $this->stubPeerBuilder;
+	}
+
+	/**
+	 * Returns new or existing Object builder class for this table.
+	 * @return     ObjectBuilder
+	 */
+	public function getObjectBuilder()
+	{
+		if (!isset($this->objectBuilder)) {
+			$this->objectBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'object');
+		}
+		return $this->objectBuilder;
+	}
+
+	/**
+	 * Returns new or existing stub Object builder class for this table.
+	 * @return     ObjectBuilder
+	 */
+	public function getStubObjectBuilder()
+	{
+		if (!isset($this->stubObjectBuilder)) {
+			$this->stubObjectBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'objectstub');
+		}
+		return $this->stubObjectBuilder;
+	}
+
+	/**
+	 * Returns new or existing MapBuilder builder class for this table.
+	 * @return     ObjectBuilder
+	 */
+	public function getMapBuilderBuilder()
+	{
+		if (!isset($this->mapBuilderBuilder)) {
+			$this->mapBuilderBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'mapbuilder');
+		}
+		return $this->mapBuilderBuilder;
+	}
+
+	/**
+	 * Returns new or existing stub Interface builder class for this table.
+	 * @return     ObjectBuilder
+	 */
+	public function getInterfaceBuilder()
+	{
+		if (!isset($this->interfaceBuilder)) {
+			$this->interfaceBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'interface');
+		}
+		return $this->interfaceBuilder;
+	}
+
+	/**
+	 * Returns new or existing stub child object builder class for this table.
+	 * @return     ObjectBuilder
+	 */
+	public function getMultiExtendObjectBuilder()
+	{
+		if (!isset($this->multiExtendObjectBuilder)) {
+			$this->multiExtendObjectBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'objectmultiextend');
+		}
+		return $this->multiExtendObjectBuilder;
+	}
+
+	/**
+	 * Returns new or existing node Object builder class for this table.
+	 * @return     ObjectBuilder
+	 */
+	public function getNodeBuilder()
+	{
+		if (!isset($this->nodeBuilder)) {
+			$this->nodeBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'node');
+		}
+		return $this->nodeBuilder;
+	}
+
+	/**
+	 * Returns new or existing node Peer builder class for this table.
+	 * @return     PeerBuilder
+	 */
+	public function getNodePeerBuilder()
+	{
+		if (!isset($this->nodePeerBuilder)) {
+			$this->nodePeerBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'nodepeer');
+		}
+		return $this->nodePeerBuilder;
+	}
+
+	/**
+	 * Returns new or existing stub node Object builder class for this table.
+	 * @return     ObjectBuilder
+	 */
+	public function getStubNodeBuilder()
+	{
+		if (!isset($this->stubNodeBuilder)) {
+			$this->stubNodeBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'nodestub');
+		}
+		return $this->stubNodeBuilder;
+	}
+
+	/**
+	 * Returns new or existing stub node Peer builder class for this table.
+	 * @return     PeerBuilder
+	 */
+	public function getStubNodePeerBuilder()
+	{
+		if (!isset($this->stubNodePeerBuilder)) {
+			$this->stubNodePeerBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'nodepeerstub');
+		}
+		return $this->stubNodePeerBuilder;
+	}
+
+	/**
+	 * Returns new or existing nested set object builder class for this table.
+	 * @return     ObjectBuilder
+	 */
+	public function getNestedSetBuilder()
+	{
+		if (!isset($this->nestedSetBuilder)) {
+			$this->nestedSetBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'nestedset');
+		}
+		return $this->nestedSetBuilder;
+	}
+
+	/**
+	 * Returns new or existing nested set Peer builder class for this table.
+	 * @return     PeerBuilder
+	 */
+	public function getNestedSetPeerBuilder()
+	{
+		if (!isset($this->nestedSetPeerBuilder)) {
+			$this->nestedSetPeerBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'nestedsetpeer');
+		}
+		return $this->nestedSetPeerBuilder;
+	}
+
+	/**
+	 * Returns new or existing ddl builder class for this table.
+	 * @return     DDLBuilder
+	 */
+	public function getDDLBuilder()
+	{
+		if (!isset($this->ddlBuilder)) {
+			$this->ddlBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'ddl');
+		}
+		return $this->ddlBuilder;
+	}
+
+	/**
+	 * Returns new or existing data sql builder class for this table.
+	 * @return     DataSQLBuilder
+	 */
+	public function getDataSQLBuilder()
+	{
+		if (!isset($this->dataSqlBuilder)) {
+			$this->dataSqlBuilder = $this->getGeneratorConfig()->getConfiguredBuilder($this->getTable(), 'datasql');
+		}
+		return $this->dataSqlBuilder;
+	}
+
+	/**
+	 * Convenience method to return a NEW Peer class builder instance
+	 * .
+	 * This is used very frequently from the peer and object builders to get
+	 * a peer builder for a RELATED table.
+	 *
+	 * @param      Table $table
+	 * @return     PeerBuilder
+	 */
+	public function getNewPeerBuilder(Table $table)
+	{
+		return $this->getGeneratorConfig()->getConfiguredBuilder($table, 'peer');
+	}
+
+	/**
+	 * Convenience method to return a NEW Object class builder instance.
+	 *
+	 * This is used very frequently from the peer and object builders to get
+	 * an object builder for a RELATED table.
+	 *
+	 * @param      Table $table
+	 * @return     ObjectBuilder
+	 */
+	public function getNewObjectBuilder(Table $table)
+	{
+		return $this->getGeneratorConfig()->getConfiguredBuilder($table, 'object');
+	}
+
+	/**
+	 * Gets the GeneratorConfig object.
+	 *
+	 * @return     GeneratorConfig
+	 */
+	public function getGeneratorConfig()
+	{
+		return $this->generatorConfig;
+	}
+
+	/**
+	 * Get a specific [name transformed] build property.
+	 *
+	 * @param      string $name
+	 * @return     string
+	 */
+	public function getBuildProperty($name)
+	{
+		if ($this->getGeneratorConfig()) {
+			return $this->getGeneratorConfig()->getBuildProperty($name);
+		}
+		return null; // just to be explicit
+	}
+
+	/**
+	 * Sets the GeneratorConfig object.
+	 *
+	 * @param      GeneratorConfig $v
+	 */
+	public function setGeneratorConfig(GeneratorConfig $v)
+	{
+		$this->generatorConfig = $v;
+	}
+
+	/**
+	 * Sets the table for this builder.
+	 * @param      Table $table
+	 */
+	public function setTable(Table $table)
+	{
+		$this->table = $table;
 	}
 
 	/**
 	 * Returns the current Table object.
 	 * @return     Table
 	 */
-	protected function getTable()
+	public function getTable()
 	{
 		return $this->table;
+	}
+
+	/**
+	 * Convenience method to returns the Platform class for this table (database).
+	 * @return     Platform
+	 */
+	public function getPlatform()
+	{
+		if ($this->getTable() && $this->getTable()->getDatabase()) {
+			return $this->getTable()->getDatabase()->getPlatform();
+		}
+	}
+
+	/**
+	 * Convenience method to returns the database for current table.
+	 * @return     Database
+	 */
+	public function getDatabase()
+	{
+		if ($this->getTable()) {
+			return $this->getTable()->getDatabase();
+		}
 	}
 
 	/**
@@ -213,9 +486,29 @@ abstract class DataModelBuilder {
 	 */
 	public function quoteIdentifier($text)
 	{
-		if (!self::getBuildProperty('disableIdentifierQuoting')) {
+		if (!$this->getBuildProperty('disableIdentifierQuoting')) {
 			return $this->getPlatform()->quoteIdentifier($text);
 		}
 		return $text;
 	}
+
+	/**
+	 * Returns the name of the current class being built, with a possible prefix.
+	 * @return     string
+	 * @see        OMBuilder#getClassname()
+	 */
+	public function prefixClassname($identifier)
+	{
+		return $this->getBuildProperty('classPrefix') . $identifier;
+	}
+
+	/**
+	 * Returns the name of the current table being built, with a possible prefix.
+	 * @return     string
+	 */
+	public function prefixTablename($identifier)
+	{
+		return $this->getBuildProperty('tablePrefix') . $identifier;
+	}
+
 }

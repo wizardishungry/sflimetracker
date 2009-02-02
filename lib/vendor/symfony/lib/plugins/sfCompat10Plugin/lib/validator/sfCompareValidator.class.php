@@ -29,13 +29,10 @@
  *     operator:       ==
  *     compare_error:  The passwords you entered do not match.
  *
- * WARNING: This class is deprecated and will be removed in symfony 1.2.
- *
  * @package    symfony
  * @subpackage validator
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @version    SVN: $Id$
- * @deprecated Deprecated since symfony 1.1
  */
 class sfCompareValidator extends sfValidator
 {

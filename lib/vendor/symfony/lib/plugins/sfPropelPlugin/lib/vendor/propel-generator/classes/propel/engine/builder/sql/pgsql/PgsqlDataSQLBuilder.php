@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id$
+ *  $Id: PgsqlDataSQLBuilder.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,6 +29,59 @@ require_once 'propel/engine/builder/sql/DataSQLBuilder.php';
  * @package    propel.engine.builder.sql.pgsql
  */
 class PgsqlDataSQLBuilder extends DataSQLBuilder {
+
+	/**
+	 * The largets serial value encountered this far.
+	 *
+	 * @var        int
+	 */
+	private $maxSeqVal;
+
+	/**
+	 * Construct a new PgsqlDataSQLBuilder object.
+	 *
+	 * @param      Table $table
+	 */
+	public function __construct(Table $table)
+	{
+		parent::__construct($table);
+	}
+
+	/**
+	 * The main method in this class, returns the SQL for INSERTing data into a row.
+	 * @param      DataRow $row The row to process.
+	 * @return     string
+	 */
+	public function buildRowSql(DataRow $row)
+	{
+		$sql = parent::buildRowSql($row);
+
+		$table = $this->getTable();
+
+		if ($table->hasAutoIncrementPrimaryKey() && $table->getIdMethod() == IDMethod::NATIVE) {
+			foreach ($row->getColumnValues() as $colValue) {
+				if ($colValue->getColumn()->isAutoIncrement()) {
+					if ($colValue->getValue() > $this->maxSeqVal) {
+						$this->maxSeqVal = $colValue->getValue();
+					}
+				}
+			}
+		}
+
+		return $sql;
+	}
+
+	public function getTableEndSql()
+	{
+		$table = $this->getTable();
+		$sql = "";
+		if ($table->hasAutoIncrementPrimaryKey() && $table->getIdMethod() == IDMethod::NATIVE) {
+			$seqname = $this->prefixTablename($this->getDDLBuilder()->getSequenceName());
+			$sql .= "SELECT pg_catalog.setval('$seqname', ".((int)$this->maxSeqVal).");
+";
+		}
+		return $sql;
+	}
 
 	/**
 	 * Get SQL value to insert for Postgres BOOLEAN column.

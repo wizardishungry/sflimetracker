@@ -204,16 +204,17 @@ abstract class sfAction extends sfComponent
    *
    * @param  bool   $condition  A condition that evaluates to true or false
    * @param  string $url        Url
+   * @param  string $statusCode Status code (default to 302)
    *
    * @throws sfStopException
    *
    * @see redirect
    */
-  public function redirectIf($condition, $url)
+  public function redirectIf($condition, $url, $statusCode = 302)
   {
     if ($condition)
     {
-      $this->redirect($url);
+      $this->redirect($url, $statusCode);
     }
   }
 
@@ -224,16 +225,17 @@ abstract class sfAction extends sfComponent
    *
    * @param  bool   $condition  A condition that evaluates to true or false
    * @param  string $url        Url
+   * @param  string $statusCode Status code (default to 302)
    *
    * @throws sfStopException
    *
    * @see redirect
    */
-  public function redirectUnless($condition, $url)
+  public function redirectUnless($condition, $url, $statusCode = 302)
   {
     if (!$condition)
     {
-      $this->redirect($url);
+      $this->redirect($url, $statusCode);
     }
   }
 
@@ -271,7 +273,7 @@ abstract class sfAction extends sfComponent
    */
   public function getPartial($templateName, $vars = null)
   {
-    sfLoader::loadHelpers('Partial');
+    $this->getContext()->getConfiguration()->loadHelpers('Partial');
 
     $vars = !is_null($vars) ? $vars : $this->varHolder->getAll();
 
@@ -314,7 +316,7 @@ abstract class sfAction extends sfComponent
    */
   public function getComponent($moduleName, $componentName, $vars = null)
   {
-    sfLoader::loadHelpers('Partial');
+    $this->getContext()->getConfiguration()->loadHelpers('Partial');
 
     $vars = !is_null($vars) ? $vars : $this->varHolder->getAll();
 
@@ -354,35 +356,6 @@ abstract class sfAction extends sfComponent
     }
 
     return sfView::INPUT;
-  }
-
-  /**
-   * Retrieves the request methods on which this action will process validation and execution.
-   *
-   * @return int One of the following values:
-   *
-   * - sfRequest::GET
-   * - sfRequest::POST
-   * - sfRequest::PUT
-   * - sfRequest::DELETE
-   * - sfRequest::HEAD
-   * - sfRequest::NONE
-   *
-   * @see sfRequest
-   */
-  public function getRequestMethods()
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return sfRequest::GET
-           | sfRequest::POST
-           | sfRequest::PUT
-           | sfRequest::DELETE
-           | sfRequest::HEAD
-           | sfRequest::NONE;
   }
 
   /**
@@ -560,6 +533,11 @@ abstract class sfAction extends sfComponent
   public function setViewClass($class)
   {
     sfConfig::set('mod_'.strtolower($this->getModuleName()).'_view_class', $class);
+  }
+
+  public function getRoute()
+  {
+    return $this->getRequest()->getAttribute('sf_route');
   }
 
   /**

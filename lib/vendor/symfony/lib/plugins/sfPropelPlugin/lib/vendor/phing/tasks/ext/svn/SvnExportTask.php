@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id$
+ * $Id: SvnExportTask.php 363 2008-04-10 16:06:37Z tiddy $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -24,45 +24,47 @@ require_once 'phing/tasks/ext/svn/SvnBaseTask.php';
 
 /**
  * Exports/checks out a repository to a local directory
+ * with authentication 
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id$
+ * @author Andrew Eddie <andrew.eddie@jamboworks.com> 
+ * @version $Id: SvnExportTask.php 363 2008-04-10 16:06:37Z tiddy $
  * @package phing.tasks.ext.svn
- * @see VersionControl_SVN
- * @since 2.1.0
+ * @since 2.2.0
  */
 class SvnExportTask extends SvnBaseTask
 {
-	private $toDir = "";
+#
+    /**
+     * Which Revision to Export
+     * 
+     * @todo check if version_control_svn supports constants
+     * 
+     * @var string
+     */
+    private $revision = 'HEAD';
 
-	/**
-	 * Sets the path to export/checkout to
-	 */
-	function setToDir($toDir)
-	{
-		$this->toDir = $toDir;
-	}
+    /**
+     * The main entry point
+     *
+     * @throws BuildException
+     */
+    function main()
+    {
+        $this->setup('export');
+        
+        $this->log("Exporting SVN repository to '" . $this->getToDir() . "'");
 
-	/**
-	 * Returns the path to export/checkout to
-	 */
-	function getToDir()
-	{
-		return $this->toDir;
-	}
+        // revision
+        $switches = array(
+            'r' => $this->revision,
+        );
 
-	/**
-	 * The main entry point
-	 *
-	 * @throws BuildException
-	 */
-	function main()
-	{
-		$this->setup('export');
-		
-		$this->log("Exporting SVN repository to '" . $this->toDir . "'");
-		
-		$this->run(array($this->toDir));
-	}
+        $this->run(array($this->getToDir()), $switches);
+    }
+
+    public function setRevision($revision)
+    {
+        $this->revision = $revision;
+    }
 }
-?>

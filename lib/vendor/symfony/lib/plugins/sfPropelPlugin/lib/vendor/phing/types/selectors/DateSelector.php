@@ -1,7 +1,7 @@
 <?php
 
 /*
- * $Id$
+ * $Id: DateSelector.php 396 2008-10-15 14:26:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -203,7 +203,7 @@ class DateSelector extends BaseExtendSelector {
         if ($this->cmp === 0) {
             return (($file->lastModified() - $this->granularity) < $this->seconds);
         } elseif ($this->cmp === 1) {
-            return (($file->lastModified() . $this->granularity) > $this->seconds);
+            return (($file->lastModified() - $this->granularity) > $this->seconds);
         } else {
             return (abs($file->lastModified() -  $this->seconds) <= $this->granularity);
         }

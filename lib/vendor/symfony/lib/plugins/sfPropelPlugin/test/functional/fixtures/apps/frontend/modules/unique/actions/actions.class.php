@@ -27,6 +27,23 @@ class uniqueActions extends sfActions
     }
   }
 
+  public function executeEdit($request)
+  {
+    $this->form = new ArticleForm(ArticlePeer::doSelectOne(new Criteria()));
+
+    if ($request->isMethod('post'))
+    {
+      $this->form->bind($request->getParameter('article'));
+
+      if ($this->form->isValid())
+      {
+        $this->form->save();
+
+        $this->redirect('unique/edit');
+      }
+    }
+  }
+
   public function executeCategory($request)
   {
     $category = CategoryPeer::retrieveByPk($request->getParameter('category[id]'));

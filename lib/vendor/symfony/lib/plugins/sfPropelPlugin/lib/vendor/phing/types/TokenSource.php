@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: TokenSource.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -93,9 +93,9 @@ class TokenSource extends DataType {
                 $this->tokens[] = $token;
             }
         } catch (BuildException $e) {
-            $this->log("Error reading TokenSource: " . $e->getMessage(), PROJECT_MSG_WARN);
+            $this->log("Error reading TokenSource: " . $e->getMessage(), Project::MSG_WARN);
         } catch (IOException $e) {
-            $this->log("Error reading TokenSource: " . $e->getMessage(), PROJECT_MSG_WARN);
+            $this->log("Error reading TokenSource: " . $e->getMessage(), Project::MSG_WARN);
         }
     }
 
@@ -154,4 +154,4 @@ class TokenSource extends DataType {
 }
 
 
-?>
+

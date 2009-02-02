@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id$
+ * $Id: CoverageMerger.php 426 2008-10-28 19:29:49Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,7 +25,7 @@ require_once 'phing/system/util/Properties.php';
  * Saves coverage output of the test to a specified database
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id$
+ * @version $Id: CoverageMerger.php 426 2008-10-28 19:29:49Z mrook $
  * @package phing.tasks.ext.coverage
  * @since 2.1.0
  */
@@ -111,8 +111,19 @@ class CoverageMerger
 					$file = unserialize($props->getProperty($filename));
 					$left = $file['coverage'];
 					$right = $coverageFile;
-					
+					if (!is_array($right)) {
+						$right = array_shift(PHPUnit_Util_CodeCoverage::bitStringToCodeCoverage(array($right), 1)); 
+					}
+						
 					$coverageMerged = CoverageMerger::mergeCodeCoverage($left, $right);
+					
+					foreach ($coverageMerged as $key => $value)
+					{
+						if ($value == -2)
+						{
+							unset($coverageMerged[$key]);
+						}
+					}
 					
 					$file['coverage'] = $coverageMerged;
 					
@@ -124,4 +135,3 @@ class CoverageMerger
 		$props->store($database);
 	}
 }
-?>

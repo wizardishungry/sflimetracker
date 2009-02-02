@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: PropertyPromptTask.php 272 2007-10-30 23:06:04Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -36,34 +36,58 @@ include_once 'phing/system/io/ConsoleReader.php';
  * @deprecated - in favor of the more capable InputTask
  */ 
 class PropertyPromptTask extends Task {
-
+	
+	/**
+	 * The property name to set with the output.
+	 * @var string
+	 */
     private $propertyName;        // required
-    private $defaultValue;
-    private $proposedValue;        // required
-    private $promptText;        // required
-    private $promptCharacter;
-    private $useExistingValue;
-
+    
     /**
-     * Sets the prompt text that will be presented to the user.
-     * @param string $prompt
-     * @return void
+     * The default value to use if no input is entered.
+     * @var string
      */
-    public function addText($prompt) {
-        $this->setPromptText($prompt);
-    }
+    private $defaultValue;
+    
+    /**
+     * The entered value.
+     * @var string
+     */
+    private $proposedValue;
+    
+    /**
+     * The text to use for the prompt.
+     * @var string
+     */
+    private $promptText;
+    
+    /**
+     * The character to put after the text.
+     * @var string
+     */
+    private $promptCharacter;
+    
+    /**
+     * 
+     */
+    private $useExistingValue;
 
     /**
      * Run the PropertyPrompt task.
      * @throws BuildException
      */
     public function main() {
+    	
         $this->proposedValue = $this->project->getProperty($this->propertyName);
         $currentValue = $this->defaultValue;
-        if ($currentValue == "" && $this->proposedValue !== null) { $currentValue = $this->proposedValue; }
-        if (! (($this->useExistingValue === true) && ($this->proposedValue !== null))) {
+        
+        if ($currentValue == "" && $this->proposedValue !== null) {
+        		$currentValue = $this->proposedValue;
+       	}
+       	
+        if ($this->useExistingValue !== true || $this->proposedValue === null) {
                         
-            $this->log("Prompting user for " . $this->propertyName . ". " . $this->getDefaultMessage(), PROJECT_MSG_VERBOSE);
+            $this->log("Prompting user for " . $this->propertyName . ". " . $this->getDefaultMessage(), Project::MSG_VERBOSE);
             
             print "\n" . $this->promptText . " [" . $currentValue . "] " . $this->promptCharacter . " ";
 
@@ -77,12 +101,12 @@ class PropertyPromptTask extends Task {
                 $this->proposedValue = $this->defaultValue;
             }
             
-            if (empty($this->proposedValue)) {
-                $this->log("No value specified, using default.", PROJECT_MSG_VERBOSE);
+            if ($this->proposedValue === "") {
+                $this->log("No value specified, using default.", Project::MSG_VERBOSE);
                 $this->proposedValue = $this->defaultValue;
             }
             
-            if (!empty($this->proposedValue)) {                    
+            if (isset($this->proposedValue) && $this->proposedValue !== "") {                    
                 $this->project->setProperty($this->propertyName, $this->proposedValue);
             }
              
@@ -166,7 +190,7 @@ class PropertyPromptTask extends Task {
     /**
      * Sets the terminating character used to 
      * punctuate the prompt text (default is "?").
-     * @param newPromptcharacter java.lang.String
+     * @param string $newPromptcharacter
      */
     public function setPromptCharacter($newPromptcharacter) {
         $this->promptCharacter = $newPromptcharacter;
@@ -174,7 +198,7 @@ class PropertyPromptTask extends Task {
     
     /**
      * Sets text of the prompt.
-     * @param newPrompttext java.lang.String
+     * @param string $newPrompttext
      */
     public function setPromptText($newPrompttext) {
         $this->promptText = $newPrompttext;
@@ -191,11 +215,20 @@ class PropertyPromptTask extends Task {
     
     /**
      * 
-     * 
-     * @param boolean newUseExistingValue
+     * @param boolean $newUseExistingValue
      */
     public function setUseExistingValue($newUseExistingValue) {
         $this->useExistingValue = $newUseExistingValue;
     }
+    
+    /**
+     * Sets the prompt text that will be presented to the user.
+     * @param string $prompt
+     * @return void
+     */
+    public function addText($prompt) {
+        $this->setPromptText($prompt);
+    }
+    
     
 }

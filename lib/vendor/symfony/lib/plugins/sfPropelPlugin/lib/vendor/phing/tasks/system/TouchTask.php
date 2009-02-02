@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: TouchTask.php 144 2007-02-05 15:19:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -117,7 +117,7 @@ class TouchTask extends Task {
     function _touch() {
         if ($this->file !== null) {
             if (!$this->file->exists()) {
-                $this->log("Creating " . $this->file->__toString(), PROJECT_MSG_INFO);
+                $this->log("Creating " . $this->file->__toString(), Project::MSG_INFO);
                 try { // try to create file
                     $this->file->createNewFile();
                 } catch(IOException  $ioe) {

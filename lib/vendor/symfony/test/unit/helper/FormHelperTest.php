@@ -42,7 +42,13 @@ class myResponse
   }
 }
 
-$t = new lime_test(95, new lime_output_color());
+class ProjectConfiguration extends sfProjectConfiguration
+{
+}
+
+$configuration = new ProjectConfiguration(dirname(__FILE__).'/../../lib', new sfEventDispatcher());
+
+$t = new lime_test(96, new lime_output_color());
 
 $context = sfContext::getInstance(array(
   'controller' => 'myController',
@@ -82,6 +88,7 @@ $t->is(form_tag(), '<form method="post" action="module/action">', 'form_tag() cr
 $t->is(form_tag('', array('class' => 'foo')), '<form class="foo" method="post" action="module/action">', 'form_tag() takes an array of attribute options');
 $t->is(form_tag('', array('method' => 'get')), '<form method="get" action="module/action">', 'form_tag() takes a "method" as an option');
 $t->is(form_tag('', array('multipart' => true)), '<form method="post" enctype="multipart/form-data" action="module/action">', 'form_tag() takes a "multipart" boolean option');
+$t->is(form_tag('', array('method' => 'put')), '<form method="post" action="module/action"><input type="hidden" name="sf_method" value="put" />', 'form_tag() creates a hidden field for methods different from GET or POST');
 
 // select_tag()
 $t->diag('select_tag()');

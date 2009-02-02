@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: AbstractFileSet.php 144 2007-02-05 15:19:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -62,7 +62,7 @@ include_once 'phing/util/DirectoryScanner.php';
  *
  * @author    Andreas Aderhold <andi@binarycloud.com>
  * @author    Hans Lellelid <hans@xmpl.org>
- * @version    $Revision: 1.15 $ $Date: 2005/05/26 13:10:53 $
+ * @version    $Revision: 1.15 $ $Date: 2007-02-05 10:19:00 -0500 (Mon, 05 Feb 2007) $
  * @see        ProjectComponent
  * @package    phing.types
  */
@@ -292,7 +292,7 @@ class AbstractFileSet extends DataType implements SelectorContainer {
         $ds->setIncludes($this->defaultPatterns->getIncludePatterns($p));
         $ds->setExcludes($this->defaultPatterns->getExcludePatterns($p));
 
-        $p->log("FileSet: Setup file scanner in dir " . $this->dir->__toString() . " with " . $this->defaultPatterns->toString(), PROJECT_MSG_DEBUG);
+        $p->log("FileSet: Setup file scanner in dir " . $this->dir->__toString() . " with " . $this->defaultPatterns->toString(), Project::MSG_DEBUG);
         
         if ($ds instanceof SelectorScanner) {
             $ds->setSelectors($this->getSelectors($p));

@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id$
+ * $Id: ProjectConfigurator.php 147 2007-02-06 20:32:22Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -32,8 +32,8 @@ include_once 'phing/system/io/PhingFile.php';
  * FileSet
  *
  * @author      Andreas Aderhold <andi@binarycloud.com>
- * @copyright © 2001,2002 THYRELL. All rights reserved
- * @version   $Revision: 1.17 $ $Date: 2006/01/06 14:57:18 $
+ * @copyright ï¿½ 2001,2002 THYRELL. All rights reserved
+ * @version   $Revision: 1.17 $ $Date: 2007-02-06 15:32:22 -0500 (Tue, 06 Feb 2007) $
  * @access    public
  * @package   phing.parser
  */
@@ -84,11 +84,10 @@ class ProjectConfigurator {
     protected function parse() {
         try {
             $reader = new BufferedReader(new FileReader($this->buildFile));
-            $reader->open();
             $parser = new ExpatParser($reader);
             $parser->parserSetOption(XML_OPTION_CASE_FOLDING,0);
             $parser->setHandler(new RootHandler($parser, $this));
-            $this->project->log("parsing buildfile ".$this->buildFile->getName(), PROJECT_MSG_VERBOSE);
+            $this->project->log("parsing buildfile ".$this->buildFile->getName(), Project::MSG_VERBOSE);
             $parser->parse();
             $reader->close();
         } catch (Exception $exc) {
@@ -223,10 +222,10 @@ class ProjectConfigurator {
     {
         $propertyName = $matches[1];
         if (!isset(self::$propReplaceProperties[$propertyName])) {
-                    self::$propReplaceProject->log('Property ${'.$propertyName.'} has not been set.', PROJECT_MSG_VERBOSE);
+                    self::$propReplaceProject->log('Property ${'.$propertyName.'} has not been set.', Project::MSG_VERBOSE);
                     return $matches[0];
         } else {
-			self::$propReplaceProject->log('Property ${'.$propertyName.'} => ' . self::$propReplaceProperties[$propertyName], PROJECT_MSG_DEBUG);
+			self::$propReplaceProject->log('Property ${'.$propertyName.'} => ' . self::$propReplaceProperties[$propertyName], Project::MSG_DEBUG);
 		}
         return self::$propReplaceProperties[$propertyName];
     }           
@@ -238,7 +237,7 @@ class ProjectConfigurator {
      * @param object the element's object
      * @param array  the element's attributes
      */
-    function configureId(&$target, $attr) {
+    public function configureId($target, $attr) {
         if (isset($attr['id']) && $attr['id'] !== null) {
             $this->project->addReference($attr['id'], $target);
         }

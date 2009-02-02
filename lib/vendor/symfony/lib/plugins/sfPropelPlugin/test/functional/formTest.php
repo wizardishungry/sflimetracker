@@ -40,7 +40,43 @@ $c->add(AttachmentPeer::NAME, $name);
 $attachments = AttachmentPeer::doSelect($c);
 
 $b->test()->is(count($attachments), 1, 'the attachment has been saved in the database');
-$b->test()->is($attachments[0]->getFile(), $uploadedFile, 'the attachment filename has been saved in the database');
+$b->test()->is($attachments[0]->getFile(), 'uploaded.yml', 'the attachment filename has been saved in the database');
+
+@unlink($uploadedFile);
+AttachmentPeer::doDeleteAll();
+$b->test()->ok(!file_exists($uploadedFile), 'uploaded file is deleted');
+
+// file upload in embedded form
+$b->
+  getAndCheck('attachment', 'embedded')->
+  with('response')->begin()->
+    checkElement('input[name="article[attachment][article_id]"]', false)->
+    checkElement('input[type="file"][name="article[attachment][file]"]')->
+  end()->
+
+  setField('article[title]', 'Test Article')->
+  setField('article[attachment][name]', $name)->
+  setField('article[attachment][file]', $fileToUpload)->
+  click('submit')->
+
+  with('form')->hasErrors(false)->
+
+  isRedirected()->
+  followRedirect()->
+
+  with('response')->contains('ok')
+;
+
+$b->test()->ok(file_exists($uploadedFile), 'file is uploaded');
+$b->test()->is(file_get_contents($uploadedFile), file_get_contents($fileToUpload), 'file is correctly uploaded');
+
+$c = new Criteria();
+$c->add(AttachmentPeer::NAME, $name);
+$attachments = AttachmentPeer::doSelect($c);
+
+$b->test()->is(count($attachments), 1, 'the attachment has been saved in the database');
+$b->test()->ok($attachments[0]->getArticleId(), 'the attachment is tied to an article');
+$b->test()->is($attachments[0]->getFile(), 'uploaded.yml', 'the attachment filename has been saved in the database');
 
 // sfValidatorPropelUnique
 
@@ -64,6 +100,11 @@ $b->
   isRequestParameter('action', 'category')->
   isStatusCode(200)->
   click('submit', array('category' => array('name' => 'foo')))->
+  with('form')->begin()->
+    hasErrors(1)->
+    hasGlobalError(false)->
+    isError('name', 'invalid')->
+  end()->
   checkResponseElement('td[colspan="2"] .error_list li', 0)->
   checkResponseElement('.error_list li', 'An object with the same "name" already exist.')->
   checkResponseElement('.error_list li', 1)
@@ -76,6 +117,11 @@ $b->
   isRequestParameter('action', 'category')->
   isStatusCode(200)->
   click('submit', array('category' => array('name' => 'foo'), 'global' => 1))->
+  with('form')->begin()->
+    hasErrors(1)->
+    hasGlobalError('invalid')->
+    isError('name', false)->
+  end()->
   checkResponseElement('td[colspan="2"] .error_list li', 'An object with the same "name" already exist.')->
   checkResponseElement('td[colspan="2"] .error_list li', 1)
 ;
@@ -125,4 +171,21 @@ $b->
   isStatusCode(200)->
   click('submit', array('article' => array('title' => 'foo', 'category_id' => 1)))->
   checkResponseElement('.error_list li', 'An object with the same "title, category_id" already exist.')
+;
+
+// update the category from the article form
+$b->
+  get('/unique/edit')->
+  isRequestParameter('module', 'unique')->
+  isRequestParameter('action', 'edit')->
+  isStatusCode(200)->
+  checkResponseElement('input[value="foo title"]')->
+  checkResponseElement('#article_category_id option[selected="selected"]', 1)->
+  checkResponseElement('input[value="Category 1"]')->
+  click('submit', array('article' => array('title' => 'foo bar', 'category' => array('name' => 'Category foo'))))->
+  isRedirected()->
+  followRedirect()->
+  checkResponseElement('input[value="foo bar"]')->
+  checkResponseElement('#article_category_id option[selected="selected"]', 1)->
+  checkResponseElement('input[value="Category foo"]')
 ;

@@ -23,4 +23,21 @@ class i18nActions extends sfActions
 
     $this->setTemplate('index');
   }
+
+  public function executeMovie($request)
+  {
+    $this->form = new MovieForm(MoviePeer::retrieveByPk($request->getParameter('id')));
+
+    if ($request->isMethod('post'))
+    {
+      $this->form->bind($request->getParameter('movie'));
+
+      if ($this->form->isValid())
+      {
+        $movie = $this->form->save();
+
+        $this->redirect('i18n/movie?id='.$movie->getId());
+      }
+    }
+  }
 }

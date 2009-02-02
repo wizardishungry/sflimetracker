@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id$
+ * $Id: CoverageReportTask.php 426 2008-10-28 19:29:49Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -23,14 +23,14 @@ require_once 'phing/Task.php';
 require_once 'phing/system/io/PhingFile.php';
 require_once 'phing/system/io/Writer.php';
 require_once 'phing/system/util/Properties.php';
-require_once 'phing/tasks/ext/phpunit2/PHPUnit2Util.php';
+require_once 'phing/tasks/ext/phpunit/PHPUnitUtil.php';
 require_once 'phing/tasks/ext/coverage/CoverageReportTransformer.php';
 
 /**
  * Transforms information in a code coverage database to XML
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id$
+ * @version $Id: CoverageReportTask.php 426 2008-10-28 19:29:49Z mrook $
  * @package phing.tasks.ext.coverage
  * @since 2.1.0
  */
@@ -117,7 +117,7 @@ class CoverageReportTask extends Task
 
 	protected function addClassToPackage($classname, $element)
 	{
-		$packageName = PHPUnit2Util::getPackageName($classname);
+		$packageName = PHPUnitUtil::getPackageName($classname);
 
 		$package = $this->getPackageElement($packageName);
 
@@ -186,8 +186,15 @@ class CoverageReportTask extends Task
 				$line = $lines[$i];
 				
 				$line = rtrim($line);
-
-				$lines[$i] = utf8_encode($line);
+				
+				if (function_exists('mb_convert_encoding'))
+				{
+					$lines[$i] = mb_convert_encoding($line, 'UTF-8');
+				}
+				else
+				{
+					$lines[$i] = utf8_encode($line);
+				}
 			}
 			
 			return $lines;
@@ -198,6 +205,11 @@ class CoverageReportTask extends Task
 	{
 		$sourceElement = $this->doc->createElement('sourcefile');
 		$sourceElement->setAttribute('name', basename($filename));
+		
+		/**
+		 * Add original/full filename to document
+		 */
+		$sourceElement->setAttribute('sourcefile', $filename);
 
 		$filelines = $this->highlightSourceFile($filename);
 
@@ -230,12 +242,8 @@ class CoverageReportTask extends Task
 	}
 
 	protected function transformCoverageInformation($filename, $coverageInformation)
-	{
-		// Strip last line of coverage information
-		end($coverageInformation);
-		unset($coverageInformation[key($coverageInformation)]);
-		
-		$classes = PHPUnit2Util::getDefinedClasses($filename, $this->classpath);
+	{	
+		$classes = PHPUnitUtil::getDefinedClasses($filename, $this->classpath);
 		
 		if (is_array($classes))
 		{
@@ -389,7 +397,7 @@ class CoverageReportTask extends Task
 		foreach ($props->keys() as $filename)
 		{
 			$file = unserialize($props->getProperty($filename));
-
+			
 			$this->transformCoverageInformation($file['fullname'], $file['coverage']);
 		}
 		
@@ -404,4 +412,3 @@ class CoverageReportTask extends Task
 		}
 	}
 }
-?>

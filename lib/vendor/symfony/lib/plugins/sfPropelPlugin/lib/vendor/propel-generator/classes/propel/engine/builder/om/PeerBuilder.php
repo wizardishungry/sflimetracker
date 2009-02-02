@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: PeerBuilder.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: PeerBuilder.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,6 +31,7 @@ require_once 'propel/engine/builder/om/OMBuilder.php';
  * methods.
  *
  * @author     Hans Lellelid <hans@xmpl.org>
+ * @package    propel.engine.builder.om
  */
 abstract class PeerBuilder extends OMBuilder {
 
@@ -42,8 +43,11 @@ abstract class PeerBuilder extends OMBuilder {
 	 */
 	public function __construct(Table $table) {
 		parent::__construct($table);
-		$this->basePeerClass = $this->getBasePeer($table);
-		$this->basePeerClassname = $this->classname($this->basePeerClass);
+		$this->basePeerClassname = $this->basePeerClass = $this->getBasePeer($table);
+		$pos = strrpos($this->basePeerClassname, '.');
+		if ($pos !== false) {
+			$this->basePeerClassname = substr($this->basePeerClassname, $pos + 1);
+		}
 	}
 
 	/**
@@ -54,15 +58,21 @@ abstract class PeerBuilder extends OMBuilder {
 	{
 		$this->addAddSelectColumns($script);
 
-		$this->addCountConstants($script);
 		$this->addDoCount($script);
 
 		// consider refactoring the doSelect stuff
 		// into a top-level method
 		$this->addDoSelectOne($script);
 		$this->addDoSelect($script);
-		$this->addDoSelectRS($script);	 // <-- there's Creole code in here
-		$this->addPopulateObjects($script); // <-- there's Creole code in here
+		$this->addDoSelectStmt($script);	 // <-- there's PDO code in here
+
+		$this->addAddInstanceToPool($script);
+		$this->addRemoveInstanceFromPool($script);
+		$this->addGetInstanceFromPool($script);
+		$this->addClearInstancePool($script);
+
+		$this->addGetPrimaryKeyHash($script);
+		$this->addPopulateObjects($script); // <-- there's PDO code in here
 
 	}
 
@@ -142,7 +152,6 @@ abstract class PeerBuilder extends OMBuilder {
 		}
 
 		$this->addGetMapBuilder($script);
-		$this->addGetPhpNameMap($script);
 
 		$this->addTranslateFieldName($script);
 		$this->addGetFieldNames($script);

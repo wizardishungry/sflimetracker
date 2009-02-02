@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: NameFactory.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: NameFactory.php 964 2008-02-10 20:42:38Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -22,13 +22,15 @@
 
 include_once 'propel/engine/EngineException.php';
 include_once 'propel/engine/database/model/NameGenerator.php';
+include_once 'propel/engine/database/model/PhpNameGenerator.php';
+include_once 'propel/engine/database/model/ConstraintNameGenerator.php';
 
 /**
  * A name generation factory.
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 964 $
  * @package    propel.engine.database.model
  */
 class NameFactory {
@@ -52,23 +54,7 @@ class NameFactory {
 	 * The cache of <code>NameGenerator</code> algorithms in use for
 	 * name generation, keyed by fully qualified class name.
 	 */
-	private $algorithms;
-
-	/**
-	 * Creates a new instance with storage for algorithm implementations.
-	 */
-	protected function __construct()
-	{
-		$this->algorithms = array();
-	}
-
-	private static function instance()
-	{
-		if (self::$instance === null) {
-			self::$instance = new NameFactory();
-		}
-		return self::$instance;
-	}
+	private static $algorithms = array();
 
 	/**
 	 * Factory method which retrieves an instance of the named generator.
@@ -76,41 +62,27 @@ class NameFactory {
 	 * @param      name The fully qualified class name of the name
 	 * generation algorithm to retrieve.
 	 */
-	protected function getAlgorithm($name)
+	protected static function getAlgorithm($name)
 	{
-		$algorithm = isset($this->algorithms[$name]) ? $this->algorithms[$name] : null;
-		if ($algorithm === null) {
-			try {
-				include_once 'propel/engine/database/model/' . $name . '.php';
-				if (!class_exists($name)) {
-					throw new Exception("Unable to instantiate class " . $name
-						. ": Make sure it's in your include_path");
-				}
-				$algorithm = new $name();
-			} catch (BuildException $e) {
-				print $e->getMessage() . "\n";
-				print $e->getTraceAsString();
-			}
-			$this->algorithms[$name] = $algorithm;
+		if (!isset(self::$algorithms[$name])) {
+			self::$algorithms[$name] = new $name();
 		}
-		return $algorithm;
-
+		return self::$algorithms[$name];
 	}
 
 	/**
 	 * Given a list of <code>String</code> objects, implements an
 	 * algorithm which produces a name.
 	 *
-	 * @param      algorithmName The fully qualified class name of the
-	 * {@link NameGenerator}
-	 * implementation to use to generate names.
+	 * @param      string $algorithmName The fully qualified class name of the {@link NameGenerator}
+	 *             implementation to use to generate names.
 	 * @param      array $inputs Inputs used to generate a name.
 	 * @return     The generated name.
 	 * @throws     EngineException
 	 */
 	public static function generateName($algorithmName, $inputs)
 	{
-		$algorithm = self::instance()->getAlgorithm($algorithmName);
+		$algorithm = self::getAlgorithm($algorithmName);
 		return $algorithm->generateName($inputs);
 	}
 }

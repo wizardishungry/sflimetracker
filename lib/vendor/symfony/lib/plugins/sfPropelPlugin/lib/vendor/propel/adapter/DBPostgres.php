@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: DBPostgres.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: DBPostgres.php 1011 2008-03-20 11:36:27Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -20,8 +20,6 @@
  * <http://propel.phpdb.org>.
  */
 
-require_once 'propel/adapter/DBAdapter.php';
-
 /**
  * This is used to connect to PostgresQL databases.
  *
@@ -29,7 +27,7 @@ require_once 'propel/adapter/DBAdapter.php';
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Hakan Tandogan <hakan42@gmx.de> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 1011 $
  * @package    propel.adapter
  */
 class DBPostgres extends DBAdapter {
@@ -93,25 +91,62 @@ class DBPostgres extends DBAdapter {
 	}
 
 	/**
-	 * Locks the specified table.
-	 *
-	 * @param      Connection $con The Creole connection to use.
-	 * @param      string $table The name of the table to lock.
-	 * @exception SQLException No Statement could be created or executed.
+	 * @see        DBAdapter::getIdMethod()
 	 */
-	public function lockTable(Connection $con, $table)
+	protected function getIdMethod()
 	{
+		return DBAdapter::ID_METHOD_SEQUENCE;
 	}
 
 	/**
-	 * Unlocks the specified table.
-	 *
-	 * @param      Connection $con The Creole connection to use.
-	 * @param      string $table The name of the table to unlock.
-	 * @exception SQLException No Statement could be created or executed.
+	 * Gets ID for specified sequence name.
 	 */
-	public function unlockTable(Connection $con, $table)
+	public function getId(PDO $con, $name = null)
 	{
+		if ($name === null) {
+			throw new PropelException("Unable to fetch next sequence ID without sequence name.");
+		}
+		$stmt = $con->query("SELECT nextval(".$con->quote($name).")");
+		$row = $stmt->fetch(PDO::FETCH_NUM);
+		return $row[0];
 	}
 
+	/**
+	 * Returns timestamp formatter string for use in date() function.
+	 * @return     string
+	 */
+	public function getTimestampFormatter()
+	{
+		return "Y-m-d H:i:s O";
+	}
+
+	/**
+	 * Returns timestamp formatter string for use in date() function.
+	 * @return     string
+	 */
+	public function getTimeFormatter()
+	{
+		return "H:i:s O";
+	}
+
+	/**
+	 * @see        DBAdapter::applyLimit()
+	 */
+	public function applyLimit(&$sql, $offset, $limit)
+	{
+		if ( $limit > 0 ) {
+			$sql .= " LIMIT ".$limit;
+		}
+		if ( $offset > 0 ) {
+			$sql .= " OFFSET ".$offset;
+		}
+	}
+	
+	/**
+	 * @see        DBAdapter::random()
+	 */
+	public function random($seed=NULL)
+	{
+		return 'random()';
+	}
 }

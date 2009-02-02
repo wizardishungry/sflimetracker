@@ -22,48 +22,17 @@
  */
 abstract class sfRequest
 {
-  /**
-   * Process validation and execution for only GET requests.
-   *
-   */
-  const GET = 2;
-
-  /**
-   * Skip validation and execution for any request method.
-   *
-   */
-  const NONE = 1;
-
-  /**
-   * Process validation and execution for only POST requests.
-   *
-   */
-  const POST = 4;
-
-  /**
-   * Process validation and execution for only PUT requests.
-   *
-   */
-  const PUT = 5;
-
-  /**
-   * Process validation and execution for only DELETE requests.
-   *
-   */
-  const DELETE = 6;
-
-  /**
-   * Process validation and execution for only HEAD requests.
-   *
-   */
-  const HEAD = 7;
+  const GET    = 'GET';
+  const POST   = 'POST';
+  const PUT    = 'PUT';
+  const DELETE = 'DELETE';
+  const HEAD   = 'HEAD';
 
   protected
-    $errors          = array(),
     $dispatcher      = null,
     $method          = null,
+    $options         = array(),
     $parameterHolder = null,
-    $config          = null,
     $attributeHolder = null;
 
   /**
@@ -71,25 +40,37 @@ abstract class sfRequest
    *
    * @see initialize()
    */
-  public function __construct(sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array())
+  public function __construct(sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array(), $options = array())
   {
-    $this->initialize($dispatcher, $parameters, $attributes);
+    $this->initialize($dispatcher, $parameters, $attributes, $options);
   }
 
   /**
    * Initializes this sfRequest.
    *
+   * Available options:
+   *
+   *  * logging: Whether to enable logging or not (false by default)
+   *
    * @param  sfEventDispatcher $dispatcher  An sfEventDispatcher instance
    * @param  array             $parameters  An associative array of initialization parameters
    * @param  array             $attributes  An associative array of initialization attributes
+   * @param  array             $options     An associative array of options
    *
    * @return bool true, if initialization completes successfully, otherwise false
    *
    * @throws <b>sfInitializationException</b> If an error occurs while initializing this sfRequest
    */
-  public function initialize(sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array())
+  public function initialize(sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array(), $options = array())
   {
     $this->dispatcher = $dispatcher;
+
+    $this->options = $options;
+
+    if (!isset($this->options['logging']))
+    {
+      $this->options['logging'] = false;
+    }
 
     // initialize parameter and attribute holders
     $this->parameterHolder = new sfParameterHolder();
@@ -125,58 +106,9 @@ abstract class sfRequest
   }
 
   /**
-   * Retrieves an error message.
+   * Gets the request method.
    *
-   * @param  string $name  An error name
-   *
-   * @return string An error message, if the error exists, otherwise null
-   */
-  public function getError($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return isset($this->errors[$name]) ? $this->errors[$name] : null;
-  }
-
-  /**
-   * Retrieves an array of error names.
-   *
-   * @return array An indexed array of error names
-   */
-  public function getErrorNames()
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return array_keys($this->errors);
-  }
-
-  /**
-   * Retrieves an array of errors.
-   *
-   * @return array An associative array of errors
-   */
-  public function getErrors()
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return $this->errors;
-  }
-
-  /**
-   * Retrieves this request's method.
-   *
-   * @return int One of the following constants:
-   *             - sfRequest::GET
-   *             - sfRequest::POST
+   * @return string The request method
    */
   public function getMethod()
   {
@@ -184,129 +116,20 @@ abstract class sfRequest
   }
 
   /**
-   * Indicates whether or not an error exists.
-   *
-   * @param  string $name  An error name
-   *
-   * @return bool true, if the error exists, otherwise false
-   */
-  public function hasError($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return array_key_exists($name, $this->errors);
-  }
-
-  /**
-   * Indicates whether or not any errors exist.
-   *
-   * @return bool true, if any error exist, otherwise false
-   */
-  public function hasErrors()
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return count($this->errors) > 0;
-  }
-
-  /**
-   * Removes an error.
-   *
-   * @param  string $name  An error name
-   *
-   * @return string An error message, if the error was removed, otherwise null
-   */
-  public function removeError($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    $retval = null;
-
-    if (isset($this->errors[$name]))
-    {
-      $retval = $this->errors[$name];
-
-      unset($this->errors[$name]);
-    }
-
-    return $retval;
-  }
-
-  /**
-   * Sets an error.
-   *
-   * @param string $name     An error name
-   * @param string $message  An error message
-   *
-   */
-  public function setError($name, $message)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    if (sfConfig::get('sf_logging_enabled'))
-    {
-      $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Error in form for parameter "%s" (with message "%s")', $name, $message))));
-    }
-
-    $this->errors[$name] = $message;
-  }
-
-  /**
-   * Sets an array of errors
-   *
-   * If an existing error name matches any of the keys in the supplied
-   * array, the associated message will be overridden.
-   *
-   * @param array $erros An associative array of errors and their associated messages
-   *
-   */
-  public function setErrors($errors)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    $this->errors = array_merge($this->errors, $errors);
-  }
-
-  /**
    * Sets the request method.
    *
-   * @param int $methodCode  One of the following constants:
-   *
-   * - sfRequest::GET
-   * - sfRequest::POST
-   * - sfRequest::PUT
-   * - sfRequest::DELETE
-   * - sfRequest::HEAD
+   * @param string $method  The request method
    *
    * @throws <b>sfException</b> - If the specified request method is invalid
    */
-  public function setMethod($methodCode)
+  public function setMethod($method)
   {
-    $available_methods = array(self::GET, self::POST, self::PUT, self::DELETE, self::HEAD, self::NONE);
-    if (in_array($methodCode, $available_methods))
+    if (!in_array(strtoupper($method), array(self::GET, self::POST, self::PUT, self::DELETE, self::HEAD)))
     {
-      $this->method = $methodCode;
-
-      return;
+      throw new sfException(sprintf('Invalid request method: %s.', $method));
     }
 
-    // invalid method type
-    throw new sfException(sprintf('Invalid request method: %s.', $methodCode));
+    $this->method = strtoupper($method);
   }
 
   /**
@@ -421,5 +244,11 @@ abstract class sfRequest
     }
 
     return $event->getReturnValue();
+  }
+
+  public function __clone()
+  {
+    $this->parameterHolder = clone $this->parameterHolder;
+    $this->attributeHolder = clone $this->attributeHolder;
   }
 }

@@ -99,8 +99,15 @@ abstract class sfDatabaseSessionStorage extends sfSessionStorage
     // what database are we using?
     $database = $this->options['database'];
 
-    // get the database resource
-    $this->db = $database->getResource();
+    // get the database and connection
+    if(get_class($database) == 'sfPropelDatabase')
+    {
+      $this->db = Propel::getConnection(); 
+    }
+    else
+    {
+      $this->db = $database->getResource(); 
+    }
     $this->con = $database->getConnection();
     
     if (is_null($this->db) && is_null($this->con))

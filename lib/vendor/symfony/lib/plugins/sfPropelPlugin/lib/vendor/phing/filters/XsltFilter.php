@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id$
+ *  $Id: XsltFilter.php 420 2008-10-26 19:21:39Z alexeyshockov $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,7 +31,7 @@ include_once 'phing/filters/ChainableReader.php';
  * @author    Hans Lellelid <hans@velum.net>
  * @author    Yannick Lecaillez <yl@seasonfive.com>
  * @author    Andreas Aderhold <andi@binarycloud.com>
- * @version   $Revision: 1.16 $
+ * @version   $Revision$
  * @see       FilterReader
  * @package   phing.filters
  */
@@ -150,7 +150,7 @@ class XsltFilter extends BaseParamFilterReader implements ChainableReader {
         }
 
         if(empty($_xml)) {
-            $this->log("XML file is empty!", PROJECT_MSG_WARN);
+            $this->log("XML file is empty!", Project::MSG_WARN);
             return ''; // return empty string, don't attempt to apply XSLT
         }
        
@@ -159,7 +159,7 @@ class XsltFilter extends BaseParamFilterReader implements ChainableReader {
         $xslFr = new FileReader($this->xslFile);
         $xslFr->readInto($_xsl);
         
-        $this->log("Tranforming XML " . $this->in->getResource() . " using style " . $this->xslFile->getPath(), PROJECT_MSG_VERBOSE);
+        $this->log("Tranforming XML " . $this->in->getResource() . " using style " . $this->xslFile->getPath(), Project::MSG_VERBOSE);
         
         $out = '';
         try {
@@ -201,13 +201,16 @@ class XsltFilter extends BaseParamFilterReader implements ChainableReader {
         // ignoring param "type" attrib, because
         // we're only supporting direct XSL params right now
         foreach($this->xsltParams as $param) {
-            $this->log("Setting XSLT param: " . $param->getName() . "=>" . $param->getExpression(), PROJECT_MSG_DEBUG);
+            $this->log("Setting XSLT param: " . $param->getName() . "=>" . $param->getExpression(), Project::MSG_DEBUG);
             $processor->setParameter(null, $param->getName(), $param->getExpression());
         }
         
-        $result = $processor->transformToXML($xmlDom);
+        $errorlevel = error_reporting();
+        error_reporting($errorlevel & ~E_WARNING);
+        @$result = $processor->transformToXML($xmlDom);
+        error_reporting($errorlevel);
         
-        if ( !$result ) {
+        if (false === $result) {
             //$errno = xslt_errno($processor);
             //$err   = xslt_error($processor);    
             throw new BuildException("XSLT Error");            
@@ -286,6 +289,28 @@ class XSLTParam {
     }
     
     /**
+     * Sets expression value (alias to the setExpression()) method. 
+     *
+     * @param string $v
+     * @see setExpression()
+     */
+    public function setValue($v)
+    {
+    	$this->setExpression($v);
+    }
+    
+	/**
+     * Gets expression value (alias to the getExpression()) method. 
+     *
+     * @param string $v
+     * @see getExpression()
+     */
+    public function getValue()
+    {
+    	return $this->getExpression();
+    }
+    
+    /**
      * Sets expression value.
      * @param string $expr
      */
@@ -314,4 +339,3 @@ class XSLTParam {
     }        
 }
 
-?>

@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id$
+ *  $Id: ContainsCondition.php 410 2008-10-21 13:10:52Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -71,6 +71,6 @@ class ContainsCondition implements Condition {
 
         return $this->caseSensitive 
             ? strpos($this->string, $this->subString) !== false
-            : substr(strtolower($this->string), strtolower($this->subString)) !== false;
+            : strpos(strtolower($this->string), strtolower($this->subString)) !== false;
     }
 }

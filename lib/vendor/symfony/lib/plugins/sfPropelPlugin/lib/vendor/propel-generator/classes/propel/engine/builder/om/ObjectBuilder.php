@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: ObjectBuilder.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: ObjectBuilder.php 842 2007-12-02 16:28:20Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,6 +31,7 @@ require_once 'propel/engine/builder/om/OMBuilder.php';
  * methods.
  *
  * @author     Hans Lellelid <hans@xmpl.org>
+ * @package    propel.engine.builder.om
  */
 abstract class ObjectBuilder extends OMBuilder {
 
@@ -65,11 +66,13 @@ abstract class ObjectBuilder extends OMBuilder {
 
 		foreach ($table->getColumns() as $col) {
 
+			// if they're not using the DateTime class than we will generate "compatibility" accessor method
 			if ($col->getType() === PropelTypes::DATE || $col->getType() === PropelTypes::TIME || $col->getType() === PropelTypes::TIMESTAMP) {
 				$this->addTemporalAccessor($script, $col);
 			} else {
-				$this->addGenericAccessor($script, $col);
+				$this->addDefaultAccessor($script, $col);
 			}
+
 			if ($col->isLazyLoad()) {
 				$this->addLazyLoader($script, $col);
 			}
@@ -86,7 +89,7 @@ abstract class ObjectBuilder extends OMBuilder {
 	{
 		foreach ($this->getTable()->getColumns() as $col) {
 
-			if ($col->isLob()) {
+			if ($col->isLobType()) {
 				$this->addLobMutator($script, $col);
 			} elseif ($col->getType() === PropelTypes::DATE || $col->getType() === PropelTypes::TIME || $col->getType() === PropelTypes::TIMESTAMP) {
 				$this->addTemporalMutator($script, $col);

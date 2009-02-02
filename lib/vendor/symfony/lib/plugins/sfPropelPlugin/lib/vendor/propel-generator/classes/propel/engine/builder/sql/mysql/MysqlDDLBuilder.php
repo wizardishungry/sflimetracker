@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id$
+ *  $Id: MysqlDDLBuilder.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,7 +25,7 @@ require_once 'propel/engine/builder/sql/DDLBuilder.php';
 /**
  * DDL Builder class for MySQL.
  *
- * @author     David Zülke
+ * @author     David Zï¿½lke
  * @author     Hans Lellelid <hans@xmpl.org>
  * @package    propel.engine.builder.sql.mysql
  */
@@ -66,7 +66,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 	protected function addDropStatements(&$script)
 	{
 		$script .= "
-DROP TABLE IF EXISTS ".$this->quoteIdentifier($this->getTable()->getName()).";
+DROP TABLE IF EXISTS ".$this->quoteIdentifier($this->prefixTablename($this->getTable()->getName())).";
 ";
 	}
 
@@ -104,16 +104,25 @@ DROP TABLE IF EXISTS ".$this->quoteIdentifier($this->getTable()->getName()).";
 
 		$script .= "
 
-CREATE TABLE ".$this->quoteIdentifier($table->getName())."
+CREATE TABLE ".$this->quoteIdentifier($this->prefixTablename($table->getName()))."
 (
 	";
 
 		$lines = array();
 
+		$databaseType = $this->getPlatform()->getDatabaseType();
+
 		foreach ($table->getColumns() as $col) {
 			$entry = $this->getColumnDDL($col);
+			$colinfo = $col->getVendorInfoForType($databaseType);
+			if ( $colinfo->hasParameter('Charset') ) {
+				$entry .= ' CHARACTER SET '.$platform->quote($colinfo->getParamter('Charset'));
+			}
+			if ( $colinfo->hasParameter('Collate') ) {
+				$entry .= ' COLLATE '.$platform->quote($colinfo->getParamter('Collate'));
+			}
 			if ($col->getDescription()) {
-				$entry .= " COMMENT '".$platform->escapeText($col->getDescription())."'";
+				$entry .= " COMMENT ".$platform->quote($col->getDescription());
 			}
 			$lines[] = $entry;
 		}
@@ -134,17 +143,40 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 
 		$mysqlTableType = $this->getBuildProperty("mysqlTableType");
 		if (!$mysqlTableType) {
-			$vendorSpecific = $table->getVendorSpecificInfo();
-			if(isset($vendorSpecific['Type'])) {
-				$mysqlTableType = $vendorSpecific['Type'];
+			$vendorSpecific = $table->getVendorInfoForType($this->getPlatform()->getDatabaseType());
+			if ($vendorSpecific->hasParameter('Type')) {
+				$mysqlTableType = $vendorSpecific->getParameter('Type');
+			} elseif ($vendorSpecific->hasParameter('Engine')) {
+				$mysqlTableType = $vendorSpecific->getParameter('Engine');
 			} else {
 				$mysqlTableType = 'MyISAM';
 			}
 		}
 
 		$script .= "Type=$mysqlTableType";
-		if($table->getDescription()) {
-			$script .= " COMMENT='".$platform->escapeText($table->getDescription())."'";
+
+		$dbVendorSpecific = $table->getDatabase()->getVendorInfoForType($databaseType);
+		$tableVendorSpecific = $table->getVendorInfoForType($databaseType);
+		$vendorSpecific = $dbVendorSpecific->getMergedVendorInfo($tableVendorSpecific);
+
+		if ( $vendorSpecific->hasParameter('Charset') ) {
+			$script .= ' CHARACTER SET '.$platform->quote($vendorSpecific->getParameter('Charset'));
+		}
+		if ( $vendorSpecific->hasParameter('Collate') ) {
+			$script .= ' COLLATE '.$platform->quote($vendorSpecific->getParameter('Collate'));
+		}
+		if ( $vendorSpecific->hasParameter('Checksum') ) {
+			$script .= ' CHECKSUM='.$platform->quote($vendorSpecific->getParameter('Checksum'));
+		}
+		if ( $vendorSpecific->hasParameter('Pack_Keys') ) {
+			$script .= ' PACK_KEYS='.$platform->quote($vendorSpecific->getParameter('Pack_Keys'));
+		}
+		if ( $vendorSpecific->hasParameter('Delay_key_write') ) {
+			$script .= ' DELAY_KEY_WRITE='.$platform->quote($vendorSpecific->getParameter('Delay_key_write'));
+		}
+
+		if ($table->getDescription()) {
+			$script .= " COMMENT=".$platform->quote($table->getDescription());
 		}
 		$script .= ";
 ";
@@ -163,7 +195,7 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 
 		$cols = $index->getColumns();
 		$list = array();
-		foreach($cols as $col) {
+		foreach ($cols as $col) {
 			$list[] = $this->quoteIdentifier($col) . ($index->hasColumnSize($col) ? '(' . $index->getColumnSize($col) . ')' : '');
 		}
 		return implode(', ', $list);
@@ -182,8 +214,8 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 		}
 
 		foreach ($table->getIndices() as $index ) {
-			$vendor = $index->getVendorSpecificInfo();
-			$lines[] .= (($vendor && $vendor['Index_type'] == 'FULLTEXT') ? 'FULLTEXT ' : '') . "KEY " . $this->quoteIdentifier($index->getName()) . "(" . $this->getIndexColumnList($index) . ")";
+			$vendorInfo = $index->getVendorInfoForType($platform->getDatabaseType());
+			$lines[] .= (($vendorInfo && $vendorInfo->getParameter('Index_type') == 'FULLTEXT') ? 'FULLTEXT ' : '') . "KEY " . $this->quoteIdentifier($index->getName()) . "(" . $this->getIndexColumnList($index) . ")";
 		}
 
 	}
@@ -206,18 +238,18 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 		// ColA, ColB+ColC, and ColB (but not ColC!). This is because of the way SQL multi-column indices work.
 		// we will later match found, defined foreign key and referenced column definitions against this array to know
 		// whether we should create a new index for mysql or not
-		foreach($table->getPrimaryKey() as $_primaryKeyColumn) {
+		foreach ($table->getPrimaryKey() as $_primaryKeyColumn) {
 			// do the above for primary keys
 			$_previousColumns[] = $this->quoteIdentifier($_primaryKeyColumn->getName());
 			$_indices[] = implode(',', $_previousColumns);
 		}
 
 		$_tableIndices = array_merge($table->getIndices(), $table->getUnices());
-		foreach($_tableIndices as $_index) {
+		foreach ($_tableIndices as $_index) {
 			// same procedure, this time for unices and indices
 			$_previousColumns = array();
 			$_indexColumns = $_index->getColumns();
-			foreach($_indexColumns as $_indexColumn) {
+			foreach ($_indexColumns as $_indexColumn) {
 				$_previousColumns[] = $this->quoteIdentifier($_indexColumn);
 				$_indices[] = implode(',', $_previousColumns);
 			}
@@ -227,10 +259,10 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 		// any column that is referenced by another table (yep, MySQL _is_ a PITA)
 		$counter = 0;
 		$allTables = $table->getDatabase()->getTables();
-		foreach($allTables as $_table) {
-			foreach($_table->getForeignKeys() as $_foreignKey) {
-				if($_foreignKey->getForeignTableName() == $table->getName()) {
-					if(!in_array($this->getColumnList($_foreignKey->getForeignColumns()), $_indices)) {
+		foreach ($allTables as $_table) {
+			foreach ($_table->getForeignKeys() as $_foreignKey) {
+				if ($_foreignKey->getForeignTableName() == $table->getName()) {
+					if (!in_array($this->getColumnList($_foreignKey->getForeignColumns()), $_indices)) {
 						// no matching index defined in the schema, so we have to create one
 						$lines[] = "INDEX ".$this->quoteIdentifier("I_referenced_".$_foreignKey->getName()."_".(++$counter))." (" .$this->getColumnList($_foreignKey->getForeignColumns()).")";
 					}
@@ -242,13 +274,13 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 
 			$indexName = $this->quoteIdentifier(substr_replace($fk->getName(), 'FI_',  strrpos($fk->getName(), 'FK_'), 3));
 
-			if(!in_array($this->getColumnList($fk->getLocalColumns()), $_indices)) {
+			if (!in_array($this->getColumnList($fk->getLocalColumns()), $_indices)) {
 				// no matching index defined in the schema, so we have to create one. MySQL needs indices on any columns that serve as foreign keys. these are not auto-created prior to 4.1.2
 				$lines[] = "INDEX $indexName (".$this->getColumnList($fk->getLocalColumns()).")";
 			}
 			$str = "CONSTRAINT ".$this->quoteIdentifier($fk->getName())."
 		FOREIGN KEY (".$this->getColumnList($fk->getLocalColumns()).")
-		REFERENCES ".$this->quoteIdentifier($fk->getForeignTableName()) . " (".$this->getColumnList($fk->getForeignColumns()).")";
+		REFERENCES ".$this->quoteIdentifier($this->prefixTablename($fk->getForeignTableName())) . " (".$this->getColumnList($fk->getForeignColumns()).")";
 			if ($fk->hasOnUpdate()) {
 				$str .= "
 		ON UPDATE ".$fk->getOnUpdate();
@@ -269,7 +301,7 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 	 */
 	private function containsColname($columns, $searchcol)
 	{
-		foreach($columns as $col) {
+		foreach ($columns as $col) {
 			if ($col instanceof Column) {
 				$col = $col->getName();
 			}
@@ -296,4 +328,56 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 	{
 	}
 
+	/**
+	 * Builds the DDL SQL for a Column object.
+	 * @return     string
+	 */
+	public function getColumnDDL(Column $col)
+	{
+		$platform = $this->getPlatform();
+		$domain = $col->getDomain();
+		$sqlType = $domain->getSqlType();
+		$notNullString = $col->getNotNullString();
+		$defaultSetting = $col->getDefaultSetting();
+
+		// Special handling of TIMESTAMP/DATETIME types ...
+		// See: http://propel.phpdb.org/trac/ticket/538
+		if ($sqlType == 'DATETIME') {
+			$def = $domain->getDefaultValue();
+			if ($def && $def->isExpression()) { // DATETIME values can only have constant expressions
+				$sqlType = 'TIMESTAMP';
+			}
+		} elseif ($sqlType == 'DATE') {
+			$def = $domain->getDefaultValue();
+			if ($def && $def->isExpression()) { // DATE values don't support expressions in MySQL
+				throw new EngineException("DATE columns cannot have default *expressions* in MySQL.");
+			}
+		}
+
+		$sb = "";
+		$sb .= $this->quoteIdentifier($col->getName()) . " ";
+		$sb .= $sqlType;
+		if ($platform->hasSize($sqlType)) {
+			$sb .= $domain->printSize();
+		}
+		$sb .= " ";
+
+		if ($sqlType == 'TIMESTAMP') {
+			$notNullString = $col->getNotNullString();
+			$defaultSetting = $col->getDefaultSetting();
+			if ($notNullString == '') {
+				$notNullString = 'NULL';
+			}
+			if ($defaultSetting == '' && $notNullString == 'NOT NULL') {
+				$defaultSetting = 'DEFAULT CURRENT_TIMESTAMP';
+			}
+			$sb .= $notNullString . " " . $defaultSetting . " ";
+		} else {
+			$sb .= $defaultSetting . " ";
+			$sb .= $notNullString . " ";
+		}
+		$sb .= $col->getAutoIncrementString();
+
+		return trim($sb);
+	}
 }

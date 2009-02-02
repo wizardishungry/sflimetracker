@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: XMLElement.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: XMLElement.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -19,18 +19,30 @@
  * <http://propel.phpdb.org>.
  */
 
+include_once 'propel/engine/database/model/VendorInfo.php';
+
 /**
  * An abstract class for elements represented by XML tags (e.g. Column, Table).
  *
  * @author     Hans Lellelid <hans@xmpl.org>
- * @version    $Revision: 536 $
+ * @version    $Revision: 989 $
  * @package    propel.engine.database.model
  */
 abstract class XMLElement {
 
+	/**
+	 * The name => value attributes from XML.
+	 *
+	 * @var        array
+	 */
 	protected $attributes = array();
 
-	protected $vendorSpecificInfo = array();
+	/**
+	 * Any associated vendor-specific information objects.
+	 *
+	 * @var        array VendorInfo[]
+	 */
+	protected $vendorInfos = array();
 
 	/**
 	 * Replaces the old loadFromXML() so that we can use loadFromXML() to load the attribs into the class.
@@ -42,7 +54,8 @@ abstract class XMLElement {
 	 * It calls a setupObject() method that must be implemented by the child class.
 	 * @param      array $attributes The attributes for the XML tag.
 	 */
-	public function loadFromXML($attributes) {
+	public function loadFromXML($attributes)
+	{
 		$this->attributes = array_change_key_case($attributes, CASE_LOWER);
 		$this->setupObject();
 	}
@@ -52,7 +65,8 @@ abstract class XMLElement {
 	 * All attribute names (keys) are lowercase.
 	 * @return     array
 	 */
-	public function getAttributes() {
+	public function getAttributes()
+	{
 		return $this->attributes;
 	}
 
@@ -63,7 +77,8 @@ abstract class XMLElement {
 	 * @param      mixed $defaultValue The default value to use in case the attribute is not set.
 	 * @return     mixed The value of the attribute or $defaultValue if not set.
 	 */
-	public function getAttribute($name, $defaultValue = null) {
+	public function getAttribute($name, $defaultValue = null)
+	{
 		$name = strtolower($name);
 		if (isset($this->attributes[$name])) {
 			return $this->attributes[$name];
@@ -77,7 +92,8 @@ abstract class XMLElement {
 	 * This is to support the default value when used w/ a boolean column.
 	 * @return     value
 	 */
-	protected function booleanValue($val) {
+	protected function booleanValue($val)
+	{
 		if (is_numeric($val)) {
 			return (bool) $val;
 		} else {
@@ -86,56 +102,57 @@ abstract class XMLElement {
 	}
 
 	/**
-	 * Sets vendor specific parameter that applies to this object.
-	 * @param      string $name
-	 * @param      string $value
+	 * Appends DOM elements to represent this object in XML.
+	 * @param      DOMNode $node
 	 */
-	public function setVendorParameter($name, $value)
-	{
-		$this->vendorSpecificInfo[$name] = $value;
-	}
+	abstract public function appendXml(DOMNode $node);
 
 	/**
-	 * Whether specified vendor specific information is set.
-	 * @param      string $name
-	 * @return     boolean
+	 * Sets an associated VendorInfo object.
+	 *
+	 * @param      mixed $data VendorInfo object or XML attrib data (array)
+	 * @return     VendorInfo
 	 */
-	public function hasVendorParameter($name)
+	public function addVendorInfo($data)
 	{
-		return isset($this->vendorSpecificInfo[$name]);
-	}
-
-	/**
-	 * Returns specified vendor specific information is set.
-	 * @param      string $name
-	 * @return     string
-	 */
-	public function getVendorParameter($name)
-	{
-		if (isset($this->vendorSpecificInfo[$name])) {
-			return $this->vendorSpecificInfo[$name];
+		if ($data instanceof VendorInfo) {
+			$vi = $data;
+			$this->vendorInfos[$vi->getType()] = $vi;
+			return $vi;
+		} else {
+			$vi = new VendorInfo();
+			$vi->loadFromXML($data);
+			return $this->addVendorInfo($vi); // call self w/ different param
 		}
-		return null; // just to be explicit
 	}
 
 	/**
-	 * Sets vendor specific information for this object.
-	 * @param      array $info
+	 * Gets the any associated VendorInfo object.
+	 * @return     VendorInfo
 	 */
-	public function setVendorSpecificInfo($info)
+	public function getVendorInfoForType($type)
 	{
-		$this->vendorSpecificInfo = $info;
+		if (isset($this->vendorInfos[$type])) {
+			return $this->vendorInfos[$type];
+		} else {
+			// return an empty object
+			return new VendorInfo();
+		}
 	}
 
 	/**
-	 * Retrieves vendor specific information for this object.
-	 * @return     array
+	 * String representation of the current object.
+	 *
+	 * This is an xml representation with the XML declaration removed.
+	 *
+	 * @see        appendXml()
 	 */
-	public function getVendorSpecificInfo()
+	public function toString()
 	{
-		return $this->vendorSpecificInfo;
+		$doc = new DOMDocument('1.0');
+		$doc->formatOutput = true;
+		$this->appendXml($doc);
+		$xmlstr = $doc->saveXML();
+		return trim(preg_replace('/<\?xml.*?\?>/', '', $xmlstr));
 	}
-
-
-
 }

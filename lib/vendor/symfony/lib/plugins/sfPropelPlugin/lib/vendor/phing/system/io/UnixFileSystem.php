@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: UnixFileSystem.php 258 2007-10-21 00:46:45Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -262,5 +262,17 @@ class UnixFileSystem extends FileSystem {
 
         return $p;
     }
+    
+    /**
+     * Whether file can be deleted.
+     * @param PhingFile $f
+     * @return boolean
+     */
+    function canDelete(PhingFile $f) 
+ 	{ 
+ 		@clearstatcache(); 
+ 		$dir = dirname($f->getAbsolutePath()); 
+ 		return (bool) @is_writable($dir); 
+	}
     
 }

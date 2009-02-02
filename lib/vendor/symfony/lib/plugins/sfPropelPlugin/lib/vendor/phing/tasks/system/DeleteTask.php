@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: DeleteTask.php 321 2007-12-14 18:00:25Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -36,7 +36,7 @@ class DeleteTask extends Task {
 
     protected $quiet = false;
     protected $failonerror = true;
-    protected $verbosity = PROJECT_MSG_VERBOSE;
+    protected $verbosity = Project::MSG_VERBOSE;
 	
 	/** Any filelists of files that should be deleted. */
     private $filelists = array();
@@ -63,9 +63,9 @@ class DeleteTask extends Task {
      */
     function setVerbose($verbosity) {
         if ($verbosity) {
-            $this->verbosity = PROJECT_MSG_INFO;
+            $this->verbosity = Project::MSG_INFO;
         } else {
-            $this->verbosity = PROJECT_MSG_VERBOSE;
+            $this->verbosity = Project::MSG_VERBOSE;
         }
     }
 
@@ -131,18 +131,18 @@ class DeleteTask extends Task {
                         if($this->failonerror) {
                             throw new BuildException($message);
                         } else {
-                            $this->log($message, $this->quiet ? PROJECT_MSG_VERBOSE : PROJECT_MSG_WARN);
+                            $this->log($message, $this->quiet ? Project::MSG_VERBOSE : Project::MSG_WARN);
                         }                        
                     }
                 }
             } else {
-                $this->log("Could not find file " . $this->file->getAbsolutePath() . " to delete.",PROJECT_MSG_VERBOSE);
+                $this->log("Could not find file " . $this->file->getAbsolutePath() . " to delete.",Project::MSG_VERBOSE);
             }
         }
 
         // delete the directory
         if ($this->dir !== null && $this->dir->exists() && $this->dir->isDirectory()) {
-            if ($this->verbosity === PROJECT_MSG_VERBOSE) {
+            if ($this->verbosity === Project::MSG_VERBOSE) {
                 $this->log("Deleting directory " . $this->dir->__toString());
             }
             $this->removeDir($this->dir);
@@ -158,7 +158,7 @@ class DeleteTask extends Task {
 					if ($this->failonerror) {
 					throw $be;
 				} else {
-					$this->log($be->getMessage(), $this->quiet ? PROJECT_MSG_VERBOSE : PROJECT_MSG_WARN);
+					$this->log($be->getMessage(), $this->quiet ? Project::MSG_VERBOSE : Project::MSG_WARN);
 				}
 			}
 		}
@@ -175,7 +175,7 @@ class DeleteTask extends Task {
                     if ($this->failonerror) {
                         throw $be;
                     } else {
-                        $this->log($be->getMessage(), $this->quiet ? PROJECT_MSG_VERBOSE : PROJECT_MSG_WARN);
+                        $this->log($be->getMessage(), $this->quiet ? Project::MSG_VERBOSE : Project::MSG_WARN);
                     }
                 }
         }
@@ -204,7 +204,7 @@ class DeleteTask extends Task {
                     if($this->failonerror) {
                         throw new BuildException($message);
                     } else {
-                        $this->log($message, $this->quiet ? PROJECT_MSG_VERBOSE : PROJECT_MSG_WARN);
+                        $this->log($message, $this->quiet ? Project::MSG_VERBOSE : Project::MSG_WARN);
                     }
                 }               
             }
@@ -217,7 +217,7 @@ class DeleteTask extends Task {
             if($this->failonerror) {
               throw new BuildException($message);
             } else {
-              $this->log($message, $this->quiet ? PROJECT_MSG_VERBOSE : PROJECT_MSG_WARN);
+              $this->log($message, $this->quiet ? Project::MSG_VERBOSE : Project::MSG_WARN);
             }
         }               
     }
@@ -242,7 +242,7 @@ class DeleteTask extends Task {
                     if($this->failonerror) {
                         throw new BuildException($message);
                     } else {
-                        $this->log($message, $this->quiet ? PROJECT_MSG_VERBOSE : PROJECT_MSG_WARN);
+                        $this->log($message, $this->quiet ? Project::MSG_VERBOSE : Project::MSG_WARN);
                     }
                 }               
 
@@ -260,11 +260,11 @@ class DeleteTask extends Task {
                         $dir->delete();
                         $dirCount++;
                     } catch (Exception $e) {
-                        $message="Unable to delete directory " + $dir;
+                        $message="Unable to delete directory " . $dir->__toString();
                         if($this->failonerror) {
                             throw new BuildException($message);
                         } else {
-                            $this->log($message, $this->quiet ? PROJECT_MSG_VERBOSE : PROJECT_MSG_WARN);
+                            $this->log($message, $this->quiet ? Project::MSG_VERBOSE : Project::MSG_WARN);
                         }
                     }
                 }

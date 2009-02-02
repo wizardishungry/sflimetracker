@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: PropelGraphvizTask.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: PropelGraphvizTask.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -20,14 +20,14 @@
  * <http://propel.phpdb.org>.
  */
 
+require_once 'propel/phing/AbstractPropelDataModelTask.php';
 include_once 'propel/engine/database/model/AppData.php';
-//require_once 'phing/Task.php';
 
 /**
- * A task to generate Graphviz png images from propel datamodel.
+ * A task to generate Graphviz dot files from Propel datamodel.
  *
  * @author     Mark Kimsal
- * @version    $Revision: 536 $
+ * @version    $Revision: 989 $
  * @package    propel.phing
  */
 class PropelGraphvizTask extends AbstractPropelDataModelTask {
@@ -118,7 +118,7 @@ class PropelGraphvizTask extends AbstractPropelDataModelTask {
 				$this->log("db: " . $database->getName());
 
 				//print the tables
-				foreach($database->getTables() as $tbl) {
+				foreach ($database->getTables() as $tbl) {
 
 					$this->log("\t+ " . $tbl->getName());
 
@@ -127,7 +127,7 @@ class PropelGraphvizTask extends AbstractPropelDataModelTask {
 
 					foreach ($tbl->getColumns() as $col) {
 						$dotSyntax .= $col->getName() . ' (' . $col->getType()  . ')';
-						if ($col->getForeignKey() != null ) {
+						if (count($col->getForeignKeys()) > 0) {
 							$dotSyntax .= ' [FK]';
 						} elseif ($col->isPrimaryKey()) {
 							$dotSyntax .= ' [PK]';
@@ -142,12 +142,14 @@ class PropelGraphvizTask extends AbstractPropelDataModelTask {
 
 				$count = 0;
 				$dotSyntax .= "\n";
-				foreach($database->getTables() as $tbl) {
+				foreach ($database->getTables() as $tbl) {
 					++$count;
 
 					foreach ($tbl->getColumns() as $col) {
-						$fk = $col->getForeignKey();
-						if ( $fk == null ) continue;
+						$fk = $col->getForeignKeys();
+						if ( count($fk) == 0 or $fk === null ) continue;
+						if ( count($fk) > 1 ) throw( new Exception("not sure what to do here...") );
+						$fk = $fk[0];   // try first one
 						$dotSyntax .= 'node'.$tbl->getName() .':cols -> node'.$fk->getForeignTableName() . ':table [label="' . $col->getName() . '=' . implode(',', $fk->getForeignColumns()) . ' "];';
 						$dotSyntax .= "\n";
 					}
@@ -158,7 +160,9 @@ class PropelGraphvizTask extends AbstractPropelDataModelTask {
 			} // foreach database
 			$dotSyntax .= "}\n";
 
-			$this->writeDot($dotSyntax,$this->outDir);
+			$this->writeDot($dotSyntax,$this->outDir,$database->getName());
+
+		$dotSyntax = '';
 
 		} //foreach datamodels
 
@@ -168,8 +172,8 @@ class PropelGraphvizTask extends AbstractPropelDataModelTask {
 	/**
 	 * probably insecure
 	 */
-	function writeDot($dotSyntax, PhingFile $outputDir) {
-		$file = new PhingFile($outputDir, 'schema.dot');
+	function writeDot($dotSyntax, PhingFile $outputDir, $baseFilename) {
+		$file = new PhingFile($outputDir, $baseFilename . '.schema.dot');
 		$this->log("Writing dot file to " . $file->getAbsolutePath());
 		file_put_contents($file->getAbsolutePath(), $dotSyntax);
 	}

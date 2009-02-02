@@ -18,25 +18,24 @@ $b = new sfTestBrowser();
 
 // default main page
 $b->
-  get('/')->
-  isStatusCode(200)->
-  isRequestParameter('module', 'default')->
-  isRequestParameter('action', 'index')->
-  checkResponseElement('body', '/congratulations/i')->
-  checkResponseElement('link[href="/sf/sf_default/css/screen.css"]')
+  getAndCheck('default', 'index', '/')->
+  with('response')->begin()->
+    checkElement('body', '/congratulations/i')->
+    checkElement('link[href="/sf/sf_default/css/screen.css"]')->
+    checkElement('link[href="/css/main.css"]')->
+    contains('<!--[if lte IE 6]><link rel="stylesheet" type="text/css" media="screen" href="/css/ie6.css" /><![endif]-->')->
+  end()
 ;
 
 // default 404
 $b->
   get('/nonexistant')->
-  isStatusCode(404)->
-  throwsException('sfError404Exception', 'Action "nonexistant/index" does not exist.')
+  isStatusCode(404)
 ;
 /*
 $b->
   get('/nonexistant/')->
-  isStatusCode(404)->
-  throwsException('sfError404Exception', 'Empty module and/or action after parsing the URL "/nonexistant/" (nonexistant/).')
+  isStatusCode(404)
 ;
 */
 // 404 with ETag enabled must returns 404, not 304
@@ -61,8 +60,7 @@ sfConfig::set('sf_etag', false);
 // unexistant action
 $b->
   get('/default/nonexistantaction')->
-  isStatusCode(404)->
-  throwsException('sfError404Exception', 'Action "default/nonexistantaction" does not exist.')
+  isStatusCode(404)
 ;
 
 // module.yml: enabled
@@ -112,7 +110,7 @@ $b->
 // settings.yml: max_forwards
 $b->
   get('/configSettingsMaxForwards/selfForward')->
-  isStatusCode(200)->
+  isStatusCode(500)->
   throwsException(null, '/Too many forwards have been detected for this request/i')
 ;
 

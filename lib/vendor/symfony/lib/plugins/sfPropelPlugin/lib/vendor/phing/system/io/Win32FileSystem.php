@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: Win32FileSystem.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -79,7 +79,7 @@ class Win32FileSystem extends FileSystem {
      *    2  absolute UNC (if first char is '\\'), else directory-relative (has form "z:foo")
      *    3  absolute local pathname (begins with "z:\\")
      */
-    function normalizePrefix($strPath, $len, $sb) {
+    function normalizePrefix($strPath, $len, &$sb) {
         $src = 0;
         while (($src < $len) && $this->isSlash($strPath{$src})) {
             $src++;
@@ -349,7 +349,7 @@ class Win32FileSystem extends FileSystem {
         $pl   = (int) $f->getPrefixLength();
 
         if (($pl === 2) && ($path{0} === $this->slash)) {
-            return path;            // UNC
+            return $path;            // UNC
         }
 
         if ($pl === 3) {
@@ -471,7 +471,7 @@ class Win32FileSystem extends FileSystem {
         @closedir($dir);
         return $vv;
     }
-
+    
 }
 
-?>
+

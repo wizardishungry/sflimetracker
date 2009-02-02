@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id$
+ * $Id: UpToDateTask.php 144 2007-02-05 15:19:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -192,10 +192,10 @@ class UpToDateTask extends Task implements Condition {
             $this->project->setNewProperty($this->_property, $this->getValue());
             if ($this->mapperElement === null) {
                 $this->log("File \"" . $this->_targetFile->getAbsolutePath() 
-                    . "\" is up-to-date.", PROJECT_MSG_VERBOSE);
+                    . "\" is up-to-date.", Project::MSG_VERBOSE);
             } else {
                 $this->log("All target files are up-to-date.",
-                    PROJECT_MSG_VERBOSE);
+                    Project::MSG_VERBOSE);
             }
         }
     }

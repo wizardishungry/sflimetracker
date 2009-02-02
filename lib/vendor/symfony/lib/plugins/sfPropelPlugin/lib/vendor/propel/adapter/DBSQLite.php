@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: DBSQLite.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: DBSQLite.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -20,16 +20,26 @@
  * <http://propel.phpdb.org>.
  */
 
-require_once 'propel/adapter/DBAdapter.php';
-
 /**
  * This is used in order to connect to a SQLite database.
  *
  * @author     Hans Lellelid <hans@xmpl.org>
- * @version    $Revision: 536 $
+ * @version    $Revision: 989 $
  * @package    propel.adapter
  */
 class DBSQLite extends DBAdapter {
+
+	/**
+	 * For SQLite this method has no effect, since SQLite doesn't support specifying a character
+	 * set (or, another way to look at it, it doesn't require a single character set per DB).
+	 *
+	 * @param      PDO   A PDO connection instance.
+	 * @param      string The charset encoding.
+	 * @throws     PropelException If the specified charset doesn't match sqlite_libencoding()
+	 */
+	public function setCharset(PDO $con, $charset)
+	{
+	}
 
 	/**
 	 * This method is used to ignore case.
@@ -90,35 +100,28 @@ class DBSQLite extends DBAdapter {
 	}
 
 	/**
-	 * Locks the specified table.
-	 *
-	 * @param      Connection $con The Creole connection to use.
-	 * @param      string $table The name of the table to lock.
-	 * @throws     SQLException No Statement could be created or
-	 * executed.
-	 */
-	public function lockTable(Connection $con, $table)
-	{
-	}
-
-	/**
-	 * Unlocks the specified table.
-	 *
-	 * @param      Connection $con The Creole connection to use.
-	 * @param      string $table The name of the table to unlock.
-	 * @throws     SQLException No Statement could be created or
-	 * executed.
-	 */
-	public function unlockTable(Connection $con, $table)
-	{
-	}
-
-	/**
 	 * @see        DBAdapter::quoteIdentifier()
 	 */
 	public function quoteIdentifier($text)
 	{
 		return '[' . $text . ']';
+	}
+
+	/**
+	 * @see        DBAdapter::applyLimit()
+	 */
+	public function applyLimit(&$sql, $offset, $limit)
+	{
+		if ( $limit > 0 ) {
+			$sql .= " LIMIT " . $limit . ($offset > 0 ? " OFFSET " . $offset : "");
+		} elseif ( $offset > 0 ) {
+			$sql .= " LIMIT -1 OFFSET " . $offset;
+		}
+	}
+
+	public function random($seed=NULL)
+	{
+		return 'random()';
 	}
 
 }

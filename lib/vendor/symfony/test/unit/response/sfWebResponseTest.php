@@ -10,7 +10,7 @@
 
 require_once(dirname(__FILE__).'/../../bootstrap/unit.php');
 
-$t = new lime_test(73, new lime_output_color());
+$t = new lime_test(81, new lime_output_color());
 
 class myWebResponse extends sfWebResponse
 {
@@ -102,25 +102,29 @@ foreach (array(
 }
 
 // ->getContentType() ->setContentType()
-$t->diag('->getContentType() ->setContentType()');
+$t->diag('->getContentType() ->setContentType() ->getCharset()');
 
 $response = new myWebResponse($dispatcher);
 $t->is($response->getContentType(), 'text/html; charset=utf-8', '->getContentType() returns a sensible default value');
+$t->is($response->getCharset(), 'utf-8', '->getCharset() returns the current charset of the response');
 
 $response->setContentType('text/xml');
 $t->is($response->getContentType(), 'text/xml; charset=utf-8', '->setContentType() adds a charset if none is given');
 
 $response->setContentType('application/vnd.mozilla.xul+xml');
 $t->is($response->getContentType(), 'application/vnd.mozilla.xul+xml; charset=utf-8', '->setContentType() adds a charset if none is given');
+$t->is($response->getCharset(), 'utf-8', '->getCharset() returns the current charset of the response');
 
 $response->setContentType('image/jpg');
 $t->is($response->getContentType(), 'image/jpg', '->setContentType() does not add a charset if the content-type is not text/*');
 
 $response->setContentType('text/xml; charset=ISO-8859-1');
 $t->is($response->getContentType(), 'text/xml; charset=ISO-8859-1', '->setContentType() does nothing if a charset is given');
+$t->is($response->getCharset(), 'ISO-8859-1', '->getCharset() returns the current charset of the response');
 
 $response->setContentType('text/xml;charset = ISO-8859-1');
 $t->is($response->getContentType(), 'text/xml;charset = ISO-8859-1', '->setContentType() does nothing if a charset is given');
+$t->is($response->getCharset(), 'ISO-8859-1', '->getCharset() returns the current charset of the response');
 
 $t->is($response->getContentType(), $response->getHttpHeader('content-type'), '->getContentType() is an alias for ->getHttpHeader(\'content-type\')');
 
@@ -213,13 +217,17 @@ catch (InvalidArgumentException $e)
 
 // ->getStylesheets()
 $t->diag('->getStylesheets()');
-$t->is($response->getStylesheets(), array('test' => array(), 'foo' => array(), 'bar' => array('media' => 'print')), '->getStylesheets() returns all current registered stylesheets');
+$t->is(array_keys($response->getStylesheets()), array('first', 'test', 'foo', 'bar', 'last'), '->getStylesheets() returns all current registered stylesheets ordered by position');
+$t->is($response->getStylesheets(''), array('test' => array(), 'foo' => array(), 'bar' => array('media' => 'print')), '->getStylesheets() takes a position as its first argument');
 $t->is($response->getStylesheets('first'), array('first' => array()), '->getStylesheets() takes a position as its first argument');
 $t->is($response->getStylesheets('last'), array('last' => array()), '->getStylesheets() takes a position as its first argument');
 
 $t->diag('->removeStylesheet()');
 $response->removeStylesheet('foo');
-$t->is($response->getStylesheets(), array('test' => array(), 'bar' => array('media' => 'print')), '->getStylesheets() does no longer contain removed stylesheets');
+$t->is(array_keys($response->getStylesheets()), array('first', 'test', 'bar', 'last'), '->getStylesheets() removes a stylesheet from the response');
+
+$response->removeStylesheet('first');
+$t->is(array_keys($response->getStylesheets()), array('test', 'bar', 'last'), '->getStylesheets() removes a stylesheet from the response');
 
 // ->addJavascript()
 $t->diag('->addJavascript()');
@@ -245,13 +253,17 @@ catch (InvalidArgumentException $e)
 
 // ->getJavascripts()
 $t->diag('->getJavascripts()');
-$t->is($response->getJavascripts(), array('test' => array(), 'foo' => array('raw_name' => true)), '->getJavascripts() returns all current registered javascripts');
+$t->is(array_keys($response->getJavascripts()), array('first_js', 'test', 'foo', 'last_js'), '->getJavascripts() returns all current registered javascripts ordered by position');
+$t->is($response->getJavascripts(''), array('test' => array(), 'foo' => array('raw_name' => true)), '->getJavascripts() takes a position as its first argument');
 $t->is($response->getJavascripts('first'), array('first_js' => array()), '->getJavascripts() takes a position as its first argument');
 $t->is($response->getJavascripts('last'), array('last_js' => array()), '->getJavascripts() takes a position as its first argument');
 
 $t->diag('->removeJavascript()');
 $response->removeJavascript('test');
-$t->is($response->getJavascripts(), array('foo' => array('raw_name' => true)), '->getJavascripts() does no longer contain removed javascripts');
+$t->is(array_keys($response->getJavascripts()), array('first_js', 'foo', 'last_js'), '->removeJavascripts() removes a javascript file');
+
+$response->removeJavascript('first_js');
+$t->is(array_keys($response->getJavascripts()), array('foo', 'last_js'), '->removeJavascripts() removes a javascript file');
 
 // ->setCookie() ->getCookies()
 $t->diag('->setCookie() ->getCookies()');

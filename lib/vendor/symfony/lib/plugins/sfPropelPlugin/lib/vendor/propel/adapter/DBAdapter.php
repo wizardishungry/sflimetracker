@@ -1,7 +1,6 @@
 <?php
-
 /*
- *  $Id: DBAdapter.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: DBAdapter.php 1011 2008-03-20 11:36:27Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -19,8 +18,6 @@
  * and is licensed under the LGPL. For more information please see
  * <http://propel.phpdb.org>.
  */
-
-include_once 'creole/Connection.php';
 
 /**
  * DBAdapter</code> defines the interface for a Propel database adapter.
@@ -41,25 +38,29 @@ include_once 'creole/Connection.php';
  * @author     Jon S. Stevens <jon@latchkey.com> (Torque)
  * @author     Brett McLaughlin <bmclaugh@algx.net> (Torque)
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 1011 $
  * @package    propel.adapter
  */
 abstract class DBAdapter {
+
+	const ID_METHOD_NONE = 0;
+	const ID_METHOD_AUTOINCREMENT = 1;
+	const ID_METHOD_SEQUENCE = 2;
 
 	/**
 	 * Creole driver to Propel adapter map.
 	 * @var        array
 	 */
 	private static $adapters = array(
-								    'mysql' => 'DBMySQL',
-									'mysqli' => 'DBMySQLi',
-								    'mssql' => 'DBMSSQL',
-								    'sybase' => 'DBSybase',
-								    'oracle' => 'DBOracle',
-								    'pgsql' => 'DBPostgres',
-								    'sqlite' => 'DBSQLite',
-								    '' => 'DBNone',
-								);
+		'mysql' => 'DBMySQL',
+		'mysqli' => 'DBMySQLi',
+		'mssql' => 'DBMSSQL',
+		'sybase' => 'DBSybase',
+		'oracle' => 'DBOracle',
+		'pgsql' => 'DBPostgres',
+		'sqlite' => 'DBSQLite',
+		'' => 'DBNone',
+	);
 
 	/**
 	 * Creates a new instance of the database adapter associated
@@ -73,7 +74,6 @@ abstract class DBAdapter {
 	public static function factory($driver) {
 		$adapterClass = isset(self::$adapters[$driver]) ? self::$adapters[$driver] : null;
 		if ($adapterClass !== null) {
-			require_once 'propel/adapter/'.$adapterClass.'.php';
 			$a = new $adapterClass();
 			return $a;
 		} else {
@@ -82,9 +82,51 @@ abstract class DBAdapter {
 	}
 
 	/**
+	 * This method is called after a connection was created to run necessary
+	 * post-initialization queries or code.
+	 *
+	 * If a charset was specified, this will be set before any other queries
+	 * are executed.
+	 *
+	 * This base method runs queries specified using the "query" setting.
+	 *
+	 * @param      PDO   A PDO connection instance.
+	 * @param      array An array of settings.
+	 * @see        setCharset()
+	 */
+	public function initConnection(PDO $con, array $settings)
+	{
+		if (isset($settings['charset']['value'])) {
+			$this->setCharset($con, $settings['charset']['value']);
+		}
+		if (isset($settings['queries']) && is_array($settings['queries'])) {
+			foreach ($settings['queries'] as $queries) {
+				foreach ((array)$queries as $query) {
+					$con->exec($query);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Sets the character encoding using SQL standard SET NAMES statement.
+	 *
+	 * This method is invoked from the default initConnection() method and must
+	 * be overridden for an RDMBS which does _not_ support this SQL standard.
+	 *
+	 * @param      PDO   A PDO connection instance.
+	 * @param      string The charset encoding.
+	 * @see        initConnection()
+	 */
+	public function setCharset(PDO $con, $charset)
+	{
+		$con->exec("SET NAMES '" . $charset . "'");
+	}
+
+	/**
 	 * This method is used to ignore case.
 	 *
-	 * @param      in The string to transform to upper case.
+	 * @param      string The string to transform to upper case.
 	 * @return     string The upper case string.
 	 */
 	public abstract function toUpperCase($in);
@@ -100,26 +142,6 @@ abstract class DBAdapter {
 	{
 		return '\'';
 	}
-
-	/**
-	 * Locks the specified table.
-	 *
-	 * @param      Connection $con The Creole connection to use.
-	 * @param      string $table The name of the table to lock.
-	 * @return     void
-	 * @throws     SQLException No Statement could be created or executed.
-	 */
-	public abstract function lockTable(Connection $con, $table);
-
-	/**
-	 * Unlocks the specified table.
-	 *
-	 * @param      Connection $con The Creole connection to use.
-	 * @param      string $table The name of the table to unlock.
-	 * @return     void
-	 * @throws     SQLException No Statement could be created or executed.
-	 */
-	public abstract function unlockTable(Connection $con, $table);
 
 	/**
 	 * This method is used to ignore case.
@@ -180,5 +202,104 @@ abstract class DBAdapter {
 	{
 		return '"' . $text . '"';
 	}
+
+	/**
+	 * Quotes a database table which could have space seperating it from an alias, both should be identified seperately
+	 * @param      string $table The table name to quo
+	 * @return     string The quoted table name
+	 **/
+	public function quoteIdentifierTable($table) {
+		return implode(" ", array_map(array($this, "quoteIdentifier"), explode(" ", $table) ) );
+	}
+
+	/**
+	 * Returns the native ID method for this RDBMS.
+	 * @return     int one of DBAdapter:ID_METHOD_SEQUENCE, DBAdapter::ID_METHOD_AUTOINCREMENT.
+	 */
+	protected function getIdMethod()
+	{
+		return DBAdapter::ID_METHOD_AUTOINCREMENT;
+	}
+
+	/**
+	 * Whether this adapter uses an ID generation system that requires getting ID _before_ performing INSERT.
+	 * @return     boolean
+	 */
+	public function isGetIdBeforeInsert()
+	{
+		return ($this->getIdMethod() === DBAdapter::ID_METHOD_SEQUENCE);
+	}
+
+	/**
+	 * Whether this adapter uses an ID generation system that requires getting ID _before_ performing INSERT.
+	 * @return     boolean
+	 */
+	public function isGetIdAfterInsert()
+	{
+		return ($this->getIdMethod() === DBAdapter::ID_METHOD_AUTOINCREMENT);
+	}
+
+	/**
+	 * Gets the generated ID (either last ID for autoincrement or next sequence ID).
+	 * @return     mixed
+	 */
+	public function getId(PDO $con, $name = null)
+	{
+		return $con->lastInsertId($name);
+	}
+
+	/**
+	 * Returns timestamp formatter string for use in date() function.
+	 * @return     string
+	 */
+	public function getTimestampFormatter()
+	{
+		return "Y-m-d H:i:s";
+	}
+
+	/**
+	 * Returns date formatter string for use in date() function.
+	 * @return     string
+	 */
+	public function getDateFormatter()
+	{
+		return "Y-m-d";
+	}
+
+	/**
+	 * Returns time formatter string for use in date() function.
+	 * @return     string
+	 */
+	public function getTimeFormatter()
+	{
+		return "H:i:s";
+	}
+
+	/**
+	 * Should Column-Names get identifiers for inserts or updates.
+	 * By default false is returned -> backwards compability.
+	 *
+	 * it`s a workaround...!!!
+	 *
+	 * @todo       should be abstract
+	 * @return     boolean
+	 * @deprecated
+	 */
+	public function useQuoteIdentifier()
+	{
+		return false;
+	}
+
+	/**
+	 * Modifies the passed-in SQL to add LIMIT and/or OFFSET.
+	 */
+	public abstract function applyLimit(&$sql, $offset, $limit);
+	
+	/**
+	 * Gets the SQL string that this adapter uses for getting a random number.
+	 *
+	 * @param      mixed $seed (optional) seed value for databases that support this
+	 */
+	public abstract function random($seed = null);
 
 }

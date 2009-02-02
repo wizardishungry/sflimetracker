@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: FilterChain.php 247 2007-10-16 21:09:37Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,9 +31,11 @@ include_once 'phing/filters/ReplaceTokens.php';
 include_once 'phing/filters/StripPhpComments.php';
 include_once 'phing/filters/StripLineBreaks.php';
 include_once 'phing/filters/StripLineComments.php';
+include_once 'phing/filters/StripWhitespace.php';
 include_once 'phing/filters/TabToSpaces.php';
 include_once 'phing/filters/TidyFilter.php';
 include_once 'phing/filters/TranslateGettext.php';
+include_once 'phing/filters/XincludeFilter.php';
 include_once 'phing/filters/XsltFilter.php';
 
 /*
@@ -115,6 +117,11 @@ class FilterChain extends DataType {
         $this->filterReaders[] = $o;        
     }
     
+	function addStripWhitespace(StripWhitespace $o) {
+        $o->setProject($this->project);
+        $this->filterReaders[] = $o;
+    }
+    
 	function addTidyFilter(TidyFilter $o) {
         $o->setProject($this->project);
         $this->filterReaders[] = $o;
@@ -125,6 +132,11 @@ class FilterChain extends DataType {
         $this->filterReaders[] = $o;
     }
     
+    function addXincludeFilter(XincludeFilter $o) {
+        $o->setProject($this->project);
+        $this->filterReaders[] = $o;
+    }
+
     function addXsltFilter(XsltFilter $o) {
         $o->setProject($this->project);
         $this->filterReaders[] = $o;

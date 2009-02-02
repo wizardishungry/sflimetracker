@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: PropelDataSQLTask.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: PropelDataSQLTask.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -23,7 +23,7 @@
 include_once 'propel/engine/database/model/AppData.php';
 include_once 'propel/engine/database/model/Database.php';
 include_once 'propel/engine/database/transform/XmlToAppData.php';
-include_once 'propel/engine/database/transform/XmlToData.php';
+include_once 'propel/engine/builder/util/transform/XmlToDataSQL.php';
 
 /**
  * Task that transforms XML datadump files into files containing SQL INSERT statements.
@@ -32,7 +32,7 @@ include_once 'propel/engine/database/transform/XmlToData.php';
  * @author     Jason van Zyl  <jvanzyl@periapt.com> (Torque)
  * @author     John McNally  <jmcnally@collab.net> (Torque)
  * @author     Fedor Karpelevitch  <fedor.karpelevitch@home.com> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 989 $
  * @package    propel.phing
  */
 class PropelDataSQLTask extends AbstractPropelDataModelTask {
@@ -122,8 +122,8 @@ class PropelDataSQLTask extends AbstractPropelDataModelTask {
 	 */
 	private function getDatabase($name)
 	{
-		foreach($this->getDataModels() as $dm) {
-			foreach($dm->getDatabases() as $db) {
+		foreach ($this->getDataModels() as $dm) {
+			foreach ($dm->getDatabases() as $db) {
 				if ($db->getName() == $name) {
 					return $db;
 				}
@@ -143,7 +143,7 @@ class PropelDataSQLTask extends AbstractPropelDataModelTask {
 
 		$targetDatabase = $this->getTargetDatabase();
 
-		$platform = $this->getPlatformForTargetDatabase();
+		$platform = $this->getGeneratorConfig()->getConfiguredPlatform();
 
 		// Load the Data XML -> DB Name properties
 		$map = new Properties();
@@ -153,11 +153,8 @@ class PropelDataSQLTask extends AbstractPropelDataModelTask {
 			throw new BuildException("Cannot open and process the datadbmap!", $ioe);
 		}
 
-		DataModelBuilder::setBuildProperties($this->getPropelProperties());
-
-		// Parse each file in teh data -> db map
-
-		foreach($map->keys() as $dataXMLFilename) {
+		// Parse each file in the data -> db map
+		foreach ($map->keys() as $dataXMLFilename) {
 
 			$dataXMLFile = new PhingFile($this->srcDir, $dataXMLFilename);
 
@@ -175,29 +172,16 @@ class PropelDataSQLTask extends AbstractPropelDataModelTask {
 				$db->setPlatform($platform);
 
 				$outFile = $this->getMappedFile($dataXMLFilename);
+				$sqlWriter = new FileWriter($outFile);
 
 				$this->log("Creating SQL from XML data dump file: " . $dataXMLFile->getAbsolutePath());
 
 				try {
-					$dataXmlParser = new XmlToData($db, $this->dbEncoding);
-					$data = $dataXmlParser->parseFile($dataXMLFile->getAbsolutePath());
+					$dataXmlParser = new XmlToDataSQL($db, $this->getGeneratorConfig(), $this->dbEncoding);
+					$dataXmlParser->transform($dataXMLFile, $sqlWriter);
 				} catch (Exception $e) {
-					throw new Exception("Exception parsing data XML: " . $e->getMessage());
+					throw new BuildException("Exception parsing data XML: " . $e->getMessage(), $x);
 				}
-
-				$fp = fopen($outFile->getAbsolutePath(), 'w');
-
-				$currTable = null;
-				foreach ($data as $dataRow) {
-					if ($currTable !== $dataRow->getTable()) {
-						$currTable = $dataRow->getTable();
-						$builder = DataModelBuilder::builderFactory($currTable, 'datasql');
-					}
-					$sql = $builder->buildRowSql($dataRow);
-					fwrite($fp, $sql);
-				}
-
-				fclose($fp);
 
 				// Place the generated SQL file(s)
 				$p = new Properties();
@@ -210,10 +194,11 @@ class PropelDataSQLTask extends AbstractPropelDataModelTask {
 
 			} else {
 				$this->log("File '" . $dataXMLFile->getAbsolutePath()
-						. "' in datadbmap does not exist, so skipping it.", PROJECT_MSG_WARN);
+						. "' in datadbmap does not exist, so skipping it.", Project::MSG_WARN);
 			}
 
 		} // foreach data xml file
 
 	} // main()
+
 }

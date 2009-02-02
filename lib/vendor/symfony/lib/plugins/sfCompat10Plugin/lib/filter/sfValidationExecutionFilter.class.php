@@ -13,14 +13,11 @@
  * sfExecutionFilter is the last filter registered for each filter chain. This
  * filter does all action and view execution.
  *
- * WARNING: This class is deprecated and will be removed in symfony 1.2.
- *
  * @package    symfony
  * @subpackage filter
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Sean Kerr <sean@code-box.org>
  * @version    SVN: $Id$
- * @deprecated Deprecated since symfony 1.1
  */
 class sfValidationExecutionFilter extends sfFilter
 {
@@ -83,15 +80,6 @@ class sfValidationExecutionFilter extends sfFilter
     {
       // action in cache, so go to the view
       return sfView::SUCCESS;
-    }
-
-    // get the request method
-    $method = $this->context->getRequest()->getMethod();
-    if (($actionInstance->getRequestMethods() & $method) != $method)
-    {
-      // this action will skip validation/execution for this method
-      // get the default view
-      return $actionInstance->getDefaultView();
     }
 
     return $this->validateAction($filterChain, $actionInstance) ? $this->executeAction($actionInstance) : $this->handleErrorAction($actionInstance);

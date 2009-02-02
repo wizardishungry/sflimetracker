@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: BuildPropelGenPEARPackageTask.php 985 2008-03-07 02:53:20Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,7 +27,7 @@ include_once 'phing/tasks/ext/pearpackage/Fileset.php';
  *
  * @author     Hans Lellelid <hans@xmpl.org>
  * @package    phing.tasks.ext
- * @version    $Revision: 536 $
+ * @version    $Revision: 985 $
  */
 class BuildPropelGenPEARPackageTask extends MatchingTask {
 
@@ -71,9 +71,9 @@ class BuildPropelGenPEARPackageTask extends MatchingTask {
 			$options['packagefile'] = $f->getName();
 			// must end in trailing slash
 			$options['outputdirectory'] = $f->getParent() . DIRECTORY_SEPARATOR;
-			$this->log("Creating package file: " . $f->getPath(), PROJECT_MSG_INFO);
+			$this->log("Creating package file: " . $f->getPath(), Project::MSG_INFO);
 		} else {
-			$this->log("Creating [default] package.xml file in base directory.", PROJECT_MSG_INFO);
+			$this->log("Creating [default] package.xml file in base directory.", Project::MSG_INFO);
 		}
 
 		// add install exceptions
@@ -164,12 +164,16 @@ class BuildPropelGenPEARPackageTask extends MatchingTask {
 
 
 		// "core" dependencies
-		$package->setPhpDep('5.0.0');
+		$package->setPhpDep('5.2.0');
 		$package->setPearinstallerDep('1.4.0');
 
 		// "package" dependencies
-		$package->addPackageDepWithChannel( 'required', 'phing', 'pear.phing.info', '2.2.0RC1');
-		$package->addPackageDepWithChannel( 'required', 'creole', 'pear.phpdb.org', '1.1.0RC1');
+		$package->addPackageDepWithChannel( 'required', 'phing', 'pear.phing.info', '2.3.0');
+		$package->addPackageDepWithChannel( 'optional', 'creole', 'pear.phpdb.org', '1.1.0');
+
+		$package->addExtensionDep('required', 'pdo');
+		$package->addExtensionDep('required', 'xml');
+		$package->addExtensionDep('required', 'xsl');
 
 		// now add the replacements ....
 		$package->addReplacement('Phing.php', 'pear-config', '@DATA-DIR@', 'data_dir');

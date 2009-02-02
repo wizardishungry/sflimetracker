@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id$
+ *  $Id: OracleDDLBuilder.php 1026 2008-04-09 10:11:19Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -40,11 +40,11 @@ class OracleDDLBuilder extends DDLBuilder {
 		$table = $this->getTable();
 		$platform = $this->getPlatform();
 		$script .= "
-DROP TABLE ".$this->quoteIdentifier($table->getName())." CASCADE CONSTRAINTS;
+DROP TABLE ".$this->quoteIdentifier($this->prefixTablename($table->getName()))." CASCADE CONSTRAINTS;
 ";
 		if ($table->getIdMethod() == "native") {
 			$script .= "
-DROP SEQUENCE ".$this->quoteIdentifier($table->getSequenceName()).";
+DROP SEQUENCE ".$this->quoteIdentifier($this->prefixTablename($this->getSequenceName())).";
 ";
 		}
 	}
@@ -67,7 +67,7 @@ DROP SEQUENCE ".$this->quoteIdentifier($table->getSequenceName()).";
 
 		$script .= "
 
-CREATE TABLE ".$this->quoteIdentifier($table->getName())."
+CREATE TABLE ".$this->quoteIdentifier($this->prefixTablename($table->getName()))."
 (
 	";
 
@@ -84,7 +84,6 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 );
 ";
 		$this->addPrimaryKey($script);
-		$this->addIndices($script);
 		$this->addSequences($script);
 
 	}
@@ -104,7 +103,7 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 		}
 		if ( is_array($table->getPrimaryKey()) && count($table->getPrimaryKey()) ) {
 			$script .= "
-	ALTER TABLE ".$this->quoteIdentifier($table->getName())."
+	ALTER TABLE ".$this->quoteIdentifier($this->prefixTablename($table->getName()))."
 		ADD CONSTRAINT ".$this->quoteIdentifier(substr($tableName,0,$length)."_PK")."
 	PRIMARY KEY (";
 			$delim = "";
@@ -126,7 +125,7 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 		$table = $this->getTable();
 		$platform = $this->getPlatform();
 		if ($table->getIdMethod() == "native") {
-			$script .= "CREATE SEQUENCE ".$this->quoteIdentifier($table->getSequenceName())." INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE NOCACHE ORDER;
+			$script .= "CREATE SEQUENCE ".$this->quoteIdentifier($this->prefixTablename($this->getSequenceName()))." INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE NOCACHE ORDER;
 ";
 		}
 	}
@@ -142,10 +141,10 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 		$platform = $this->getPlatform();
 		foreach ($table->getIndices() as $index) {
 			$script .= "CREATE ";
-			if($index->getIsUnique()) {
+			if ($index->getIsUnique()) {
 				$script .= "UNIQUE";
 			}
-			$script .= "INDEX ".$this->quoteIdentifier($index->getName()) ." ON ".$this->quoteIdentifier($table->getName())." (".$this->getColumnList($index->getColumns()).");
+			$script .= "INDEX ".$this->quoteIdentifier($index->getName()) ." ON ".$this->quoteIdentifier($this->prefixTablename($table->getName()))." (".$this->getColumnList($index->getColumns()).");
 ";
 		}
 	}
@@ -160,7 +159,7 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 		$platform = $this->getPlatform();
 		foreach ($table->getForeignKeys() as $fk) {
 			$script .= "
-ALTER TABLE ".$this->quoteIdentifier($table->getName())." ADD CONSTRAINT ".$this->quoteIdentifier($fk->getName())." FOREIGN KEY (".$this->getColumnList($fk->getLocalColumns()) .") REFERENCES ".$this->quoteIdentifier($fk->getForeignTableName())." (".$this->getColumnList($fk->getForeignColumns()).")";
+ALTER TABLE ".$this->quoteIdentifier($this->prefixTablename($table->getName()))." ADD CONSTRAINT ".$this->quoteIdentifier($fk->getName())." FOREIGN KEY (".$this->getColumnList($fk->getLocalColumns()) .") REFERENCES ".$this->quoteIdentifier($this->prefixTablename($fk->getForeignTableName()))." (".$this->getColumnList($fk->getForeignColumns()).")";
 			if ($fk->hasOnUpdate()) {
 				$this->warn("ON UPDATE not yet implemented for Oracle builder.(ignoring for ".$this->getColumnList($fk->getLocalColumns())." fk).");
 				//$script .= " ON UPDATE ".$fk->getOnUpdate();

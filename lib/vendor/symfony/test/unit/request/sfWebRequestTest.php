@@ -10,7 +10,7 @@
 
 require_once(dirname(__FILE__).'/../../bootstrap/unit.php');
 
-$t = new lime_test(31, new lime_output_color());
+$t = new lime_test(36, new lime_output_color());
 
 class myRequest extends sfWebRequest
 {
@@ -93,13 +93,6 @@ $t->is($request->getRequestFormat(), 'js', '->getRequestFormat() returns the req
 $request->setRequestFormat('css');
 $t->is($request->getRequestFormat(), 'css', '->setRequestFormat() sets the request format');
 
-$request->acceptableContentTypes = null;
-$_SERVER['HTTP_ACCEPT'] = 'application/json';
-$request->setFormat('json', 'application/json');
-$request->setParameter('sf_format', null);
-$request->setRequestFormat(null);
-$t->is($request->getRequestFormat(), 'json', '->getRequestFormat() uses the Accept HTTP header to guess the format');
-
 // ->getFormat() ->setFormat()
 $t->diag('->getFormat() ->setFormat()');
 $request->setFormat('js', 'application/x-javascript');
@@ -131,3 +124,31 @@ $_SERVER['HTTP_HOST'] = 'symfony-project.org';
 $t->is($request->getUriPrefix(), 'https://symfony-project.org', '->getUriPrefix() works fine with no port in HTTP_HOST');
 $_SERVER['HTTP_HOST'] = 'symfony-project.org:8043';
 $t->is($request->getUriPrefix(), 'https://symfony-project.org:8043', '->getUriPrefix() works for nonstandard https ports');
+
+// ->getRemoteAddress()
+$t->diag('->getRemoteAddress()');
+$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+$t->is($request->getRemoteAddress(), '127.0.0.1', '->getRemoteAddress() returns the remote address');
+
+// ->getForwardedFor()
+$t->diag('->getForwardedFor()');
+$t->is($request->getForwardedFor(), null, '->getForwardedFor() returns null if the request was not forwarded.');
+$_SERVER['HTTP_X_FORWARDED_FOR'] = '10.0.0.1, 10.0.0.2';
+$t->is_deeply($request->getForwardedFor(), array('10.0.0.1', '10.0.0.2'), '->getForwardedFor() returns the value from HTTP_X_FORWARDED_FOR');
+
+// methods
+$t->diag('methods');
+$_SERVER['REQUEST_METHOD'] = 'POST';
+$_POST['sf_method'] = 'PUT';
+$request = new myRequest($dispatcher);
+$t->is($request->getMethod(), 'PUT', '->getMethod() returns the "sf_method" parameter value if it exists and if the method is POST');
+
+$_SERVER['REQUEST_METHOD'] = 'GET';
+$_POST['sf_method'] = 'PUT';
+$request = new myRequest($dispatcher);
+$t->is($request->getMethod(), 'GET', '->getMethod() returns the "sf_method" parameter value if it exists and if the method is POST');
+
+$_SERVER['REQUEST_METHOD'] = 'POST';
+unset($_POST['sf_method']);
+$request = new myRequest($dispatcher);
+$t->is($request->getMethod(), 'POST', '->getMethod() returns the "sf_method" parameter value if it exists and if the method is POST');

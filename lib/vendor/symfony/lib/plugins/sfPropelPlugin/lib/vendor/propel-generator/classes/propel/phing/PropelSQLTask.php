@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: PropelSQLTask.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: PropelSQLTask.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -84,7 +84,7 @@ class PropelSQLTask extends AbstractPropelDataModelTask {
 	 *
 	 * @throws     IOException - if unable to store properties
 	 */
-	private function createSqlDbMap()
+	protected function createSqlDbMap()
 	{
 		if ($this->getSqlDbMap() === null) {
 			return;
@@ -111,7 +111,7 @@ class PropelSQLTask extends AbstractPropelDataModelTask {
 		} else {
 			// the traditional way is to map the schema.xml filenames
 			$dmMap = $this->getDataModelDbMap();
-			foreach(array_keys($dmMap) as $dataModelName) {
+			foreach (array_keys($dmMap) as $dataModelName) {
 				$sqlFile = $this->getMappedFile($dataModelName);
 				if ($this->getDatabase() === null) {
 					$databaseName = $dmMap[$dataModelName];
@@ -133,7 +133,7 @@ class PropelSQLTask extends AbstractPropelDataModelTask {
 
 		$this->validate();
 
-		if(!$this->mapperElement) {
+		if (!$this->mapperElement) {
 			throw new BuildException("You must use a <mapper/> element to describe how names should be transformed.");
 		}
 
@@ -150,12 +150,16 @@ class PropelSQLTask extends AbstractPropelDataModelTask {
 		// 2) Now actually create the DDL based on the datamodel(s) from XML schema file.
 		$targetDatabase = $this->getTargetDatabase();
 
-		DataModelBuilder::setBuildProperties($this->getPropelProperties());
-		$builderClazz = DataModelBuilder::getBuilderClass('ddl');
+		$generatorConfig = $this->getGeneratorConfig();
+
+		$builderClazz = $generatorConfig->getBuilderClassname('ddl');
 
 		foreach ($dataModels as $package => $dataModel) {
 
 			foreach ($dataModel->getDatabases() as $database) {
+
+				// Clear any start/end DLL
+				call_user_func(array($builderClazz, 'reset'));
 
 				// file we are going to create
 				if (!$this->packageObjectModel) {
@@ -171,14 +175,14 @@ class PropelSQLTask extends AbstractPropelDataModelTask {
 				// First add any "header" SQL
 				$ddl = call_user_func(array($builderClazz, 'getDatabaseStartDDL'));
 
-				foreach($database->getTables() as $table) {
+				foreach ($database->getTables() as $table) {
 
 					if (!$table->isSkipSql()) {
-						$builder = DataModelBuilder::builderFactory($table, 'ddl');
+						$builder = $generatorConfig->getConfiguredBuilder($table, 'ddl');
 						$this->log("\t+ " . $table->getName() . " [builder: " . get_class($builder) . "]");
 						$ddl .= $builder->build();
-						foreach($builder->getWarnings() as $warning) {
-							$this->log($warning, PROJECT_MSG_WARN);
+						foreach ($builder->getWarnings() as $warning) {
+							$this->log($warning, Project::MSG_WARN);
 						}
 					} else {
 						$this->log("\t + (skipping) " . $table->getName());
@@ -189,7 +193,7 @@ class PropelSQLTask extends AbstractPropelDataModelTask {
 				// Finally check to see if there is any "footer" SQL
 				$ddl .= call_user_func(array($builderClazz, 'getDatabaseEndDDL'));
 
-
+				#var_dump($outFile->getAbsolutePath());
 				// Now we're done.  Write the file!
 				file_put_contents($outFile->getAbsolutePath(), $ddl);
 
@@ -217,7 +221,7 @@ class PropelSQLTask extends AbstractPropelDataModelTask {
 			$dataModel = array_shift($dataModels);
 			$packagedDataModels = array();
 
-			$platform = $this->getPlatformForTargetDatabase();
+			$platform = $this->getGeneratorConfig()->getConfiguredPlatform();
 
 			foreach ($dataModel->getDatabases() as $db) {
 				foreach ($db->getTables() as $table) {
@@ -244,11 +248,10 @@ class PropelSQLTask extends AbstractPropelDataModelTask {
 			'name' => $db->getName(),
 			'baseClass' => $db->getBaseClass(),
 			'basePeer' => $db->getBasePeer(),
-			//'defaultPhpType' => $db->getDefaultPhpType(),
 			'defaultIdMethod' => $db->getDefaultIdMethod(),
 			'defaultPhpNamingMethod' => $db->getDefaultPhpNamingMethod(),
 			'defaultTranslateMethod' => $db->getDefaultTranslateMethod(),
-			//'heavyIndexing' => $db->getHeavyIndexing(),
+			'heavyIndexing' => $db->getHeavyIndexing(),
 		);
 
 		$clone = new Database();

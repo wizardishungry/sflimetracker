@@ -13,6 +13,7 @@ class attachmentActions extends sfActions
   public function executeIndex($request)
   {
     $this->form = new AttachmentForm();
+    unset($this->form['article_id']);
 
     if ($request->isMethod('post'))
     {
@@ -20,14 +21,27 @@ class attachmentActions extends sfActions
 
       if ($this->form->isValid())
       {
-        $file = $this->form->getValue('file');
-        $file->save(sfConfig::get('sf_cache_dir').'/uploaded'.$file->getExtension($file->getOriginalExtension()));
-
         $this->form->save();
 
         $this->redirect('attachment/ok');
       }
     }
+  }
+
+  public function executeEmbedded($request)
+  {
+    $this->form = new ArticleForm(null, array('with_attachment' => true));
+
+    if (
+      $request->isMethod('post')
+      &&
+      $this->form->bindAndSave($request->getParameter('article'), $request->getFiles('article'))
+    )
+    {
+      $this->redirect('attachment/ok');
+    }
+
+    $this->setTemplate('index');
   }
 
   public function executeOk()

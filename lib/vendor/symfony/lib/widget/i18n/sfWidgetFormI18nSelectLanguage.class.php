@@ -25,6 +25,8 @@ class sfWidgetFormI18nSelectLanguage extends sfWidgetFormSelect
    *
    *  * culture:   The culture to use for internationalized strings (required)
    *  * languages: An array of language codes to use (ISO 639-1)
+   *  * add_empty: Whether to add a first empty value or not (false by default)
+   *               If the option is not a Boolean, the value will be used as the text value
    *
    * @param array $options     An array of options
    * @param array $attributes  An array of default HTML attributes
@@ -37,24 +39,18 @@ class sfWidgetFormI18nSelectLanguage extends sfWidgetFormSelect
 
     $this->addRequiredOption('culture');
     $this->addOption('languages');
+    $this->addOption('add_empty', false);
 
     // populate choices with all languages
     $culture = isset($options['culture']) ? $options['culture'] : 'en';
 
-    $languages = sfCultureInfo::getInstance($culture)->getLanguages();
+    $languages = sfCultureInfo::getInstance($culture)->getLanguages(isset($options['languages']) ? $options['languages'] : null);
 
-    // restrict languages to a sub-set
-    if (isset($options['languages']))
+    $addEmpty = isset($options['add_empty']) ? $options['add_empty'] : false;
+    if (false !== $addEmpty)
     {
-      if ($problems = array_diff($options['languages'], array_keys($languages)))
-      {
-        throw new InvalidArgumentException(sprintf('The following languages do not exist: %s.', implode(', ', $problems)));
-      }
-
-      $languages = array_intersect_key($languages, array_flip($options['languages']));
+      $languages = array_merge(array('' => true === $addEmpty ? '' : $addEmpty), $languages);
     }
-
-    asort($languages);
 
     $this->setOption('choices', $languages);
   }

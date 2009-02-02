@@ -22,7 +22,8 @@
 class sfSimpleAutoload
 {
   static protected
-    $instance = null;
+    $registered = false,
+    $instance   = null;
 
   protected
     $cacheFile    = null,
@@ -66,6 +67,11 @@ class sfSimpleAutoload
    */
   static public function register()
   {
+    if (self::$registered)
+    {
+      return;
+    }
+
     ini_set('unserialize_callback_func', 'spl_autoload_call');
     if (false === spl_autoload_register(array(self::getInstance(), 'autoload')))
     {
@@ -76,6 +82,8 @@ class sfSimpleAutoload
     {
       register_shutdown_function(array(self::getInstance(), 'saveCache'));
     }
+
+    self::$registered = true;
   }
 
   /**
@@ -86,6 +94,7 @@ class sfSimpleAutoload
   static public function unregister()
   {
     spl_autoload_unregister(array(self::getInstance(), 'autoload'));
+    self::$registered = false;
   }
 
   /**

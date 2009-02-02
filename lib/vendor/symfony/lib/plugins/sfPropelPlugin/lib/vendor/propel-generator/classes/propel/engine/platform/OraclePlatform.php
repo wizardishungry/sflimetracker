@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: OraclePlatform.php 656 2007-06-20 15:25:53Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'propel/engine/platform/DefaultPlatform.php';
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Martin Poeschl <mpoeschl@marmot.at> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 656 $
  * @package    propel.engine.platform
  */
 class OraclePlatform extends DefaultPlatform {
@@ -83,6 +83,15 @@ class OraclePlatform extends DefaultPlatform {
 	 * @see        Platform::supportsNativeDeleteTrigger()
 	 */
 	public function supportsNativeDeleteTrigger()
+	{
+		return true;
+	}
+
+	/**
+	 * Whether the underlying PDO driver for this platform returns BLOB columns as streams (instead of strings).
+	 * @return     boolean
+	 */
+	public function hasStreamBlobImpl()
 	{
 		return true;
 	}

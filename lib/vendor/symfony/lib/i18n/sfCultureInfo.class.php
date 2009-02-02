@@ -548,7 +548,7 @@ class sfCultureInfo
     {
       $elements = $this->findInfo('NumberElements');
       $patterns = $this->findInfo('NumberPatterns');
-      $currencies = $this->getCurrencies();
+      $currencies = $this->getCurrencies(null, true);
       $data = array('NumberElements' => $elements, 'NumberPatterns' => $patterns, 'Currencies' => $currencies);
 
       $this->setNumberFormat(new sfNumberFormatInfo($data));
@@ -657,33 +657,149 @@ class sfCultureInfo
   }
 
   /**
+   * Get the country name in the current culture for the given code.
+   *
+   * @param  string A valid country code
+   *
+   * @return string The country name in the current culture
+   */
+  public function getCountry($code)
+  {
+    $countries = $this->simplify($this->findInfo('Countries', true));
+
+    if (!isset($countries[$code]))
+    {
+      throw new InvalidArgumentException(sprintf('The country %s does not exist.', $code));
+    }
+
+    return $countries[$code];
+  }
+
+  /**
+   * Get the currency name in the current culture for the given code.
+   *
+   * @param  string A valid currency code
+   *
+   * @return string The currency name in the current culture
+   */
+  public function getCurrency($code)
+  {
+    $currencies = $this->simplify($this->findInfo('Currencies', true));
+
+    if (!isset($currencies[$code]))
+    {
+      throw new InvalidArgumentException(sprintf('The currency %s does not exist.', $code));
+    }
+
+    return $currencies[$code][1];
+  }
+
+  /**
+   * Get the language name in the current culture for the given code.
+   *
+   * @param  string A valid language code
+   *
+   * @return string The language name in the current culture
+   */
+  public function getLanguage($code)
+  {
+    $languages = $this->simplify($this->findInfo('Languages', true));
+
+    if (!isset($languages[$code]))
+    {
+      throw new InvalidArgumentException(sprintf('The language %s does not exist.', $code));
+    }
+
+    return $languages[$code];
+  }
+
+  /**
    * Gets a list of countries in the language of the localized version.
+   *
+   * @param  array An array of countries used to restrict the returned array (null by default, which means all countries)
    *
    * @return array a list of localized country names. 
    */
-  public function getCountries()
+  public function getCountries($countries = null)
   {
-    return $this->simplify($this->findInfo('Countries', true));
+    $allCountries = $this->simplify($this->findInfo('Countries', true));
+
+    // restrict countries to a sub-set
+    if (!is_null($countries))
+    {
+      if ($problems = array_diff($countries, array_keys($allCountries)))
+      {
+        throw new InvalidArgumentException(sprintf('The following countries do not exist: %s.', implode(', ', $problems)));
+      }
+
+      $allCountries = array_intersect_key($allCountries, array_flip($countries));
+    }
+
+    asort($allCountries);
+
+    return $allCountries;
   }
 
   /**
    * Gets a list of currencies in the language of the localized version.
    *
+   * @param  array   An array of currencies used to restrict the returned array (null by default, which means all currencies)
+   * @param  Boolean Whether to return the symbol and the name or not (false by default)
+   *
    * @return array a list of localized currencies.
    */
-  public function getCurrencies()
+  public function getCurrencies($currencies = null, $full = false)
   {
-    return $this->findInfo('Currencies', true);
+    $allCurrencies = $this->findInfo('Currencies', true);
+
+    // restrict countries to a sub-set
+    if (!is_null($currencies))
+    {
+      if ($problems = array_diff($currencies, array_keys($allCurrencies)))
+      {
+        throw new InvalidArgumentException(sprintf('The following currencies do not exist: %s.', implode(', ', $problems)));
+      }
+
+      $allCurrencies = array_intersect_key($allCurrencies, array_flip($currencies));
+    }
+
+    asort($allCurrencies);
+    if (!$full)
+    {
+      foreach ($allCurrencies as $key => $value)
+      {
+        $allCurrencies[$key] = $value[1];
+      }
+    }
+
+    return $allCurrencies;
   }
 
   /**
    * Gets a list of languages in the language of the localized version.
    *
+   * @param  array An array of languages used to restrict the returned array (null by default, which means all languages)
+   *
    * @return array list of localized language names.
    */
-  public function getLanguages()
+  public function getLanguages($languages = null)
   {
-    return $this->simplify($this->findInfo('Languages', true));
+    $allLanguages = $this->simplify($this->findInfo('Languages', true));
+
+    // restrict languages to a sub-set
+    if (!is_null($languages))
+    {
+      if ($problems = array_diff($languages, array_keys($allLanguages)))
+      {
+        throw new InvalidArgumentException(sprintf('The following languages do not exist: %s.', implode(', ', $problems)));
+      }
+
+      $allLanguages = array_intersect_key($allLanguages, array_flip($languages));
+    }
+
+    asort($allLanguages);
+
+    return $allLanguages;
   }
 
   /**

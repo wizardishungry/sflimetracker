@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: BuildException.php 287 2007-11-04 14:59:39Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,10 +28,16 @@
  */
 class BuildException extends Exception {
 
-    /** location in the xml file */
-    protected $location = null; 
+    /**
+	 * Location in the xml file.
+	 * @var Location
+	 */
+    protected $location;
             
-    /** The nested "cause" exception. */
+    /**
+	 * The nested "cause" exception.
+	 * @var Exception
+	 */
     protected $cause;
     
     /**
@@ -84,15 +90,30 @@ class BuildException extends Exception {
         }                
     }
     
-    function getCause() {
+    /**
+     * Gets the cause exception.
+     *
+     * @return Exception
+     */
+    public function getCause() {
         return $this->cause;
     }
     
-    function getLocation() {
+    /**
+     * Gets the location of error in XML file.
+     *
+     * @return Location
+     */
+    public function getLocation() {
         return $this->location;
     }
 
-    function setLocation($loc) {        
+    /**
+     * Sets the location of error in XML file.
+     *
+     * @param Locaiton $loc
+     */
+    public function setLocation(Location $loc) {        
         $this->location = $loc;
         $this->message = $loc->toString() . ': ' . $this->message;
     }

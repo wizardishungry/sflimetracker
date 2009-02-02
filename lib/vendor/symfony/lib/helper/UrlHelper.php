@@ -17,69 +17,14 @@
  * @version    SVN: $Id$
  */
 
-
-/**
- * Returns a routed URL based on the module/action passed as argument
- * and the routing configuration.
- *
- * <b>Examples:</b>
- * <code>
- *  echo url_for('my_module/my_action');
- *    => /path/to/my/action
- *  echo url_for('@my_rule');
- *    => /path/to/my/action 
- *  echo url_for('@my_rule', true);
- *    => http://myapp.example.com/path/to/my/action
- * </code>
- *
- * @param  string $internal_uri  'module/action' or '@rule' of the action
- * @param  bool   $absolute      return absolute path?
- * @return string routed URL
- */
-function url_for($internal_uri, $absolute = false)
+function link_to2($name, $routeName, $params, $options = array())
 {
-  return sfContext::getInstance()->getController()->genUrl($internal_uri, $absolute);
+  $params = array_merge(array('sf_route' => $routeName), is_object($params) ? array('sf_subject' => $params) : $params);
+
+  return link_to1($name, $params, $options);
 }
 
-/**
- * Creates a <a> link tag of the given name using a routed URL
- * based on the module/action passed as argument and the routing configuration.
- * It's also possible to pass a string instead of a module/action pair to
- * get a link tag that just points without consideration. 
- * If null is passed as a name, the link itself will become the name.
- * If an object is passed as a name, the object string representation is used.
- * One of the options serves for for creating javascript confirm alerts where 
- * if you pass 'confirm' => 'Are you sure?', the link will be guarded 
- * with a JS popup asking that question. If the user accepts, the link is processed,
- * otherwise not.
- *
- * <b>Options:</b>
- * - 'absolute' - if set to true, the helper outputs an absolute URL
- * - 'query_string' - to append a query string (starting by ?) to the routed url
- * - 'anchor' - to append an anchor (starting by #) to the routed url
- * - 'confirm' - displays a javascript confirmation alert when the link is clicked
- * - 'popup' - if set to true, the link opens a new browser window 
- * - 'post' - if set to true, the link submits a POST request instead of GET (caution: do not use inside a form)
- *
- * <b>Note:</b> The 'popup' and 'post' options are not compatible with each other.
- *
- * <b>Examples:</b>
- * <code>
- *  echo link_to('Delete this page', 'my_module/my_action');
- *    => <a href="/path/to/my/action">Delete this page</a>
- *  echo link_to('Visit Hoogle', 'http://www.hoogle.com');
- *    => <a href="http://www.hoogle.com">Visit Hoogle</a>
- *  echo link_to('Delete this page', 'my_module/my_action', array('id' => 'myid', 'confirm' => 'Are you sure?', 'absolute' => true));
- *    => <a href="http://myapp.example.com/path/to/my/action" id="myid" onclick="return confirm('Are you sure?');">Delete this page</a>
- * </code>
- *
- * @param  string $name          name of the link, i.e. string to appear between the <a> tags
- * @param  string $internal_uri  'module/action' or '@rule' of the action
- * @param  array  $options       additional HTML compliant <a> tag parameters
- * @return string XHTML compliant <a href> tag
- * @see    url_for
- */
-function link_to($name = '', $internal_uri = '', $options = array())
+function link_to1($name, $internal_uri, $options = array())
 {
   $html_options = _parse_attributes($options);
 
@@ -129,6 +74,126 @@ function link_to($name = '', $internal_uri = '', $options = array())
   }
 
   return content_tag('a', $name, $html_options);
+}
+
+function url_for2($routeName, $params = array(), $absolute = false)
+{
+  $params = array_merge(array('sf_route' => $routeName), is_object($params) ? array('sf_subject' => $params) : $params);
+
+  return url_for1($params, $absolute);
+}
+
+function url_for1($internal_uri, $absolute = false)
+{
+  return sfContext::getInstance()->getController()->genUrl($internal_uri, $absolute);
+}
+
+/**
+ * Returns a routed URL based on the module/action passed as argument
+ * and the routing configuration.
+ *
+ * <b>Examples:</b>
+ * <code>
+ *  echo url_for('my_module/my_action');
+ *    => /path/to/my/action
+ *  echo url_for('@my_rule');
+ *    => /path/to/my/action 
+ *  echo url_for('@my_rule', true);
+ *    => http://myapp.example.com/path/to/my/action
+ * </code>
+ *
+ * @param  string $internal_uri  'module/action' or '@rule' of the action
+ * @param  bool   $absolute      return absolute path?
+ * @return string routed URL
+ */
+function url_for()
+{
+  // for BC with 1.1
+  $arguments = func_get_args();
+  if (is_array($arguments[0]) || '@' == substr($arguments[0], 0, 1) || false !== strpos($arguments[0], '/'))
+  {
+    return call_user_func_array('url_for1', $arguments);
+  }
+  else
+  {
+    return call_user_func_array('url_for2', $arguments);
+  }
+}
+
+/**
+ * Creates a <a> link tag of the given name using a routed URL
+ * based on the module/action passed as argument and the routing configuration.
+ * It's also possible to pass a string instead of a module/action pair to
+ * get a link tag that just points without consideration. 
+ * If null is passed as a name, the link itself will become the name.
+ * If an object is passed as a name, the object string representation is used.
+ * One of the options serves for for creating javascript confirm alerts where 
+ * if you pass 'confirm' => 'Are you sure?', the link will be guarded 
+ * with a JS popup asking that question. If the user accepts, the link is processed,
+ * otherwise not.
+ *
+ * <b>Options:</b>
+ * - 'absolute' - if set to true, the helper outputs an absolute URL
+ * - 'query_string' - to append a query string (starting by ?) to the routed url
+ * - 'anchor' - to append an anchor (starting by #) to the routed url
+ * - 'confirm' - displays a javascript confirmation alert when the link is clicked
+ * - 'popup' - if set to true, the link opens a new browser window 
+ * - 'post' - if set to true, the link submits a POST request instead of GET (caution: do not use inside a form)
+ * - 'method' - if set to post, delete, or put, the link submits a request with the given HTTP method instead of GET (caution: do not use inside a form)
+ *
+ * <b>Note:</b> The 'popup', 'post', and 'method' options are not compatible with each other.
+ *
+ * <b>Examples:</b>
+ * <code>
+ *  echo link_to('Delete this page', 'my_module/my_action');
+ *    => <a href="/path/to/my/action">Delete this page</a>
+ *  echo link_to('Visit Hoogle', 'http://www.hoogle.com');
+ *    => <a href="http://www.hoogle.com">Visit Hoogle</a>
+ *  echo link_to('Delete this page', 'my_module/my_action', array('id' => 'myid', 'confirm' => 'Are you sure?', 'absolute' => true));
+ *    => <a href="http://myapp.example.com/path/to/my/action" id="myid" onclick="return confirm('Are you sure?');">Delete this page</a>
+ * </code>
+ *
+ * @param  string $name          name of the link, i.e. string to appear between the <a> tags
+ * @param  string $internal_uri  'module/action' or '@rule' of the action
+ * @param  array  $options       additional HTML compliant <a> tag parameters
+ * @return string XHTML compliant <a href> tag
+ * @see    url_for
+ */
+function link_to()
+{
+  // for BC with 1.1
+  $arguments = func_get_args();
+  if (empty($arguments[1]) || '@' == substr($arguments[1], 0, 1) || false !== strpos($arguments[1], '/'))
+  {
+    return call_user_func_array('link_to1', $arguments);
+  }
+  else
+  {
+    if (!array_key_exists(2, $arguments))
+    {
+      $arguments[2] = array();
+    }
+    return call_user_func_array('link_to2', $arguments);
+  }
+}
+
+function url_for_form(sfForm $form, $routePrefix)
+{
+  $format = '%s/%s';
+  if ('@' == $routePrefix[0])
+  {
+    $format = '%s_%s';
+    $routePrefix = substr($routePrefix, 1);
+  }
+
+  $uri = sprintf($format, $routePrefix, $form->getObject()->isNew() ? 'create' : 'update');
+
+  return url_for($uri, $form->getObject());
+}
+
+function form_tag_for(sfForm $form, $routePrefix, $attributes = array())
+{
+  return $form->renderFormTag(url_for_form($form, $routePrefix), $attributes);
 }
 
 /**
@@ -275,7 +340,7 @@ function public_path($path, $absolute = false)
  * @return string XHTML compliant <input> tag
  * @see    url_for, link_to
  */
-function button_to($name, $internal_uri ='', $options = array())
+function button_to($name, $internal_uri, $options = array())
 {
   $html_options = _parse_attributes($options);
   $html_options['value'] = $name;
@@ -395,23 +460,23 @@ function _convert_options_to_javascript($html_options, $url = 'this.href')
   $popup = isset($html_options['popup']) ? $html_options['popup'] : '';
   unset($html_options['popup']);
 
-  // post
-  $post = isset($html_options['post']) ? $html_options['post'] : '';
-  unset($html_options['post']);
+  // method
+  $method = isset($html_options['method']) ? $html_options['method'] : (isset($html_options['post']) && $html_options['post'] ? 'post' : false);
+  unset($html_options['post'], $html_options['method']);
 
   $onclick = isset($html_options['onclick']) ? $html_options['onclick'] : '';
 
-  if ($popup && $post)
+  if ($popup && $method)
   {
-    throw new sfConfigurationException('You can\'t use "popup" and "post" in the same link.');
+    throw new sfConfigurationException('You can\'t use "popup", "method" and "post" in the same link.');
   }
   else if ($confirm && $popup)
   {
     $html_options['onclick'] = $onclick.'if ('._confirm_javascript_function($confirm).') { '._popup_javascript_function($popup, $url).' };return false;';
   }
-  else if ($confirm && $post)
+  else if ($confirm && $method)
   {
-    $html_options['onclick'] = $onclick.'if ('._confirm_javascript_function($confirm).') { '._post_javascript_function().' };return false;';
+    $html_options['onclick'] = $onclick.'if ('._confirm_javascript_function($confirm).') { '._method_javascript_function($method).' };return false;';
   }
   else if ($confirm)
   {
@@ -424,9 +489,9 @@ function _convert_options_to_javascript($html_options, $url = 'this.href')
       $html_options['onclick'] = 'return '._confirm_javascript_function($confirm).';';
     }
   }
-  else if ($post)
+  else if ($method)
   {
-    $html_options['onclick'] = $onclick._post_javascript_function().'return false;';
+    $html_options['onclick'] = $onclick._method_javascript_function($method).'return false;';
   }
   else if ($popup)
   {
@@ -462,7 +527,30 @@ function _popup_javascript_function($popup, $url = '')
 
 function _post_javascript_function()
 {
-  return "f = document.createElement('form'); document.body.appendChild(f); f.method = 'POST'; f.action = this.href; f.submit();";
+  return _method_javascript_function('POST');
+}
+
+function _method_javascript_function($method)
+{
+  $function = "var f = document.createElement('form'); f.style.display = 'none'; this.parentNode.appendChild(f); f.method = 'post'; f.action = this.href;";
+
+  if ('post' != strtolower($method))
+  {
+    $function .= "var m = document.createElement('input'); m.setAttribute('type', 'hidden'); ";
+    $function .= sprintf("m.setAttribute('name', 'sf_method'); m.setAttribute('value', '%s'); f.appendChild(m);", strtolower($method));
+  }
+
+  // CSRF protection
+  $form = new sfForm();
+  if ($form->isCSRFProtected())
+  {
+    $function .= "var m = document.createElement('input'); m.setAttribute('type', 'hidden'); ";
+    $function .= sprintf("m.setAttribute('name', '%s'); m.setAttribute('value', '%s'); f.appendChild(m);", $form->getCSRFFieldName(), $form->getCSRFToken());
+  }
+
+  $function .= "f.submit();";
+
+  return $function;
 }
 
 function _encodeText($text)

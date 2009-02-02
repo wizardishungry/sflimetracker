@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: MoveTask.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -45,7 +45,57 @@ class MoveTask extends CopyTask {
         $this->forceOverwrite = true;
     }
     
+    /**
+     * Validates attributes coming in from XML
+     *
+     * @access  private
+     * @return  void
+     * @throws  BuildException
+     */
+    protected function validateAttributes() {    
+        if ($this->file !== null && $this->file->isDirectory()) {
+			if (($this->destFile !== null && $this->destDir !== null)
+				|| ($this->destFile === null && $this->destDir === null)) {
+					throw new BuildException("One and only one of tofile and todir must be set.");
+			}
+            
+            if ($this->destFile === null)
+            {
+				$this->destFile = new PhingFile($this->destDir, $this->file->getName());
+			}
+            
+            if ($this->destDir === null)
+            {
+				$this->destDir = $this->destFile->getParentFile();
+			}
+            
+			$this->completeDirMap[$this->file->getAbsolutePath()] = $this->destFile->getAbsolutePath();
+			
+			$this->file = null;
+		} else {
+			parent::validateAttributes();
+		}
+    }
+    
     protected function doWork() {
+		if (count($this->completeDirMap) > 0)
+		{
+			foreach ($this->completeDirMap as $from => $to)
+			{
+                $f = new PhingFile($from);
+                $d = new PhingFile($to);
+                
+                $moved = false;
+                try { // try to rename                    
+                    $this->log("Attempting to rename $from to $to", $this->verbosity);
+                    $this->renameFile($f, $d, $this->forceOverwrite);
+                    $moved = true;
+                } catch (IOException $ioe) {
+                    $moved = false;
+                    $this->log("Failed to rename $from to $to: " . $ioe->getMessage(), $this->verbosity);
+                }
+			}
+		}
     
         $copyMapSize = count($this->fileCopyMap);
         if ($copyMapSize > 0) {
@@ -96,7 +146,7 @@ class MoveTask extends CopyTask {
                 $d = new PhingFile((string) $dir);
                 if (!$d->exists()) {
                     if (!$d->mkdirs()) {
-                        $this->log("Unable to create directory " . $d->getAbsolutePath(), PROJECT_MSG_ERR);
+                        $this->log("Unable to create directory " . $d->getAbsolutePath(), Project::MSG_ERR);
                     } else {
                         $count++;
                     }
@@ -194,4 +244,4 @@ class MoveTask extends CopyTask {
         return $renamed;
     }
 }
-?>
+

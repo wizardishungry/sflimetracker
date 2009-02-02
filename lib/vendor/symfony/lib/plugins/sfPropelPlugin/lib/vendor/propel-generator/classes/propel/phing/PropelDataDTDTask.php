@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: PropelDataDTDTask.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: PropelDataDTDTask.php 521 2007-01-05 13:29:36Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -20,7 +20,7 @@
  * <http://propel.phpdb.org>.
  */
 
-require_once 'propel/phing/AbstractPropelDataModelTask.php';
+require_once 'propel/phing/PropelDataModelTemplateTask.php';
 include_once 'propel/engine/builder/om/ClassTools.php';
 
 /**
@@ -29,7 +29,7 @@ include_once 'propel/engine/builder/om/ClassTools.php';
  * @author     Hans Lellelid <hans@xmpl.org>
  * @package    propel.phing
  */
-class PropelDataDTDTask extends AbstractPropelDataModelTask {
+class PropelDataDTDTask extends PropelDataModelTemplateTask {
 
 
 	public function main() {
@@ -37,7 +37,7 @@ class PropelDataDTDTask extends AbstractPropelDataModelTask {
 		// check to make sure task received all correct params
 		$this->validate();
 
-		if(!$this->mapperElement) {
+		if (!$this->mapperElement) {
 			throw new BuildException("You must use a <mapper/> element to describe how names should be transformed.");
 		}
 

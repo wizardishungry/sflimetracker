@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: ValidationFailed.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: ValidationFailed.php 521 2007-01-05 13:29:36Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -30,7 +30,7 @@
  * failed.
  *
  * @author     Hans Lellelid <hans@xmpl.org>
- * @version    $Revision: 536 $
+ * @version    $Revision: 521 $
  * @package    propel.validator
  * @see        BasePeer::doValidate()
  */

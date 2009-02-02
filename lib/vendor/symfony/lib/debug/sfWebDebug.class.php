@@ -19,102 +19,143 @@
 class sfWebDebug
 {
   protected
-    $dispatcher  = null,
-    $log         = array(),
-    $maxPriority = 1000,
-    $types       = array(),
-    $lastTimeLog = -1;
+    $dispatcher = null,
+    $logger     = null,
+    $options    = array(),
+    $panels     = array();
 
-  public function __construct(sfEventDispatcher $dispatcher)
+  /**
+   * Constructor.
+   *
+   * Available options:
+   *
+   *  * image_root_path: The image root path
+   *
+   * @param sfEventDispatcher $dispatcher The event dispatcher
+   * @param sfVarLogger       $logger     The logger
+   * @param array             $options    An array of options
+   */
+  public function __construct(sfEventDispatcher $dispatcher, sfVarLogger $logger, array $options = array())
   {
     $this->dispatcher = $dispatcher;
+    $this->logger     = $logger;
+    $this->options    = $options;
 
-    $this->dispatcher->connect('view.cache.filter_content', array($this, 'decorateContentWithDebug'));
+    if (!isset($this->options['image_root_path']))
+    {
+      $this->options['image_root_path'] = '';
+    }
+
+    $this->configure();
+
+    $this->dispatcher->notify(new sfEvent($this, 'debug.web.load_panels'));
   }
 
   /**
-   * Logs a message to the web debug toolbar.
-   *
-   * @param array $logEntry An array of parameter
-   *
-   * @see sfWebDebugLogger
+   * Configures the web debug toolbar.
    */
-  public function log($logEntry)
+  public function configure()
   {
-    // elapsed time
-    if ($this->lastTimeLog == -1)
+    $this->setPanel('symfony_version', new sfWebDebugPanelSymfonyVersion($this));
+    if (sfConfig::get('sf_debug') && sfConfig::get('sf_cache'))
     {
-      $this->lastTimeLog = sfConfig::get('sf_timer_start');
+      $this->setPanel('cache', new sfWebDebugPanelCache($this));
     }
-
-    $this->lastTimeLog = microtime(true);
-
-    // update max priority
-    if ($logEntry['priority'] < $this->maxPriority)
+    if (sfConfig::get('sf_logging_enabled'))
     {
-      $this->maxPriority = $logEntry['priority'];
+      $this->setPanel('config', new sfWebDebugPanelConfig($this));
     }
-
-    // update types
-    if (!isset($this->types[$logEntry['type']]))
+    $this->setPanel('logs', new sfWebDebugPanelLogs($this));
+    $this->setPanel('memory', new sfWebDebugPanelMemory($this));
+    if (sfConfig::get('sf_debug'))
     {
-      $this->types[$logEntry['type']] = 1;
+      $this->setPanel('time', new sfWebDebugPanelTimer($this));
     }
-    else
-    {
-      ++$this->types[$logEntry['type']];
-    }
-
-    $this->log[] = $logEntry;
   }
 
   /**
-   * Loads helpers needed for the web debug toolbar.
+   * Gets the logger.
+   *
+   * @return sfVarLogger The logger instance
    */
-  protected function loadHelpers()
+  public function getLogger()
   {
-    sfLoader::loadHelpers(array('Helper', 'Url', 'Asset', 'Tag'));
+    return $this->logger;
   }
 
   /**
-   * Formats a log line.
+   * Gets the event dispatcher.
    *
-   * @param string $logLine The log line to format
-   *
-   * @return string The formatted log lin
+   * @return sfEventDispatcher The event dispatcher
    */
-  protected function formatLogLine($logLine)
+  public function getEventDispatcher()
   {
-    static $constants;
+    return $this->dispatcher;
+  }
 
-    if (!$constants)
+  /**
+   * Gets the registered panels.
+   *
+   * @return array The panels
+   */
+  public function getPanels()
+  {
+    return $this->panels;
+  }
+
+  /**
+   * Sets a panel by name.
+   *
+   * @param string          $name  The panel name
+   * @param sfWebDebugPanel $panel The panel
+   */
+  public function setPanel($name, sfWebDebugPanel $panel)
+  {
+    $this->panels[$name] = $panel;
+  }
+
+  /**
+   * Removes a panel by name.
+   *
+   * @param string          $name  The panel name
+   */
+  public function removePanel($name)
+  {
+    unset($this->panels[$name]);
+  }
+
+  /**
+   * Gets an option value by name.
+   *
+   * @param  string $name  The option name
+   *
+   * @return mixed  The option value
+   */
+  public function getOption($name, $default = null)
+  {
+    return isset($this->options[$name]) ? $this->options[$name] : $default;
+  }
+
+  /**
+   * Injects the web debug toolbar into a given HTML string.
+   *
+   * @param string  $content The HTML content
+   *
+   * @return string The content with the web debug toolbar injected
+   */
+  public function injectToolbar($content)
+  {
+    $content = str_ireplace('</head>', '<style type="text/css">'.str_replace("\n", ' ', $this->getStylesheet()).'</style></head>', $content);
+
+    $debug = $this->asHtml();
+    $count = 0;
+    $content = str_ireplace('</body>', '<script type="text/javascript">'.$this->getJavascript().'</script>'.$debug.'</body>', $content, $count);
+    if (!$count)
     {
-      foreach (array('sf_app_dir', 'sf_root_dir', 'sf_symfony_lib_dir') as $constant)
-      {
-        $constants[realpath(sfConfig::get($constant)).DIRECTORY_SEPARATOR] = $constant.DIRECTORY_SEPARATOR;
-      }
+      $content .= $debug;
     }
 
-    // escape HTML
-    $logLine = htmlspecialchars($logLine, ENT_QUOTES, sfConfig::get('sf_charset'));
-
-    // replace constants value with constant name
-    $logLine = str_replace(array_keys($constants), array_values($constants), $logLine);
-
-    $logLine = sfToolkit::pregtr($logLine, array('/&quot;(.+?)&quot;/s' => '"<span class="sfWebDebugLogInfo">\\1</span>"',
-                                                   '/^(.+?)\(\)\:/S'      => '<span class="sfWebDebugLogInfo">\\1()</span>:',
-                                                   '/line (\d+)$/'        => 'line <span class="sfWebDebugLogInfo">\\1</span>'));
-
-    // special formatting for SQL lines
-    $logLine = preg_replace('/\b(SELECT|FROM|AS|LIMIT|ASC|COUNT|DESC|WHERE|LEFT JOIN|INNER JOIN|RIGHT JOIN|ORDER BY|GROUP BY|IN|LIKE|DISTINCT|DELETE|INSERT|INTO|VALUES)\b/', '<span class="sfWebDebugLogInfo">\\1</span>', $logLine);
-
-    // remove username/password from DSN
-    if (strpos($logLine, 'DSN') !== false)
-    {
-      $logLine = preg_replace("/=&gt;\s+'?[^'\s,]+'?/", "=&gt; '****'", $logLine);
-    }
-
-    return $logLine;
+    return $content;
   }
 
   /**
@@ -122,279 +163,51 @@ class sfWebDebug
    *
    * @return string The web debug toolbar HTML
    */
-  public function getResults()
+  public function asHtml()
   {
-    if (!sfConfig::get('sf_web_debug'))
+    $titles = array();
+    $panels = array();
+    foreach ($this->panels as $name => $panel)
     {
-      return '';
-    }
-
-    $this->loadHelpers();
-
-    $result = '';
-
-    // max priority
-    $maxPriority = '';
-    if (sfConfig::get('sf_logging_enabled'))
-    {
-      $maxPriority = $this->getPriority($this->maxPriority);
-    }
-
-    $logs = '';
-    $sqlLogs = array();
-    if (sfConfig::get('sf_logging_enabled'))
-    {
-      $logs = '<table class="sfWebDebugLogs">
-        <tr>
-          <th>#</th>
-          <th>type</th>
-          <th>message</th>
-        </tr>'."\n";
-      $line_nb = 0;
-      foreach ($this->log as $logEntry)
+      if ($title = $panel->getTitle())
       {
-        $log = $logEntry['message'];
-
-        $priority = $this->getPriority($logEntry['priority']);
-
-        if (strpos($type = $logEntry['type'], 'sf') === 0)
+        if ($content = $panel->getPanelContent() || $panel->getTitleUrl())
         {
-          $type = substr($type, 2);
+          $id = sprintf('sfWebDebug%sDetails', $name);
+          $titles[]  = sprintf('<li><a title="%s" href="%s"%s>%s</a></li>',
+            $panel->getPanelTitle(),
+            $panel->getTitleUrl() ? $panel->getTitleUrl() : '#',
+            $panel->getTitleUrl() ? '' : ' onclick="sfWebDebugShowDetailsFor(\''.$id.'\'); return false;"',
+            $title
+          );
+          $panels[] = sprintf('<div id="%s" class="sfWebDebugTop" style="display: none"><h1>%s</h1>%s</div>',
+            $id,
+            $panel->getPanelTitle(),
+            $panel->getPanelContent()
+          );
         }
-
-        // xdebug information
-        $debug_info = '';
-        if ($logEntry['debugStack'])
+        else
         {
-          $debug_info .= '&nbsp;<a href="#" onclick="sfWebDebugToggle(\'debug_'.$line_nb.'\'); return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/toggle.gif').'</a><div class="sfWebDebugDebugInfo" id="debug_'.$line_nb.'" style="display:none">';
-          foreach ($logEntry['debugStack'] as $i => $logLine)
-          {
-            $debug_info .= '#'.$i.' &raquo; '.$this->formatLogLine($logLine).'<br/>';
-          }
-          $debug_info .= "</div>\n";
+          $titles[] = sprintf('<li>%s</li>', $title);
         }
-
-        // format log
-        $log = $this->formatLogLine($log);
-
-        // sql queries log
-        if (preg_match('/execute(?:Query|Update).+?\:\s+(.+)$/s', $log, $match))
-        {
-          $sqlLogs[] = $match[1];
-        }
-
-        ++$line_nb;
-        $logs .= sprintf("<tr class='sfWebDebugLogLine sfWebDebug%s %s'><td class=\"sfWebDebugLogNumber\">%s</td><td class=\"sfWebDebugLogType\">%s&nbsp;%s</td><td>%s%s</td></tr>\n",
-          ucfirst($priority),
-          $logEntry['type'],
-          $line_nb,
-          image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/'.$priority.'.png'),
-          $type,
-          $log,
-          $debug_info
-        );
-      }
-      $logs .= '</table>';
-
-      ksort($this->types);
-      $types = array();
-      foreach ($this->types as $type => $nb)
-      {
-        $types[] = '<a href="#" onclick="sfWebDebugToggleMessages(\''.$type.'\'); return false;">'.$type.'</a>';
       }
     }
-
-    // ignore cache link
-    $cacheLink = '';
-    if (sfConfig::get('sf_debug') && sfConfig::get('sf_cache'))
-    {
-      $selfUrl = $_SERVER['PHP_SELF'].((strpos($_SERVER['PHP_SELF'], '_sf_ignore_cache') === false) ? '?_sf_ignore_cache=1' : '');
-      $cacheLink = '<li><a href="'.$selfUrl.'" title="reload and ignore cache">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/reload.png').'</a></li>';
-    }
-
-    // logging information
-    $logLink = '';
-    if (sfConfig::get('sf_logging_enabled'))
-    {
-      $logLink = '<li><a href="#" onclick="sfWebDebugShowDetailsFor(\'sfWebDebugLog\'); return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/comment.png').' logs &amp; msgs</a></li>';
-    }
-
-    // database information
-    $dbInfo = '';
-    $dbInfoDetails = '';
-    if ($sqlLogs)
-    {
-      $dbInfo = '<li><a href="#" onclick="sfWebDebugShowDetailsFor(\'sfWebDebugDatabaseDetails\'); return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/database.png').' '.count($sqlLogs).'</a></li>';
-
-      $dbInfoDetails = '
-        <div id="sfWebDebugDatabaseLogs">
-        <ol><li>'.implode("</li>\n<li>", $sqlLogs).'</li></ol>
-        </div>
-      ';
-    }
-
-    // memory used
-    $memoryInfo = '';
-    if (sfConfig::get('sf_debug') && function_exists('memory_get_usage'))
-    {
-      $totalMemory = sprintf('%.1f', (memory_get_usage() / 1024));
-      $memoryInfo = '<li>'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/memory.png').' '.$totalMemory.' KB</li>';
-    }
-
-    // total time elapsed
-    $timeInfo = '';
-    if (sfConfig::get('sf_debug'))
-    {
-      $totalTime = (microtime(true) - sfConfig::get('sf_timer_start')) * 1000;
-      $totalTime = sprintf(($totalTime <= 1) ? '%.2f' : '%.0f', $totalTime);
-      $timeInfo = '<li class="last"><a href="#" onclick="sfWebDebugShowDetailsFor(\'sfWebDebugTimeDetails\'); return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/time.png').' '.$totalTime.' ms</a></li>';
-    }
-
-    // timers
-    $timeInfoDetails = '<table class="sfWebDebugLogs" style="width: 300px"><tr><th>type</th><th>calls</th><th>time (ms)</th><th>time (%)</th></tr>';
-    foreach (sfTimerManager::getTimers() as $name => $timer)
-    {
-      $timeInfoDetails .= sprintf('<tr><td class="sfWebDebugLogType">%s</td><td class="sfWebDebugLogNumber" style="text-align: right">%d</td><td style="text-align: right">%.2f</td><td style="text-align: right">%d</td></tr>', $name, $timer->getCalls(), $timer->getElapsedTime() * 1000, $timer->getElapsedTime() * 1000 * 100 / $totalTime );
-    }
-    $timeInfoDetails .= '</table>';
-
-    // logs
-    $logInfo = '';
-    if (sfConfig::get('sf_logging_enabled'))
-    {
-      $logInfo .= '
-        <ul id="sfWebDebugLogMenu">
-          <li><a href="#" onclick="sfWebDebugToggleAllLogLines(true, \'sfWebDebugLogLine\'); return false;">[all]</a></li>
-          <li><a href="#" onclick="sfWebDebugToggleAllLogLines(false, \'sfWebDebugLogLine\'); return false;">[none]</a></li>
-          <li><a href="#" onclick="sfWebDebugShowOnlyLogLines(\'info\'); return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/info.png').'</a></li>
-          <li><a href="#" onclick="sfWebDebugShowOnlyLogLines(\'warning\'); return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/warning.png').'</a></li>
-          <li><a href="#" onclick="sfWebDebugShowOnlyLogLines(\'error\'); return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/error.png').'</a></li>
-          <li>'.implode("</li>\n<li>", $types).'</li>
-        </ul>
-        <div id="sfWebDebugLogLines">'.$logs.'</div>
-      ';
-    }
-
-    $result .= '
-    <div id="sfWebDebug">
-      <div id="sfWebDebugBar" class="sfWebDebug'.ucfirst($maxPriority).'">
-        <a href="#" onclick="sfWebDebugToggleMenu(); return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/sf.png').'</a>
-        <ul id="sfWebDebugDetails" class="menu">
-          <li>'.SYMFONY_VERSION.'</li>
-          <li><a href="#" onclick="sfWebDebugShowDetailsFor(\'sfWebDebugConfig\'); return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/config.png').' vars &amp; config</a></li>
-          '.$cacheLink.'
-          '.$logLink.'
-          '.$dbInfo.'
-          '.$memoryInfo.'
-          '.$timeInfo.'
-        </ul>
-        <a href="#" onclick="document.getElementById(\'sfWebDebug\').style.display=\'none\'; return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/close.png').'</a>
-      </div>
-
-      <div id="sfWebDebugLog" class="sfWebDebugTop" style="display: none"><h1>Log and debug messages</h1>'.$logInfo.'</div>
-      <div id="sfWebDebugConfig" class="sfWebDebugTop" style="display: none"><h1>Configuration and request variables</h1>'.$this->getCurrentConfigAsHtml().'</div>
-      <div id="sfWebDebugDatabaseDetails" class="sfWebDebugTop" style="display: none"><h1>SQL queries</h1>'.$dbInfoDetails.'</div>
-      <div id="sfWebDebugTimeDetails" class="sfWebDebugTop" style="display: none"><h1>Timers</h1>'.$timeInfoDetails.'</div>
-
-      </div>
-    ';
-
-    return $result;
-  }
-
-  /**
-   * Returns the current configuration as HTML.
-   *
-   * @return string The current configuration as HTML
-   */
-  protected function getCurrentConfigAsHtml()
-  {
-    $config = array(
-      'debug'        => sfConfig::get('sf_debug')           ? 'on' : 'off',
-      'xdebug'       => extension_loaded('xdebug')          ? 'on' : 'off',
-      'logging'      => sfConfig::get('sf_logging_enabled') ? 'on' : 'off',
-      'cache'        => sfConfig::get('sf_cache')           ? 'on' : 'off',
-      'compression'  => sfConfig::get('sf_compressed')      ? 'on' : 'off',
-      'tokenizer'    => function_exists('token_get_all')    ? 'on' : 'off',
-      'eaccelerator' => extension_loaded('eaccelerator') && ini_get('eaccelerator.enable') ? 'on' : 'off',
-      'apc'          => extension_loaded('apc') && ini_get('apc.enabled')                  ? 'on' : 'off',
-      'xcache'       => extension_loaded('xcache') && ini_get('xcache.cacher')             ? 'on' : 'off',
-    );
-
-    $result = '<ul id="sfWebDebugConfigSummary">';
-    foreach ($config as $key => $value)
-    {
-      $result .= '<li class="is'.$value.($key == 'xcache' ? ' last' : '').'">'.$key.'</li>';
-    }
-    $result .= '</ul>';
-
-    $context = sfContext::getInstance();
-    $result .= $this->formatArrayAsHtml('request',  sfDebug::requestAsArray($context->getRequest()));
-    $result .= $this->formatArrayAsHtml('response', sfDebug::responseAsArray($context->getResponse()));
-    $result .= $this->formatArrayAsHtml('user',     sfDebug::userAsArray($context->getUser()));
-    $result .= $this->formatArrayAsHtml('settings', sfDebug::settingsAsArray());
-    $result .= $this->formatArrayAsHtml('globals',  sfDebug::globalsAsArray());
-    $result .= $this->formatArrayAsHtml('php',      sfDebug::phpInfoAsArray());
-    $result .= $this->formatArrayAsHtml('symfony',  sfDebug::symfonyInfoAsArray());
-
-    return $result;
-  }
-
-  /**
-   * Converts an array to HTML.
-   *
-   * @param string $id      The identifier to use
-   * @param array  $values  The array of values
-   *
-   * @return string An HTML string
-   */
-  protected function formatArrayAsHtml($id, $values)
-  {
-    $id = ucfirst(strtolower($id));
-    $content = '
-    <h2>'.$id.' <a href="#" onclick="sfWebDebugToggle(\'sfWebDebug'.$id.'\'); return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/toggle.gif').'</a></h2>
-    <div id="sfWebDebug'.$id.'" style="display: none"><pre>'.htmlspecialchars(sfYaml::dump(self::removeObjects($values)), ENT_QUOTES, sfConfig::get('sf_charset')).'</pre></div>
-    ';
-
-    return $content;
-  }
-
-  /**
-   * Listens to the 'view.cache.filter_content' event to decorate a chunk of HTML with cache information.
-   *
-   * @param sfEvent $event   A sfEvent instance
-   * @param string  $content The HTML content
-   *
-   * @return string The decorated HTML string
-   */
-  public function decorateContentWithDebug(sfEvent $event, $content)
-  {
-    // don't decorate if not html or if content is null
-    if (!sfConfig::get('sf_web_debug') || !$content || false === strpos($event['response']->getContentType(), 'html'))
-    {
-      return $content;
-    }
-
-    $viewCacheManager = $event->getSubject();
-    sfLoader::loadHelpers(array('Helper', 'Url', 'Asset', 'Tag'));
-
-    $bgColor      = $event['new'] ? '#9ff' : '#ff9';
-    $lastModified = $viewCacheManager->getLastModified($event['uri']);
-    $id           = md5($event['uri']);
 
     return '
-      <div id="main_'.$id.'" class="sfWebDebugActionCache" style="border: 1px solid #f00">
-      <div id="sub_main_'.$id.'" class="sfWebDebugCache" style="background-color: '.$bgColor.'; border-right: 1px solid #f00; border-bottom: 1px solid #f00;">
-      <div style="height: 16px; padding: 2px"><a href="#" onclick="sfWebDebugToggle(\'sub_main_info_'.$id.'\'); return false;"><strong>cache information</strong></a>&nbsp;<a href="#" onclick="sfWebDebugToggle(\'sub_main_'.$id.'\'); document.getElementById(\'main_'.$id.'\').style.border = \'none\'; return false;">'.image_tag(sfConfig::get('sf_web_debug_web_dir').'/images/close.png').'</a>&nbsp;</div>
-        <div style="padding: 2px; display: none" id="sub_main_info_'.$id.'">
-        [uri]&nbsp;'.htmlspecialchars($event['uri'], ENT_QUOTES, sfConfig::get('sf_charset')).'<br />
-        [life&nbsp;time]&nbsp;'.$viewCacheManager->getLifeTime($event['uri']).'&nbsp;seconds<br />
-        [last&nbsp;modified]&nbsp;'.(time() - $lastModified).'&nbsp;seconds<br />
-        &nbsp;<br />&nbsp;
+      <div id="sfWebDebug">
+        <div id="sfWebDebugBar" class="sfWebDebug'.ucfirst($this->getPriority($this->logger->getHighestPriority())).'">
+          <a href="#" onclick="sfWebDebugToggleMenu(); return false;"><img src="'.$this->options['image_root_path'].'/sf.png" alt="Debug toolbar" /></a>
+
+          <ul id="sfWebDebugDetails" class="menu">
+            '.implode("\n", $titles).'
+            <li class="last">
+              <a href="#" onclick="document.getElementById(\'sfWebDebug\').style.display=\'none\'; return false;"><img src="'.$this->options['image_root_path'].'/close.png" alt="Close" /></a>
+            </li>
+          </ul>
         </div>
-      </div><div>
-      '.$content.'
-      </div></div>
+
+        '.implode("\n", $panels).'
+      </div>
     ';
   }
 
@@ -405,7 +218,7 @@ class sfWebDebug
    *
    * @return string The priority as a string
    */
-  protected function getPriority($value)
+  public function getPriority($value)
   {
     if ($value >= sfLogger::INFO)
     {
@@ -421,25 +234,448 @@ class sfWebDebug
     }
   }
 
-  static protected function removeObjects($values)
+  /**
+   * Gets the javascript code to inject in the head tag.
+   *
+   * @param string The javascript code
+   */
+  public function getJavascript()
   {
-    $nvalues = array();
-    foreach ($values as $key => $value)
+    return <<<EOF
+/* <![CDATA[ */
+function sfWebDebugGetElementsByClassName(strClass, strTag, objContElm)
+{
+  // http://muffinresearch.co.uk/archives/2006/04/29/getelementsbyclassname-deluxe-edition/
+  strTag = strTag || "*";
+  objContElm = objContElm || document;
+  var objColl = (strTag == '*' && document.all) ? document.all : objContElm.getElementsByTagName(strTag);
+  var arr = new Array();
+  var delim = strClass.indexOf('|') != -1  ? '|' : ' ';
+  var arrClass = strClass.split(delim);
+  var j = objColl.length;
+  for (var i = 0; i < j; i++) {
+    if(objColl[i].className == undefined) continue;
+    var arrObjClass = objColl[i].className.split(' ');
+    if (delim == ' ' && arrClass.length > arrObjClass.length) continue;
+    var c = 0;
+    comparisonLoop:
     {
-      if (is_array($value))
-      {
-        $nvalues[$key] = self::removeObjects($value);
-      }
-      else if (is_object($value))
-      {
-        $nvalues[$key] = sprintf('%s Object()', get_class($value));
-      }
-      else
-      {
-        $nvalues[$key] = $value;
+      var l = arrObjClass.length;
+      for (var k = 0; k < l; k++) {
+        var n = arrClass.length;
+        for (var m = 0; m < n; m++) {
+          if (arrClass[m] == arrObjClass[k]) c++;
+          if (( delim == '|' && c == 1) || (delim == ' ' && c == arrClass.length)) {
+            arr.push(objColl[i]);
+            break comparisonLoop;
+          }
+        }
       }
     }
+  }
+  return arr;
+}
 
-    return $nvalues;
+function sfWebDebugToggleMenu()
+{
+  var element = document.getElementById('sfWebDebugDetails');
+
+  var cacheElements = sfWebDebugGetElementsByClassName('sfWebDebugCache');
+  var mainCacheElements = sfWebDebugGetElementsByClassName('sfWebDebugActionCache');
+  var panelElements = sfWebDebugGetElementsByClassName('sfWebDebugTop');
+
+  if (element.style.display != 'none')
+  {
+    for (var i = 0; i < panelElements.length; ++i)
+    {
+      panelElements[i].style.display = 'none';
+    }
+
+    // hide all cache information
+    for (var i = 0; i < cacheElements.length; ++i)
+    {
+      cacheElements[i].style.display = 'none';
+    }
+    for (var i = 0; i < mainCacheElements.length; ++i)
+    {
+      mainCacheElements[i].style.border = 'none';
+    }
+  }
+  else
+  {
+    for (var i = 0; i < cacheElements.length; ++i)
+    {
+      cacheElements[i].style.display = '';
+    }
+    for (var i = 0; i < mainCacheElements.length; ++i)
+    {
+      mainCacheElements[i].style.border = '1px solid #f00';
+    }
+  }
+
+  sfWebDebugToggle('sfWebDebugDetails');
+  sfWebDebugToggle('sfWebDebugShowMenu');
+  sfWebDebugToggle('sfWebDebugHideMenu');
+}
+
+function sfWebDebugShowDetailsFor(element)
+{
+  if (typeof element == 'string')
+    element = document.getElementById(element);
+
+  var panelElements = sfWebDebugGetElementsByClassName('sfWebDebugTop');
+  for (var i = 0; i < panelElements.length; ++i)
+  {
+    if (panelElements[i] != element)
+    {
+      panelElements[i].style.display = 'none';
+    }
+  }
+
+  sfWebDebugToggle(element);
+}
+
+function sfWebDebugToggle(element)
+{
+  if (typeof element == 'string')
+    element = document.getElementById(element);
+
+  if (element)
+    element.style.display = element.style.display == 'none' ? '' : 'none';
+}
+
+function sfWebDebugToggleMessages(klass)
+{
+  var elements = sfWebDebugGetElementsByClassName(klass);
+
+  var x = elements.length;
+  for (var i = 0; i < x; ++i)
+  {
+    sfWebDebugToggle(elements[i]);
+  }
+}
+
+function sfWebDebugToggleAllLogLines(show, klass)
+{
+  var elements = sfWebDebugGetElementsByClassName(klass);
+  var x = elements.length;
+  for (var i = 0; i < x; ++i)
+  {
+    elements[i].style.display = show ? '' : 'none';
+  }
+}
+
+function sfWebDebugShowOnlyLogLines(type)
+{
+  var types = new Array();
+  types[0] = 'info';
+  types[1] = 'warning';
+  types[2] = 'error';
+  for (klass in types)
+  {
+    var elements = sfWebDebugGetElementsByClassName('sfWebDebug' + types[klass].substring(0, 1).toUpperCase() + types[klass].substring(1, types[klass].length));
+    var x = elements.length;
+    for (var i = 0; i < x; ++i)
+    {
+      if ('tr' == elements[i].tagName.toLowerCase())
+      {
+        elements[i].style.display = (type == types[klass]) ? '' : 'none';
+      }
+    }
+  }
+}
+/* ]]> */
+EOF;
+  }
+
+  /**
+   * Gets the stylesheet code to inject in the head tag.
+   *
+   * @param string The stylesheet code
+   */
+  public function getStylesheet()
+  {
+    return <<<EOF
+#sfWebDebug
+{
+  padding: 0;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  color: #333;
+  text-align: left;
+  line-height: 12px;
+}
+
+#sfWebDebug a, #sfWebDebug a:hover
+{
+  text-decoration: none;
+  border: none;
+  background-color: transparent;
+  color: #000;
+}
+
+#sfWebDebug img
+{
+  border: 0;
+}
+
+#sfWebDebugBar
+{
+  position: absolute;
+  margin: 0;
+  padding: 1px 0;
+  right: 0px;
+  top: 0px;
+  opacity: 0.80;
+  filter: alpha(opacity:80);
+  z-index: 10000;
+  white-space: nowrap;
+}
+
+#sfWebDebugBar[id]
+{
+  position: fixed;
+}
+
+#sfWebDebugBar img
+{
+  vertical-align: middle;
+}
+
+#sfWebDebugBar .menu
+{
+  padding: 5px;
+  padding-left: 0;
+  display: inline;
+  margin: 0;
+}
+
+#sfWebDebugBar .menu li
+{
+  display: inline;
+  list-style: none;
+  margin: 0;
+  padding: 0 6px;
+}
+
+#sfWebDebugBar .menu li.last
+{
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#sfWebDebugDatabaseDetails li
+{
+  margin: 0;
+  margin-left: 30px;
+  padding: 5px 0;
+}
+
+#sfWebDebugShortMessages li
+{
+  margin-bottom: 10px;
+  padding: 5px;
+  background-color: #ddd;
+}
+
+#sfWebDebugShortMessages li
+{
+  list-style: none;
+}
+
+#sfWebDebugDetails
+{
+  margin-right: 7px;
+}
+
+#sfWebDebug pre
+{
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+
+#sfWebDebug h1
+{
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  padding: 0;
+  border: 0px;
+  background-color: #eee;
+}
+
+#sfWebDebug h2
+{
+  font-size: 14px;
+  font-weight: bold;
+  margin: 10px 0;
+  padding: 0;
+  border: 0px;
+  background: none;
+}
+
+#sfWebDebug .sfWebDebugTop
+{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 98%;
+  padding: 0 1%;
+  margin: 0;
+  z-index: 9999;
+  background-color: #efefef;
+  border-bottom: 1px solid #aaa;
+}
+
+#sfWebDebugLog
+{
+  margin: 0;
+  padding: 3px;
+  font-size: 11px;
+}
+
+#sfWebDebugLogMenu li
+{
+  display: inline;
+  list-style: none;
+  margin: 0;
+  padding: 0 5px;
+  border-right: 1px solid #aaa;
+}
+
+#sfWebDebugConfigSummary
+{
+  display: inline;
+  padding: 5px;
+  background-color: #ddd;
+  border: 1px solid #aaa;
+  margin: 20px 0;
+}
+
+#sfWebDebugConfigSummary li
+{
+  list-style: none;
+  display: inline;
+  margin: 0;
+  padding: 0 5px;
+}
+
+#sfWebDebugConfigSummary li.last
+{
+  border: 0;
+}
+
+.sfWebDebugInfo, .sfWebDebugInfo td
+{
+  background-color: #ddd;
+}
+
+.sfWebDebugWarning, .sfWebDebugWarning td
+{
+  background-color: orange;
+}
+
+.sfWebDebugError, .sfWebDebugError td
+{
+  background-color: #f99;
+}
+
+.sfWebDebugLogNumber
+{
+  width: 1%;
+}
+
+.sfWebDebugLogType
+{
+  width: 1%;
+  white-space: nowrap;
+  color: darkgreen;
+}
+
+.sfWebDebugLogInfo
+{
+  color: blue;
+}
+
+.ison
+{
+  color: #3f3;
+  margin-right: 5px;
+}
+
+.isoff
+{
+  color: #f33;
+  margin-right: 5px;
+  text-decoration: line-through;
+}
+
+.sfWebDebugLogs
+{
+  padding: 0;
+  margin: 0;
+  border: 1px solid #999;
+  font-family: Arial;
+  font-size: 11px;
+}
+
+.sfWebDebugLogs tr
+{
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.sfWebDebugLogs td
+{
+  margin: 0;
+  border: 0;
+  padding: 1px 3px;
+  vertical-align: top;
+}
+
+.sfWebDebugLogs th
+{
+  margin: 0;
+  border: 0;
+  padding: 3px 5px;
+  vertical-align: top;
+  background-color: #999;
+  color: #eee;
+  white-space: nowrap;
+}
+
+.sfWebDebugDebugInfo
+{
+  margin-left: 10px;
+  padding-left: 5px;
+  border-left: 1px solid #aaa;
+}
+
+.sfWebDebugCache
+{
+  padding: 0;
+  margin: 0;
+  font-family: Arial;
+  position: absolute;
+  overflow: hidden;
+  z-index: 995;
+  font-size: 9px;
+  padding: 2px;
+  filter:alpha(opacity=85);
+  -moz-opacity:0.85;
+  opacity: 0.85;
+}
+
+#sfWebDebugSymfonyVersion
+{
+  margin-left: 0;
+  padding: 1px 4px;
+  background-color: #666;
+  color: #fff;
+}
+EOF;
   }
 }

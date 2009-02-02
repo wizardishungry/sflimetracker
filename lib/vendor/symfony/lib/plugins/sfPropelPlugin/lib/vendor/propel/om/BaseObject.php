@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: BaseObject.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: BaseObject.php 1066 2008-07-17 07:33:35Z ron $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -20,8 +20,6 @@
  * <http://propel.phpdb.org>.
  */
 
-require_once 'propel/om/Persistent.php';
-
 /**
  * This class contains attributes and methods that are used by all
  * business objects within the system.
@@ -29,7 +27,7 @@ require_once 'propel/om/Persistent.php';
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Frank Y. Kim <frank.kim@clearink.com> (Torque)
  * @author     John D. McNally <jmcnally@collab.net> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 1066 $
  * @package    propel.om
  */
 abstract class BaseObject {
@@ -54,6 +52,13 @@ abstract class BaseObject {
 	protected $modifiedColumns = array();
 
 	/**
+	 * Empty constructor (this allows people with their own BaseObject implementation to use its constructor)
+	 */
+	public function __construct() {
+
+	}
+
+	/**
 	 * Returns whether the object has been modified.
 	 *
 	 * @return     boolean True if the object has been modified.
@@ -72,6 +77,15 @@ abstract class BaseObject {
 	public function isColumnModified($col)
 	{
 		return in_array($col, $this->modifiedColumns);
+	}
+
+	/**
+	 * Get the columns that have been modified in this object.
+	 * @return     array A unique list of the modified column names for this object.
+	 */
+	public function getModifiedColumns()
+	{
+		return array_unique($this->modifiedColumns);
 	}
 
 	/**
@@ -144,7 +158,8 @@ abstract class BaseObject {
 	 */
 	public function equals($obj)
 	{
-		if (is_object($obj)) {
+		$thisclazz = get_class($this);
+		if (is_object($obj) && $obj instanceof $thisclazz) {
 			if ($this === $obj) {
 				return true;
 			} elseif ($this->getPrimaryKey() === null || $obj->getPrimaryKey() === null)  {

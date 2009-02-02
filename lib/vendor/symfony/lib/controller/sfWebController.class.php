@@ -31,28 +31,26 @@ abstract class sfWebController extends sfController
   public function genUrl($parameters = array(), $absolute = false)
   {
     // absolute URL or symfony URL?
-    if (!is_array($parameters) && preg_match('#^[a-z][a-z0-9\+.\-]*\:(//)?#i', $parameters))
+    if (is_string($parameters) && preg_match('#^[a-z][a-z0-9\+.\-]*\://#i', $parameters))
     {
       return $parameters;
     }
 
-    if (!is_array($parameters) && $parameters == '#')
+    // relative URL?
+    if (is_string($parameters) && '/' == $parameters[0])
     {
       return $parameters;
     }
 
-    $url = $this->context->getRequest()->getRelativeUrlRoot();
-
-    if (!sfConfig::get('sf_no_script_name'))
+    if (is_string($parameters) && $parameters == '#')
     {
-      $scriptName = $this->context->getRequest()->getScriptName();
-      $url = is_null($url) ? $scriptName : $url.'/'.basename($scriptName);
+      return $parameters;
     }
 
-    $route_name = '';
+    $route = '';
     $fragment = '';
 
-    if (!is_array($parameters))
+    if (is_string($parameters))
     {
       // strip fragment
       if (false !== ($pos = strpos($parameters, '#')))
@@ -61,32 +59,19 @@ abstract class sfWebController extends sfController
         $parameters = substr($parameters, 0, $pos);
       }
 
-      list($route_name, $parameters) = $this->convertUrlStringToParameters($parameters);
+      list($route, $parameters) = $this->convertUrlStringToParameters($parameters);
     }
-
-    if (sfConfig::get('sf_url_format') == 'PATH')
+    else if (is_array($parameters))
     {
-      // use PATH format
-      $divider = '/';
-      $equals  = '/';
-      $querydiv = '/';
-    }
-    else
-    {
-      // use GET format
-      $divider = ini_get('arg_separator.output');
-      $equals  = '=';
-      $querydiv = '?';
+      if (isset($parameters['sf_route']))
+      {
+        $route = $parameters['sf_route'];
+        unset($parameters['sf_route']);
+      }
     }
 
     // routing to generate path
-    $url .= $this->context->getRouting()->generate($route_name, $parameters, $querydiv, $divider, $equals);
-
-    if ($absolute)
-    {
-      $request = $this->context->getRequest();
-      $url = 'http'.($request->isSecure() ? 's' : '').'://'.$request->getHost().$url;
-    }
+    $url = $this->context->getRouting()->generate($route, $parameters, $absolute);
 
     if ($fragment)
     {
@@ -107,9 +92,9 @@ abstract class sfWebController extends sfController
   {
     $givenUrl = $url;
 
-    $params       = array();
-    $query_string = '';
-    $route_name   = '';
+    $params = array();
+    $queryString = '';
+    $route = '';
 
     // empty url?
     if (!$url)
@@ -120,12 +105,12 @@ abstract class sfWebController extends sfController
     // we get the query string out of the url
     if ($pos = strpos($url, '?'))
     {
-      $query_string = substr($url, $pos + 1);
+      $queryString = substr($url, $pos + 1);
       $url = substr($url, 0, $pos);
     }
 
     // 2 url forms
-    // @route_name?key1=value1&key2=value2...
+    // @routeName?key1=value1&key2=value2...
     // module/action?key1=value1&key2=value2...
 
     // first slash optional
@@ -135,14 +120,18 @@ abstract class sfWebController extends sfController
     }
 
 
-    // route_name?
+    // routeName?
     if ($url[0] == '@')
     {
-      $route_name = substr($url, 1);
+      $route = substr($url, 1);
     }
     else if (false !== strpos($url, '/'))
     {
       list($params['module'], $params['action']) = explode('/', $url);
+    }
+    else if (!$queryString)
+    {
+      $route = $givenUrl;
     }
     else
     {
@@ -150,7 +139,7 @@ abstract class sfWebController extends sfController
     }
 
     // split the query string
-    if ($query_string)
+    if ($queryString)
     {
       $matched = preg_match_all('/
         ([^&=]+)            # key
@@ -159,7 +148,7 @@ abstract class sfWebController extends sfController
         (?:
           (?=&[^&=]+=) | $  # followed by another key= or the end of the string
         )
-      /x', $query_string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
+      /x', $queryString, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
       foreach ($matches as $match)
       {
         $params[urldecode($match[1][0])] = urldecode($match[2][0]);
@@ -168,11 +157,11 @@ abstract class sfWebController extends sfController
       // check that all string is matched
       if (!$matched)
       {
-        throw new sfParseException(sprintf('Unable to parse query string "%s".', $query_string));
+        throw new sfParseException(sprintf('Unable to parse query string "%s".', $queryString));
       }
     }
 
-    return array($route_name, $params);
+    return array($route, $params);
   }
 
   /**

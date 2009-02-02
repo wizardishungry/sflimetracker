@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: PhingFile.php 362 2008-03-08 10:07:53Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -394,6 +394,7 @@ class PhingFile {
      *
      */
     function exists() {                
+		clearstatcache();
         if ($this->isFile()) {
             return @file_exists($this->path);
         } else {
@@ -411,6 +412,7 @@ class PhingFile {
      *
      */
     function isDirectory() {
+		clearstatcache();
         $fs = FileSystem::getFileSystem();
         if ($fs->checkAccess($this) !== true) {
             throw new IOException("No read access to ".$this->path);
@@ -429,6 +431,7 @@ class PhingFile {
      *          false otherwise
      */
     function isFile() {
+		clearstatcache();
         //$fs = FileSystem::getFileSystem();
         return @is_file($this->path);
     }
@@ -527,8 +530,8 @@ class PhingFile {
      */
     function delete() {
         $fs = FileSystem::getFileSystem();
-        if ($fs->checkAccess($this, true) !== true) {
-            throw new IOException("No read access to " . $this->path."\n");
+        if ($fs->canDelete($this) !== true) {
+            throw new IOException("Cannot delete " . $this->path . "\n"); 
         }
         return $fs->delete($this);
     }
@@ -684,11 +687,7 @@ class PhingFile {
             throw new Exception("IllegalArgumentException, Negative $time\n");
         }
 
-        // FIXME check if accessible
         $fs = FileSystem::getFileSystem();
-        if ($fs->checkAccess($this, true) !== true) {
-            throw new IOException("File::setLastModified(). No write access to file\n");
-        }
         return $fs->setLastModifiedTime($this, $time);
     }
 
@@ -710,6 +709,23 @@ class PhingFile {
         return $fs->setReadOnly($this);
     }
 
+	/**
+	 * Sets the owner of the file.
+	 * @param mixed $user User name or number.
+	 */
+	public function setUser($user) {
+		$fs = FileSystem::getFileSystem();
+		return $fs->chown($this->getPath(), $user);
+    }
+    
+	/**
+     * Retrieve the owner of this file.
+     * @return int User ID of the owner of this file. 
+     */
+    function getUser() {
+        return @fileowner($this->getPath());
+    }
+    
     /**
      * Sets the mode of the file
      * @param int $mode Ocatal mode.
@@ -863,4 +879,4 @@ class PhingFile {
         return $this->getPath();
     }
 }
-?>
+

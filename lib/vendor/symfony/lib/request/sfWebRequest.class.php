@@ -37,17 +37,35 @@ class sfWebRequest extends sfRequest
   /**
    * Initializes this sfRequest.
    *
+   * Available options:
+   *
+   *  * formats:           The list of supported format and their associated mime-types
+   *  * path_info_key:     The path info key (default to SERVER)
+   *  * path_info_array:   The path info key (default to PATH_INFO)
+   *  * relative_url_root: The relative URL root
+   *
    * @param  sfEventDispatcher $dispatcher  An sfEventDispatcher instance
    * @param  array             $parameters  An associative array of initialization parameters
    * @param  array             $attributes  An associative array of initialization attributes
+   * @param  array             $options     An associative array of options
    *
    * @return bool true, if initialization completes successfully, otherwise false
    *
    * @throws <b>sfInitializationException</b> If an error occurs while initializing this sfRequest
+   *
+   * @see sfRequest
    */
-  public function initialize(sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array())
+  public function initialize(sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array(), $options = array())
   {
-    parent::initialize($dispatcher, $parameters, $attributes);
+    parent::initialize($dispatcher, $parameters, $attributes, $options);
+
+    // GET parameters
+    $this->getParameters = get_magic_quotes_gpc() ? sfToolkit::stripslashesDeep($_GET) : $_GET;
+    $this->parameterHolder->add($this->getParameters);
+
+    // POST parameters
+    $this->postParameters = get_magic_quotes_gpc() ? sfToolkit::stripslashesDeep($_POST) : $_POST;
+    $this->parameterHolder->add($this->postParameters);
 
     if (isset($_SERVER['REQUEST_METHOD']))
     {
@@ -58,7 +76,8 @@ class sfWebRequest extends sfRequest
           break;
 
         case 'POST':
-          $this->setMethod(self::POST);
+          $this->setMethod(strtoupper($this->getParameter('sf_method', 'POST')));
+          $this->parameterHolder->remove('sf_method');
           break;
 
         case 'PUT':
@@ -83,320 +102,29 @@ class sfWebRequest extends sfRequest
       $this->setMethod(self::GET);
     }
 
-    foreach ($this->getAttribute('formats', array()) as $format => $mimeTypes)
+    if (isset($this->options['formats']))
     {
-      $this->setFormat($format, $mimeTypes);
-    }
-
-    // load parameters from GET/PATH_INFO/POST
-    $this->loadParameters();
-  }
-
-  /**
-   * Retrieves an array of file information.
-   *
-   * @param  string $name  A file name
-   *
-   * @return array An associative array of file information, if the file exists, otherwise null
-   */
-  public function getFile($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return $this->hasFile($name) ? $this->getFileValues($name) : null;
-  }
-
-  /**
-   * Retrieves a file error.
-   *
-   * @param  string $name  A file name
-   *
-   * @return int One of the following error codes:
-   *
-   *             - <b>UPLOAD_ERR_OK</b>        (no error)
-   *             - <b>UPLOAD_ERR_INI_SIZE</b>  (the uploaded file exceeds the
-   *                                           upload_max_filesize directive
-   *                                           in php.ini)
-   *             - <b>UPLOAD_ERR_FORM_SIZE</b> (the uploaded file exceeds the
-   *                                           MAX_FILE_SIZE directive that
-   *                                           was specified in the HTML form)
-   *             - <b>UPLOAD_ERR_PARTIAL</b>   (the uploaded file was only
-   *                                           partially uploaded)
-   *             - <b>UPLOAD_ERR_NO_FILE</b>   (no file was uploaded)
-   */
-  public function getFileError($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return $this->hasFile($name) ? $this->getFileValue($name, 'error') : UPLOAD_ERR_NO_FILE;
-  }
-
-  /**
-   * Retrieves a file name.
-   *
-   * @param  string $name  A file nam.
-   *
-   * @return string A file name, if the file exists, otherwise null
-   */
-  public function getFileName($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return $this->hasFile($name) ? $this->getFileValue($name, 'name') : null;
-  }
-
-  /**
-   * Retrieves an array of file names.
-   *
-   * @return array An indexed array of file names
-   */
-  public function getFileNames()
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return array_keys($_FILES);
-  }
-
-  /**
-   * Retrieves an array of files.
-   *
-   * @param  string $key  A key
-   * @return array  An associative array of files
-   */
-  public function getFiles($key = null)
-  {
-    return is_null($key) ? $_FILES : (isset($_FILES[$key]) ? $_FILES[$key] : array());
-  }
-
-  /**
-   * Retrieves a file path.
-   *
-   * @param  string $name  A file name
-   *
-   * @return string A file path, if the file exists, otherwise null
-   */
-  public function getFilePath($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return $this->hasFile($name) ? $this->getFileValue($name, 'tmp_name') : null;
-  }
-
-  /**
-   * Retrieve a file size.
-   *
-   * @param  string $name  A file name
-   *
-   * @return int A file size, if the file exists, otherwise null
-   */
-  public function getFileSize($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return $this->hasFile($name) ? $this->getFileValue($name, 'size') : null;
-  }
-
-  /**
-   * Retrieves a file type.
-   *
-   * This may not be accurate. This is the mime-type sent by the browser
-   * during the upload.
-   *
-   * @param  string $name  A file name
-   *
-   * @return string A file type, if the file exists, otherwise null
-   */
-  public function getFileType($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return $this->hasFile($name) ? $this->getFileValue($name, 'type') : null;
-  }
-
-  /**
-   * Indicates whether or not a file exists.
-   *
-   * @param  string $name  A file name
-   *
-   * @return bool true, if the file exists, otherwise false
-   */
-  public function hasFile($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    if (preg_match('/^(.+?)\[(.+?)\]$/', $name, $match))
-    {
-      return isset($_FILES[$match[1]]['name'][$match[2]]);
-    }
-    else
-    {
-      return isset($_FILES[$name]);
-    }
-  }
-
-  /**
-   * Indicates whether or not a file error exists.
-   *
-   * @param  string $name  A file name
-   *
-   * @return bool true, if the file error exists, otherwise false
-   */
-  public function hasFileError($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    return $this->hasFile($name) ? ($this->getFileValue($name, 'error') != UPLOAD_ERR_OK) : false;
-  }
-
-  /**
-   * Indicates whether or not any file errors occured.
-   *
-   * @return bool true, if any file errors occured, otherwise false
-   */
-  public function hasFileErrors()
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    foreach ($this->getFileNames() as $name)
-    {
-      if ($this->hasFileError($name) === true)
+      foreach ($this->options['formats'] as $format => $mimeTypes)
       {
-        return true;
+        $this->setFormat($format, $mimeTypes);
       }
     }
 
-    return false;
-  }
-
-  /**
-   * Indicates whether or not any files exist.
-   *
-   * @return boolean true, if any files exist, otherwise false
-   */
-  public function hasFiles()
-  {
-    if (!sfConfig::get('sf_compat_10'))
+    if (!isset($this->options['path_info_key']))
     {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
+      $this->options['path_info_key'] = 'PATH_INFO';
     }
 
-    return (count($_FILES) > 0);
-  }
-
-  /**
-   * Retrieves a file value.
-   *
-   * @param string $name A file name
-   * @param string $key Value to search in the file
-   * 
-   * @return string File value
-   */
-  public function getFileValue($name, $key)
-  {
-    if (!sfConfig::get('sf_compat_10'))
+    if (!isset($this->options['path_info_array']))
     {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
+      $this->options['path_info_array'] = 'SERVER';
     }
 
-    if (preg_match('/^(.+?)\[(.+?)\]$/', $name, $match))
-    {
-      return $_FILES[$match[1]][$key][$match[2]];
-    }
-    else
-    {
-      return $_FILES[$name][$key];
-    }
-  }
+    // additional parameters
+    $this->requestParameters = $this->parseRequestParameters();
+    $this->parameterHolder->add($this->requestParameters);
 
-  /**
-   * Retrieves all the values from a file.
-   *
-   * @param  string $name  A file name
-   *
-   * @return array Associative list of the file values
-   */
-  public function getFileValues($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    if (preg_match('/^(.+?)\[(.+?)\]$/', $name, $match))
-    {
-      return array(
-        'name'     => $_FILES[$match[1]]['name'][$match[2]],
-        'type'     => $_FILES[$match[1]]['type'][$match[2]],
-        'tmp_name' => $_FILES[$match[1]]['tmp_name'][$match[2]],
-        'error'    => $_FILES[$match[1]]['error'][$match[2]],
-        'size'     => $_FILES[$match[1]]['size'][$match[2]],
-      );
-    }
-    else
-    {
-      return $_FILES[$name];
-    }
-  }
-
-  /**
-   * Retrieves an extension for a given file.
-   *
-   * @param  string $name  A file name
-   *
-   * @return string Extension for the file
-   */
-  public function getFileExtension($name)
-  {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
-
-    static $mimeTypes = null;
-
-    $fileType = $this->getFileType($name);
-
-    if (!$fileType)
-    {
-      return '.bin';
-    }
-
-    if (is_null($mimeTypes))
-    {
-      $mimeTypes = unserialize(file_get_contents(sfConfig::get('sf_symfony_lib_dir').'/plugins/sfCompat10Plugin/data/mime_types.dat'));
-    }
-
-    return isset($mimeTypes[$fileType]) ? '.'.$mimeTypes[$fileType] : '.bin';
+    $this->fixParameters();
   }
 
   /**
@@ -430,7 +158,7 @@ class sfWebRequest extends sfRequest
   {
     $pathArray = $this->getPathInfoArray();
 
-    return preg_match('/^http/', $pathArray['REQUEST_URI']);
+    return isset($pathArray['REQUEST_URI']) ? preg_match('/^http/', $pathArray['REQUEST_URI']) : false;
   }
 
   /**
@@ -452,10 +180,10 @@ class sfWebRequest extends sfRequest
       $protocol = 'http';
     }
 
-    $host = explode(":", $pathArray['HTTP_HOST']);
+    $host = explode(":", $this->getHost());
     if (count($host) == 1)
     {
-      $host[] = $pathArray['SERVER_PORT'];
+      $host[] = isset($pathArray['SERVER_PORT']) ? $pathArray['SERVER_PORT'] : '';
     }
 
     if ($host[1] == $standardPort || empty($host[1]))
@@ -478,7 +206,7 @@ class sfWebRequest extends sfRequest
     $pathArray = $this->getPathInfoArray();
 
     // simulate PATH_INFO if needed
-    $sf_path_info_key = sfConfig::get('sf_path_info_key', 'PATH_INFO');
+    $sf_path_info_key = $this->options['path_info_key'];
     if (!isset($pathArray[$sf_path_info_key]) || !$pathArray[$sf_path_info_key])
     {
       if (isset($pathArray['REQUEST_URI']))
@@ -495,9 +223,9 @@ class sfWebRequest extends sfRequest
     else
     {
       $pathInfo = $pathArray[$sf_path_info_key];
-      if ($sf_relative_url_root = $this->getRelativeUrlRoot())
+      if ($relativeUrlRoot = $this->getRelativeUrlRoot())
       {
-        $pathInfo = preg_replace('/^'.str_replace('/', '\\/', $sf_relative_url_root).'\//', '', $pathInfo);
+        $pathInfo = preg_replace('/^'.str_replace('/', '\\/', $relativeUrlRoot).'\//', '', $pathInfo);
       }
     }
 
@@ -515,6 +243,19 @@ class sfWebRequest extends sfRequest
     return $pathInfo;
   }
 
+  public function getPathInfoPrefix()
+  {
+    $prefix = $this->getRelativeUrlRoot();
+
+    if (!isset($this->options['no_script_name']) || !$this->options['no_script_name'])
+    {
+      $scriptName = $this->getScriptName();
+      $prefix = is_null($prefix) ? $scriptName : $prefix.'/'.basename($scriptName);
+    }
+
+    return $prefix;
+  }
+
   public function getGetParameters()
   {
     return $this->getParameters;
@@ -530,68 +271,12 @@ class sfWebRequest extends sfRequest
     return $this->requestParameters;
   }
 
-  /**
-   * Moves an uploaded file.
-   *
-   * @param string $name      A file name
-   * @param string $file      An absolute filesystem path to where you would like the
-   *                          file moved. This includes the new filename as well, since
-   *                          uploaded files are stored with random names
-   * @param int    $fileMode  The octal mode to use for the new file
-   * @param bool   $create    Indicates that we should make the directory before moving the file
-   * @param int    $dirMode   The octal mode to use when creating the directory
-   *
-   * @return bool true, if the file was moved, otherwise false
-   *
-   * @throws <b>sfFileException</b> If a major error occurs while attempting to move the file
-   */
-  public function moveFile($name, $file, $fileMode = 0666, $create = true, $dirMode = 0777)
+  public function addRequestParameters($parameters)
   {
-    if (!sfConfig::get('sf_compat_10'))
-    {
-      throw new sfConfigurationException('You must set "compat_10" to true if you want to use this method which is deprecated.');
-    }
+    $this->requestParameters = array_merge($this->requestParameters, $parameters);
+    $this->getParameterHolder()->add($parameters);
 
-    if ($this->hasFile($name) && $this->getFileValue($name, 'error') == UPLOAD_ERR_OK && $this->getFileValue($name, 'size') > 0)
-    {
-      // get our directory path from the destination filename
-      $directory = dirname($file);
-
-      if (!is_readable($directory))
-      {
-        $fmode = 0777;
-
-        if ($create && !@mkdir($directory, $dirMode, true))
-        {
-          // failed to create the directory
-          throw new sfFileException(sprintf('Failed to create file upload directory "%s".', $directory));
-        }
-
-        // chmod the directory since it doesn't seem to work on
-        // recursive paths
-        @chmod($directory, $dirMode);
-      }
-      else if (!is_dir($directory))
-      {
-        // the directory path exists but it's not a directory
-        throw new sfFileException(sprintf('File upload path "%s" exists, but is not a directory.', $directory));
-      }
-      else if (!is_writable($directory))
-      {
-        // the directory isn't writable
-        throw new sfFileException(sprintf('File upload path "%s" is not writable.', $directory));
-      }
-
-      if (@move_uploaded_file($this->getFileValue($name, 'tmp_name'), $file))
-      {
-        // chmod our file
-        @chmod($file, $fileMode);
-
-        return true;
-      }
-    }
-
-    return false;
+    $this->fixParameters();
   }
 
   /**
@@ -639,9 +324,7 @@ class sfWebRequest extends sfRequest
    */
   public function isMethod($method)
   {
-    $pathArray = $this->getPathInfoArray();
-
-    return strtolower($method) == strtolower($this->getMethodName());
+    return strtoupper($method) == $this->getMethod();
   }
 
   /**
@@ -651,9 +334,12 @@ class sfWebRequest extends sfRequest
    */
   public function getMethodName()
   {
-    $pathArray = $this->getPathInfoArray();
+    if ($this->options['logging'])
+    {
+      $this->dispatcher->notify(new sfEvent($this, 'application.log', array('The "sfWebRequest::getMethodName()" method is deprecated, please use "getMethod()" instead.', 'priority' => sfLogger::WARNING)));
+    }
 
-    return isset($pathArray['REQUEST_METHOD']) ? $pathArray['REQUEST_METHOD'] : 'GET';
+    return $this->getMethod();
   }
 
   /**
@@ -853,9 +539,16 @@ class sfWebRequest extends sfRequest
    */
   public function getRelativeUrlRoot()
   {
-    if ($this->relativeUrlRoot === null)
+    if (is_null($this->relativeUrlRoot))
     {
-      $this->relativeUrlRoot = sfConfig::get('sf_relative_url_root', preg_replace('#/[^/]+\.php5?$#', '', $this->getScriptName()));
+      if (!isset($this->options['relative_url_root']))
+      {
+        $this->relativeUrlRoot = preg_replace('#/[^/]+\.php5?$#', '', $this->getScriptName());
+      }
+      else
+      {
+        $this->relativeUrlRoot = $this->options['relative_url_root'];
+      }
     }
 
     return $this->relativeUrlRoot;
@@ -907,12 +600,12 @@ class sfWebRequest extends sfRequest
    *
    * @return  array Path information
    */
-  protected function getPathInfoArray()
+  public function getPathInfoArray()
   {
     if (!$this->pathInfoArray)
     {
       // parse PATH_INFO
-      switch (sfConfig::get('sf_path_info_array', 'SERVER'))
+      switch ($this->options['path_info_array'])
       {
         case 'SERVER':
           $this->pathInfoArray =& $_SERVER;
@@ -983,7 +676,11 @@ class sfWebRequest extends sfRequest
   /**
    * Gets the request format.
    *
-   * If no format is defined by the user, it defaults to the sf_format request parameter if available.
+   * Here is the process to determine the format:
+   *
+   *  * format defined by the user (with setRequestFormat())
+   *  * sf_format request parameter
+   *  * null
    *
    * @return string The request format
    */
@@ -991,23 +688,21 @@ class sfWebRequest extends sfRequest
   {
     if (is_null($this->format))
     {
-      if ($this->getParameter('sf_format'))
-      {
-        $this->setRequestFormat($this->getParameter('sf_format'));
-      }
-      else
-      {
-        $acceptableContentTypes = $this->getAcceptableContentTypes();
-
-        // skip if no acceptable content types or browsers
-        if (isset($acceptableContentTypes[0]) && ('text/xml' != $acceptableContentTypes[0] && 'application/xml' != $acceptableContentTypes[0]))
-        {
-          $this->setRequestFormat($this->getFormat($acceptableContentTypes[0]));
-        }
-      }
+      $this->setRequestFormat($this->getParameter('sf_format'));
     }
 
     return $this->format;
+  }
+
+  /**
+   * Retrieves an array of files.
+   *
+   * @param  string $key  A key
+   * @return array  An associative array of files
+   */
+  static public function getFiles($key = null)
+  {
+    return is_null($key) ? $_FILES : (isset($_FILES[$key]) ? $_FILES[$key] : array());
   }
 
   /**
@@ -1071,6 +766,52 @@ class sfWebRequest extends sfRequest
   }
 
   /**
+   * Returns the remote IP address that made the request.
+   *
+   * @return string The remote IP address
+   */
+  public function getRemoteAddress()
+  {
+    $pathInfo = $this->getPathInfoArray();
+
+    return $pathInfo['REMOTE_ADDR'];
+  }
+
+  /**
+   * Returns an array containing a list of IPs, the first being the client address
+   * and the others the addresses of each proxy that passed the request. The address 
+   * for the last proxy can be retrieved via getRemoteAddress().
+   *
+   * This method returns null if no proxy passed this request. Note that some proxies
+   * do not use this header, and act as if they were the client.
+   *
+   * @return string|null An array of IP from the client and the proxies that passed
+   * the request, or null if no proxy was used.
+   */
+  public function getForwardedFor()
+  {
+    $pathInfo = $this->getPathInfoArray();
+
+    if (empty($pathInfo['HTTP_X_FORWARDED_FOR']))
+    {
+      return null;
+    }
+
+    return explode(', ', $pathInfo['HTTP_X_FORWARDED_FOR']);
+  }
+
+  public function checkCSRFProtection()
+  {
+    $form = new sfForm();
+    $form->bind($form->isCSRFProtected() ? array($form->getCSRFFieldName() => $this->getParameter($form->getCSRFFieldName())) : array());
+
+    if (!$form->isValid())
+    {
+      throw $form->getErrorSchema();
+    }
+  }
+
+  /**
    * Parses the request parameters.
    *
    * This method notifies the request.filter_parameters event.
@@ -1079,40 +820,37 @@ class sfWebRequest extends sfRequest
    */
   protected function parseRequestParameters()
   {
-    return $this->dispatcher->filter(new sfEvent($this, 'request.filter_parameters', array('path_info' => $this->getPathInfo())), array())->getReturnValue();
+    return $this->dispatcher->filter(new sfEvent($this, 'request.filter_parameters', $this->getRequestContext()), array())->getReturnValue();
   }
 
   /**
-   * Loads GET, PATH_INFO and POST data into the parameter list.
+   * Returns the request context used.
    *
+   * @param array An array of values representing the current request
    */
-  protected function loadParameters()
+  public function getRequestContext()
   {
-    // GET parameters
-    $this->getParameters = get_magic_quotes_gpc() ? sfToolkit::stripslashesDeep($_GET) : $_GET;
-    $this->parameterHolder->add($this->getParameters);
+    return array(
+      'path_info'   => $this->getPathInfo(),
+      'prefix'      => $this->getPathInfoPrefix(),
+      'method'      => $this->getMethod(),
+      'format'      => $this->getRequestFormat(),
+      'host'        => $this->getHost(),
+      'is_secure'   => $this->isSecure(),
+      'request_uri' => $this->getUri(),
+    );
+  }
 
-    // additional parameters
-    $this->requestParameters = $this->parseRequestParameters();
-    $this->parameterHolder->add($this->requestParameters);
-
-    // POST parameters
-    $this->postParameters = get_magic_quotes_gpc() ? sfToolkit::stripslashesDeep($_POST) : $_POST;
-    $this->parameterHolder->add($this->postParameters);
-
+  protected function fixParameters()
+  {
     // move symfony parameters to attributes (parameters prefixed with _sf_)
     foreach ($this->parameterHolder->getAll() as $key => $value)
     {
       if (0 === stripos($key, '_sf_'))
       {
         $this->parameterHolder->remove($key);
-        $this->setAttribute($key, $value);
+        $this->setAttribute(substr($key, 1), $value);
       }
-    }
-
-    if (sfConfig::get('sf_logging_enabled'))
-    {
-      $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Request parameters %s', str_replace("\n", '', var_export($this->getParameterHolder()->getAll(), true))))));
     }
   }
 }

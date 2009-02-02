@@ -1,7 +1,7 @@
 <?php
 
 	/**
-	 * $Id$
+	 * $Id: LogWriter.php 325 2007-12-20 15:44:58Z hans $
 	 *
 	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 	 * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,7 +27,7 @@
 	 * Extends the Writer class to output messages to Phing's log
 	 *
 	 * @author Michiel Rook <michiel.rook@gmail.com>
-	 * @version $Id$
+	 * @version $Id: LogWriter.php 325 2007-12-20 15:44:58Z hans $
 	 * @package phing.util
 	 */
 	class LogWriter extends Writer
@@ -39,7 +39,7 @@
 		/**
 		 * Constructs a new LogWriter object
 		 */
-		function __construct(Task $task, $level = PROJECT_MSG_INFO)
+		function __construct(Task $task, $level = Project::MSG_INFO)
 		{
 			$this->task = $task;
 			$this->level = $level;
@@ -93,4 +93,3 @@
 		}
 	}
 
-?>

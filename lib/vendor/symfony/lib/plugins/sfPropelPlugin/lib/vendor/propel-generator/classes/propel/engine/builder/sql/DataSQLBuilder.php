@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id$
+ *  $Id: DataSQLBuilder.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -21,6 +21,7 @@
  */
 
 require_once 'propel/engine/builder/DataModelBuilder.php';
+require_once 'propel/engine/database/model/PropelTypes.php';
 
 /**
  * Baseclass for SQL data dump SQL building classes.
@@ -29,6 +30,56 @@ require_once 'propel/engine/builder/DataModelBuilder.php';
  * @package    propel.engine.builder.sql
  */
 abstract class DataSQLBuilder extends DataModelBuilder {
+
+	/**
+	 * Perform any reset between runs of this builder.
+	 *
+	 * This can be used, for example, to clear any stored start/end SQL.
+	 */
+	public static function reset()
+	{
+		// does nothing by default
+	}
+
+	/**
+	 * Gets any SQL to place at the start of all the row inserts.
+	 *
+	 * @return     string
+	 */
+	public static function getDatabaseStartSql()
+	{
+		return '';
+	}
+
+	/**
+	 * Gets any SQL to place at the end of all the row inserts.
+	 *
+	 * @return     string
+	 */
+	public static function getDatabaseEndSql()
+	{
+		return '';
+	}
+
+	/**
+	 * Gets any SQL to place before row inserts for a new table.
+	 *
+	 * @return     string
+	 */
+	public function getTableStartSql()
+	{
+		return '';
+	}
+
+	/**
+	 * Gets any SQL to place at the end of row inserts for a table.
+	 *
+	 * @return     string
+	 */
+	public function getTableEndSql()
+	{
+		return '';
+	}
 
 	/**
 	 * The main method in this class, returns the SQL for INSERTing data into a row.
@@ -41,7 +92,7 @@ abstract class DataSQLBuilder extends DataModelBuilder {
 		$platform = $this->getPlatform();
 		$table = $this->getTable();
 
-		$sql .= "INSERT INTO ".$this->quoteIdentifier($this->getTable()->getName())." (";
+		$sql .= "INSERT INTO ".$this->quoteIdentifier($this->prefixTablename($this->getTable()->getName()))." (";
 
 		// add column names to SQL
 		$colNames = array();
@@ -73,9 +124,7 @@ abstract class DataSQLBuilder extends DataModelBuilder {
 	protected function getColumnValueSql(ColumnValue $colValue)
 	{
 		$column = $colValue->getColumn();
-		$creoleTypeString = PropelTypes::getCreoleType($column->getPropelType());
-		$creoleTypeCode = CreoleTypes::getCreoleCode($creoleTypeString);
-		$method = 'get' . CreoleTypes::getAffix($creoleTypeCode) . 'Sql';
+		$method = 'get' . $column->getPhpNative() . 'Sql';
 		return $this->$method($colValue->getValue());
 	}
 
@@ -102,9 +151,9 @@ abstract class DataSQLBuilder extends DataModelBuilder {
 	{
 		// they took magic __toString() out of PHP5.0.0; this sucks
 		if (is_object($blob)) {
-			return "'" . $this->escape($blob->__toString()) . "'";
+			return $this->getPlatform()->quote($blob->__toString());
 		} else {
-			return "'" . $this->escape($blob) . "'";
+			return $this->getPlatform()->quote($blob);
 		}
 	}
 
@@ -117,9 +166,9 @@ abstract class DataSQLBuilder extends DataModelBuilder {
 	{
 		// they took magic __toString() out of PHP5.0.0; this sucks
 		if (is_object($clob)) {
-			return "'" . $this->escape($clob->__toString()) . "'";
+			return $this->getPlatform()->quote($clob->__toString());
 		} else {
-			return "'" . $this->escape($clob) . "'";
+			return $this->getPlatform()->quote($clob);
 		}
 	}
 
@@ -189,7 +238,7 @@ abstract class DataSQLBuilder extends DataModelBuilder {
 	 */
 	protected function getStringSql($value)
 	{
-		return "'" . $this->getPlatform()->escapeText($value) . "'";
+		return $this->getPlatform()->quote($value);
 	}
 
 	/**

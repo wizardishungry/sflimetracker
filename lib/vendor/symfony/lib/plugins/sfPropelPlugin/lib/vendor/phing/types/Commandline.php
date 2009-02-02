@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: Commandline.php 227 2007-08-28 02:17:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -357,9 +357,9 @@ class Commandline {
         if (count($args) > $offset) {
             $buf .= "s";
         }
-        $buf .= ":" . Phing::getProperty("line.separator");
+        $buf .= ":" . PHP_EOL;
         for ($i = $offset, $alen=count($args); $i < $alen; $i++) {
-            $buf .= "'" . $args[$i] . "'" . Phing::getProperty("line.separator");
+            $buf .= "'" . $args[$i] . "'" . PHP_EOL;
         }
         $buf .= self::DISCLAIMER;
         return $buf;

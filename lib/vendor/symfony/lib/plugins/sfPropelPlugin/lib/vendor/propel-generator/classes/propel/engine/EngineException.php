@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: EngineException.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: EngineException.php 521 2007-01-05 13:29:36Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,7 +27,7 @@ require_once 'phing/BuildException.php';
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Daniel Rall <dlr@collab.net> (Torque)
  * @author     Jason van Zyl <jvz@apache.org> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 521 $
  * @package    propel.engine
  */
 class EngineException extends BuildException {}

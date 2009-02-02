@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: Persistent.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: Persistent.php 713 2007-10-24 07:22:40Z dwhittle $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,7 +25,7 @@
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     John D. McNally <jmcnally@collab.net> (Torque)
  * @author     Fedor K. <fedor@apache.org> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 713 $
  * @package    propel.om
  */
 interface Persistent {
@@ -102,17 +102,17 @@ interface Persistent {
 
 	/**
 	 * Deletes the object.
-	 * @param      Connection $con
+	 * @param      PropelPDO $con
 	 * @return     void
 	 * @throws     Exception
 	 */
-	public function delete($con = null);
+	public function delete(PropelPDO $con = null);
 
 	/**
 	 * Saves the object.
-	 * @param      Connection $con
+	 * @param      PropelPDO $con
 	 * @return     void
 	 * @throws     Exception
 	 */
-	public function save($con = null);
+	public function save(PropelPDO $con = null);
 }

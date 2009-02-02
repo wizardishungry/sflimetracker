@@ -136,7 +136,8 @@ function get_component($moduleName, $componentName, $vars = array())
   $context = sfContext::getInstance();
   $actionName = '_'.$componentName;
 
-  $view = new sfPartialView($context, $moduleName, $actionName, '');
+  $class = sfConfig::get('mod_'.$moduleName.'_partial_view_class', 'sf').'PartialView';
+  $view = new $class($context, $moduleName, $actionName, '');
   $view->setPartialVars($vars);
 
   if ($retval = $view->getCache())
@@ -210,7 +211,8 @@ function get_partial($templateName, $vars = array())
   }
   $actionName = '_'.$templateName;
 
-  $view = new sfPartialView($context, $moduleName, $actionName, '');
+  $class = sfConfig::get('mod_'.$moduleName.'_partial_view_class', 'sf').'PartialView';
+  $view = new $class($context, $moduleName, $actionName, '');
   $view->setPartialVars($vars);
 
   return $view->render();
@@ -352,7 +354,8 @@ function _call_component($moduleName, $componentName, $vars)
   // load component's module config file
   require($context->getConfigCache()->checkConfig('modules/'.$moduleName.'/config/module.yml'));
 
-  $componentInstance->getVarHolder()->add($vars);
+  // pass unescaped vars to the component
+  $componentInstance->getVarHolder()->add(sfOutputEscaper::unescape($vars));
 
   // dispatch component
   $componentToRun = 'execute'.ucfirst($componentName);

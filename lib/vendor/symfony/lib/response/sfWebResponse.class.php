@@ -20,6 +20,13 @@
  */
 class sfWebResponse extends sfResponse
 {
+  const
+    FIRST  = 'first',
+    MIDDLE = '',
+    LAST   = 'last',
+    ALL    = 'ALL',
+    RAW    = 'RAW';
+
   protected
     $cookies     = array(),
     $statusCode  = 200,
@@ -108,6 +115,11 @@ class sfWebResponse extends sfResponse
       $this->options['charset'] = 'utf-8';
     }
 
+    if (!isset($this->options['send_http_headers']))
+    {
+      $this->options['send_http_headers'] = true;
+    }
+
     if (!isset($this->options['http_protocol']))
     {
       $this->options['http_protocol'] = 'HTTP/1.0';
@@ -167,7 +179,7 @@ class sfWebResponse extends sfResponse
       }
     }
 
-    $this->cookies[] = array(
+    $this->cookies[$name] = array(
       'name'     => $name,
       'value'    => $value,
       'expire'   => $expire,
@@ -192,9 +204,19 @@ class sfWebResponse extends sfResponse
   }
 
   /**
+   * Retrieves status text for the current web response.
+   *
+   * @return string Status text
+   */
+  public function getStatusText()
+  {
+    return $this->statusText;
+  }
+
+  /**
    * Retrieves status code for the current web response.
    *
-   * @return string Status code
+   * @return integer Status code
    */
   public function getStatusCode()
   {
@@ -278,6 +300,16 @@ class sfWebResponse extends sfResponse
   }
 
   /**
+   * Gets the current charset as defined by the content type.
+   *
+   * @return string The current charset
+   */
+  public function getCharset()
+  {
+    return $this->options['charset'];
+  }
+
+  /**
    * Gets response content type.
    *
    * @return array
@@ -293,7 +325,7 @@ class sfWebResponse extends sfResponse
    */
   public function sendHttpHeaders()
   {
-    if (sfConfig::get('sf_test'))
+    if (!$this->options['send_http_headers'])
     {
       return;
     }
@@ -318,21 +350,14 @@ class sfWebResponse extends sfResponse
 
       if ($value != '' && $this->options['logging'])
       {
-        $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Send header "%s": "%s"', $name, $value))));
+        $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Send header "%s: %s"', $name, $value))));
       }
     }
 
     // cookies
     foreach ($this->cookies as $cookie)
     {
-      if (version_compare(phpversion(), '5.2', '>='))
-      {
-        setrawcookie($cookie['name'], $cookie['value'], $cookie['expire'], $cookie['path'], $cookie['domain'], $cookie['secure'], $cookie['httpOnly']);
-      }
-      else
-      {
-        setrawcookie($cookie['name'], $cookie['value'], $cookie['expire'], $cookie['path'], $cookie['domain'], $cookie['secure']);
-      }
+      setrawcookie($cookie['name'], $cookie['value'], $cookie['expire'], $cookie['path'], $cookie['domain'], $cookie['secure'], $cookie['httpOnly']);
 
       if ($this->options['logging'])
       {
@@ -382,7 +407,7 @@ class sfWebResponse extends sfResponse
    *
    * @return string Formatted date
    */
-  public function getDate($timestamp, $type = 'rfc1123')
+  static public function getDate($timestamp, $type = 'rfc1123')
   {
     $type = strtolower($type);
 
@@ -415,7 +440,7 @@ class sfWebResponse extends sfResponse
     $currentHeaders = array();
     if ($vary)
     {
-      $currentHeaders = split('/\s*,\s*/', $vary);
+      $currentHeaders = preg_split('/\s*,\s*/', $vary);
     }
     $header = $this->normalizeHeaderName($header);
 
@@ -438,7 +463,7 @@ class sfWebResponse extends sfResponse
     $currentHeaders = array();
     if ($cacheControl)
     {
-      foreach (split('/\s*,\s*/', $cacheControl) as $tmp)
+      foreach (preg_split('/\s*,\s*/', $cacheControl) as $tmp)
       {
         $tmp = explode('=', $tmp);
         $currentHeaders[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : null;
@@ -576,93 +601,125 @@ class sfWebResponse extends sfResponse
   /**
    * Retrieves stylesheets for the current web response.
    *
-   * @param  string  $position
+   * By default, the position is sfWebResponse::ALL,
+   * and the method returns all stylesheets ordered by position.
    *
-   * @return string Stylesheets
+   * @param  string  $position The position
+   *
+   * @return array   An associative array of stylesheet files as keys and options as values
    */
-  public function getStylesheets($position = '')
+  public function getStylesheets($position = self::ALL)
   {
-    if ($position == 'ALL')
+    if (self::ALL === $position)
+    {
+      $stylesheets = array();
+      foreach ($this->getPositions() as $position)
+      {
+        foreach ($this->stylesheets[$position] as $file => $options)
+        {
+          $stylesheets[$file] = $options;
+        }
+      }
+
+      return $stylesheets;
+    }
+    else if (self::RAW === $position)
     {
       return $this->stylesheets;
     }
 
     $this->validatePosition($position);
 
-    return isset($this->stylesheets[$position]) ? $this->stylesheets[$position] : array();
+    return $this->stylesheets[$position];
   }
 
   /**
    * Adds a stylesheet to the current web response.
    *
-   * @param string $css       Stylesheet
+   * @param string $file      The stylesheet file
    * @param string $position  Position
    * @param string $options   Stylesheet options
    */
-  public function addStylesheet($css, $position = '', $options = array())
+  public function addStylesheet($file, $position = '', $options = array())
   {
     $this->validatePosition($position);
 
-    $this->stylesheets[$position][$css] = $options;
+    $this->stylesheets[$position][$file] = $options;
   }
 
   /**
    * Removes a stylesheet from the current web response.
    *
-   * @param string $css       Stylesheet
-   * @param string $position  Position
+   * @param string $css The stylesheet file to remove
    */
-  public function removeStylesheet($css, $position = '')
+  public function removeStylesheet($file)
   {
-    $this->validatePosition($position);
-
-    unset($this->stylesheets[$position][$css]);
+    foreach ($this->getPositions() as $position)
+    {
+      unset($this->stylesheets[$position][$file]);
+    }
   }
 
   /**
-   * Retrieves javascript code from the current web response.
+   * Retrieves javascript files from the current web response.
    *
-   * @param  string $position  Position
+   * By default, the position is sfWebResponse::ALL,
+   * and the method returns all javascripts ordered by position.
    *
-   * @return string Javascript code
+   * @param  string $position  The position
+   *
+   * @return array An associative array of javascript files as keys and options as values
    */
-  public function getJavascripts($position = '')
+  public function getJavascripts($position = self::ALL)
   {
-    if ($position == 'ALL')
+    if (self::ALL === $position)
+    {
+      $javascripts = array();
+      foreach ($this->getPositions() as $position)
+      {
+        foreach ($this->javascripts[$position] as $file => $options)
+        {
+          $javascripts[$file] = $options;
+        }
+      }
+
+      return $javascripts;
+    }
+    else if (self::RAW === $position)
     {
       return $this->javascripts;
     }
 
     $this->validatePosition($position);
 
-    return isset($this->javascripts[$position]) ? $this->javascripts[$position] : array();
+    return $this->javascripts[$position];
   }
 
   /**
    * Adds javascript code to the current web response.
    *
-   * @param string $js        Javascript code
+   * @param string $gile      The JavaScript file
    * @param string $position  Position
    * @param string $options   Javascript options
    */
-  public function addJavascript($js, $position = '', $options = array())
+  public function addJavascript($file, $position = '', $options = array())
   {
     $this->validatePosition($position);
 
-    $this->javascripts[$position][$js] = $options;
+    $this->javascripts[$position][$file] = $options;
   }
 
   /**
-   * Removes javascript code from the current web response.
+   * Removes a JavaScript file from the current web response.
    *
-   * @param string $js        Javascript code
-   * @param string $position  Position
+   * @param string $file The Javascript file to remove
    */
-  public function removeJavascript($js, $position = '')
+  public function removeJavascript($file)
   {
-    $this->validatePosition($position);
-
-    unset($this->javascripts[$position][$js]);
+    foreach ($this->getPositions() as $position)
+    {
+      unset($this->javascripts[$position][$file]);
+    }
   }
 
   /**
@@ -693,13 +750,7 @@ class sfWebResponse extends sfResponse
    */
   public function getCookies()
   {
-    $cookies = array();
-    foreach ($this->cookies as $cookie)
-    {
-      $cookies[$cookie['name']] = $cookie;
-    }
-
-    return $cookies;
+    return $this->cookies;
   }
 
   /**
@@ -731,8 +782,8 @@ class sfWebResponse extends sfResponse
     $this->headers     = $response->getHttpHeaders();
     $this->metas       = $response->getMetas();
     $this->httpMetas   = $response->getHttpMetas();
-    $this->stylesheets = $response->getStylesheets('ALL');
-    $this->javascripts = $response->getJavascripts('ALL');
+    $this->stylesheets = $response->getStylesheets(self::RAW);
+    $this->javascripts = $response->getJavascripts(self::RAW);
     $this->slots       = $response->getSlots();
   }
 
@@ -796,6 +847,12 @@ class sfWebResponse extends sfResponse
     if (false === stripos($contentType, 'charset') && (0 === stripos($contentType, 'text/') || strlen($contentType) - 3 === strripos($contentType, 'xml')))
     {
       $contentType .= '; charset='.$this->options['charset'];
+    }
+
+    // change the charset for the response
+    if (preg_match('/charset\s*=\s*(.+)\s*$/', $contentType, $match))
+    {
+      $this->options['charset'] = $match[1];
     }
 
     return $contentType;

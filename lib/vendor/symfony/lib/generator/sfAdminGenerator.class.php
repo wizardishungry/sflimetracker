@@ -26,6 +26,7 @@
 abstract class sfAdminGenerator extends sfCrudGenerator
 {
   protected
+    $formObject = null,
     $fields = array();
 
   /**
@@ -282,12 +283,12 @@ abstract class sfAdminGenerator extends sfCrudGenerator
     $params = array_merge(array('control_name' => $this->getSingularName().'['.$column->getName().']'), $params);
 
     // default parameter values
-    $type = $column->getCreoleType();
-    if ($type == CreoleTypes::DATE)
+    $type = $column->getType();
+    if ($type == PropelColumnTypes::DATE)
     {
       $params = array_merge(array('rich' => true, 'calendar_button_img' => sfConfig::get('sf_admin_web_dir').'/images/date.png'), $params);
     }
-    else if ($type == CreoleTypes::TIMESTAMP)
+    else if ($type == PropelColumnTypes::TIMESTAMP)
     {
       $params = array_merge(array('rich' => true, 'withtime' => true, 'calendar_button_img' => sfConfig::get('sf_admin_web_dir').'/images/date.png'), $params);
     }
@@ -599,7 +600,7 @@ EOF;
     $user_params = is_array($user_params) ? $user_params : sfToolkit::stringToArray($user_params);
     $params      = $user_params ? array_merge($params, $user_params) : $params;
 
-    $type = $column->getCreoleType();
+    $type = $column->getType();
     
     $columnGetter = $this->getColumnGetter($column, true);
 
@@ -611,12 +612,12 @@ EOF;
     {
       return "get_partial('".$column->getName()."', array('type' => 'list', '{$this->getSingularName()}' => \${$this->getSingularName()}))";
     }
-    else if ($type == CreoleTypes::DATE || $type == CreoleTypes::TIMESTAMP)
+    else if ($type == PropelColumnTypes::DATE || $type == PropelColumnTypes::TIMESTAMP)
     {
-      $format = isset($params['date_format']) ? $params['date_format'] : ($type == CreoleTypes::DATE ? 'D' : 'f');
+      $format = isset($params['date_format']) ? $params['date_format'] : ($type == PropelColumnTypes::DATE ? 'D' : 'f');
       return "($columnGetter !== null && $columnGetter !== '') ? format_date($columnGetter, \"$format\") : ''";
     }
-    elseif ($type == CreoleTypes::BOOLEAN)
+    elseif ($type == PropelColumnTypes::BOOLEAN)
     {
       return "$columnGetter ? image_tag(sfConfig::get('sf_admin_web_dir').'/images/tick.png') : '&nbsp;'";
     }
@@ -649,7 +650,7 @@ EOF;
       return "get_partial('".$column->getName()."', array('type' => 'filter', 'filters' => \$filters))";
     }
 
-    $type = $column->getCreoleType();
+    $type = $column->getType();
 
     $default_value = "isset(\$filters['".$column->getName()."']) ? \$filters['".$column->getName()."'] : null";
     $unquotedName = 'filters['.$column->getName().']';
@@ -661,19 +662,19 @@ EOF;
       return "object_select_tag($default_value, null, $params)";
 
     }
-    else if ($type == CreoleTypes::DATE)
+    else if ($type == PropelColumnTypes::DATE)
     {
       // rich=false not yet implemented
       $params = $this->getObjectTagParams($params, array('rich' => true, 'calendar_button_img' => sfConfig::get('sf_admin_web_dir').'/images/date.png'));
       return "input_date_range_tag($name, $default_value, $params)";
     }
-    else if ($type == CreoleTypes::TIMESTAMP)
+    else if ($type == PropelColumnTypes::TIMESTAMP)
     {
       // rich=false not yet implemented
       $params = $this->getObjectTagParams($params, array('rich' => true, 'withtime' => true, 'calendar_button_img' => sfConfig::get('sf_admin_web_dir').'/images/date.png'));
       return "input_date_range_tag($name, $default_value, $params)";
     }
-    else if ($type == CreoleTypes::BOOLEAN)
+    else if ($type == PropelColumnTypes::BOOLEAN)
     {
       $defaultIncludeCustom = '__("yes or no")';
 
@@ -687,18 +688,18 @@ EOF;
 
       return "select_tag($name, $options, $params)";
     }
-    else if ($type == CreoleTypes::CHAR || $type == CreoleTypes::VARCHAR || $type == CreoleTypes::TEXT || $type == CreoleTypes::LONGVARCHAR)
+    else if ($type == PropelColumnTypes::CHAR || $type == PropelColumnTypes::VARCHAR || $type == PropelColumnTypes::LONGVARCHAR)
     {
       $size = ($column->getSize() < 15 ? $column->getSize() : 15);
       $params = $this->getObjectTagParams($params, array('size' => $size));
       return "input_tag($name, $default_value, $params)";
     }
-    else if ($type == CreoleTypes::INTEGER || $type == CreoleTypes::TINYINT || $type == CreoleTypes::SMALLINT || $type == CreoleTypes::BIGINT)
+    else if ($type == PropelColumnTypes::INTEGER || $type == PropelColumnTypes::TINYINT || $type == PropelColumnTypes::SMALLINT || $type == PropelColumnTypes::BIGINT)
     {
       $params = $this->getObjectTagParams($params, array('size' => 7));
       return "input_tag($name, $default_value, $params)";
     }
-    else if ($type == CreoleTypes::FLOAT || $type == CreoleTypes::DOUBLE || $type == CreoleTypes::DECIMAL || $type == CreoleTypes::NUMERIC || $type == CreoleTypes::REAL)
+    else if ($type == PropelColumnTypes::FLOAT || $type == PropelColumnTypes::DOUBLE || $type == PropelColumnTypes::DECIMAL || $type == PropelColumnTypes::NUMERIC || $type == PropelColumnTypes::REAL)
     {
       $params = $this->getObjectTagParams($params, array('size' => 7));
       return "input_tag($name, $default_value, $params)";
@@ -717,9 +718,24 @@ EOF;
    */
   public function getFormObject()
   {
-    $class = $this->getClassName().'Form';
+    if (is_null($this->formObject))
+    {
+      $class = $this->getFormClassName();
 
-    return new $class();
+      $this->formObject = new $class();
+    }
+
+    return $this->formObject;
+  }
+
+  /**
+   * Gets the form class name
+   *
+   * @return string The form class name associated with this generator
+   */
+  public function getFormClassName()
+  {
+    return isset($this->params['form_class']) ? $this->params['form_class'] : $this->getClassName().'Form';
   }
 
   /**
@@ -776,6 +792,23 @@ EOF;
     }
 
     return $last;
+  }
+
+  /**
+   * Gets the HTML to add to the form tag if the form is multipart.
+   *
+   * @return string
+   */
+  public function getFormMultipartHtml()
+  {
+    if (isset($this->params['non_verbose_templates']) && $this->params['non_verbose_templates'])
+    {
+      return '[?php $form->isMultipart() and print \' enctype="multipart/form-data"\' ?]';
+    }
+    else
+    {
+      return $this->getFormObject()->isMultipart() ? ' enctype="multipart/form-data"' : '';
+    }
   }
 
   /**

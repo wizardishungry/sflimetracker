@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: Validator.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: Validator.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,7 +28,7 @@ include_once 'propel/engine/database/model/Rule.php';
  * Validator.
  *
  * @author     Michael Aichler <aichler@mediacluster.de> (Propel)
- * @version    $Revision: 536 $
+ * @version    $Revision: 989 $
  * @package    propel.engine.database.model
  */
 class Validator extends XMLElement {
@@ -36,21 +36,33 @@ class Validator extends XMLElement {
 	const TRANSLATE_NONE = "none";
 	const TRANSLATE_GETTEXT = "gettext";
 
-	private $columnName;
+	/**
+	 * The column this validator applies to.
+	 *
+	 * @var        Column
+	 */
 	private $column;
-	private $ruleList;
-	private $translate;
-	private $table;
 
 	/**
-	 * Creates a new column and set the name
+	 * The rules for the validation.
 	 *
-	 * @param      name validator name
+	 * @var        array Rule[]
 	 */
-	public function __construct()
-	{
-		$this->ruleList = array();
-	}
+	private $ruleList = array();
+
+	/**
+	 * The translation mode.
+	 *
+	 * @var        string
+	 */
+	private $translate;
+
+	/**
+	 * Parent table.
+	 *
+	 * @var        Table
+	 */
+	private $table;
 
 	/**
 	 * Sets up the Validator object based on the attributes that were passed to loadFromXML().
@@ -58,7 +70,7 @@ class Validator extends XMLElement {
 	 */
 	protected function setupObject()
 	{
-		$this->columnName = $this->getAttribute("column");
+		$this->column = $this->getTable()->getColumn($this->getAttribute("column"));
 		$this->translate = $this->getAttribute("translate", $this->getTable()->getDatabase()->getDefaultTranslateMethod());;
 	}
 
@@ -101,7 +113,7 @@ class Validator extends XMLElement {
 	 */
 	public function getColumnName()
 	{
-		return $this->columnName;
+		return $this->column->getName();
 	}
 
 	/**
@@ -162,25 +174,21 @@ class Validator extends XMLElement {
 	}
 
 	/**
-	 * Gets XML (string) representation of this Validator.
-	 * @return     string
+	 * @see        XMLElement::appendXml(DOMNode)
 	 */
-	public function toString()
+	public function appendXml(DOMNode $node)
 	{
-		$result = "<validator column=\"" . $this->columnName . "\"";
+		$doc = ($node instanceof DOMDocument) ? $node : $node->ownerDocument;
+
+		$valNode = $node->appendChild($doc->createElement('validator'));
+		$valNode->setAttribute('column', $this->getColumnName());
+
 		if ($this->translate !== null) {
-			$result .= " translate=\"".$this->translate."\"";
-		}
-		$result .= ">\n";
-
-		if ($this->ruleList !== null) {
-			for($i=0,$_i=count($this->ruleList); $i < $_i; $i++) {
-				$result .= $this->ruleList[$i]->toString();
-			}
+			$valNode->setAttribute('translate', $this->translate);
 		}
 
-		$result .= "</validator>\n";
-
-		return $result;
+		foreach ($this->ruleList as $rule) {
+			$rule->appendXml($valNode);
+		}
 	}
 }

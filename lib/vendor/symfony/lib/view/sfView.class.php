@@ -112,12 +112,7 @@ abstract class sfView
     $this->context    = $context;
     $this->dispatcher = $context->getEventDispatcher();
 
-    if (sfConfig::get('sf_logging_enabled'))
-    {
-      $this->dispatcher->notify(new sfEvent($this, 'application.log', array(sprintf('Initialize view for "%s/%s"', $moduleName, $actionName))));
-    }
-
-    sfOutputEscaper::markClassAsSafe('sfForm');
+    sfOutputEscaper::markClassesAsSafe(array('sfForm', 'sfModelGeneratorHelper'));
 
     $this->attributeHolder = $this->initializeAttributeHolder();
 
@@ -131,11 +126,15 @@ abstract class sfView
       {
         $this->setExtension('.'.$format.$this->getExtension());
       }
-
+      
       if ($mimeType = $request->getMimeType($format))
       {
         $this->context->getResponse()->setContentType($mimeType);
-        $this->setDecorator(false);
+        
+        if ('html' != $format)
+        {
+          $this->setDecorator(false);
+        }
       }
 
       $this->dispatcher->notify(new sfEvent($this, 'view.configure_format', array('format' => $format, 'response' => $context->getResponse(), 'request' => $context->getRequest())));
@@ -360,7 +359,20 @@ abstract class sfView
 
     if (!is_readable($this->directory.'/'.$this->template))
     {
-      throw new sfRenderException(sprintf('The template "%s" does not exist or is unreadable in "%s".', $this->template, $this->directory));
+      // 404?
+      if ('404' == $this->context->getResponse()->getStatusCode())
+      {
+        // use default exception templates
+        $this->template = sfException::getTemplatePathForError($this->context->getRequest()->getRequestFormat(), false);
+        $this->directory = dirname($this->template);
+        $this->template = basename($this->template);
+        $this->setAttribute('code', '404');
+        $this->setAttribute('text', 'Not Found');
+      }
+      else
+      {
+        throw new sfRenderException(sprintf('The template "%s" does not exist or is unreadable in "%s".', $this->template, $this->directory));
+      }
     }
 
     // check to see if this is a decorator template

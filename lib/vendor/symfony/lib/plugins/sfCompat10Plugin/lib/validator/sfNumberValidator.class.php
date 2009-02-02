@@ -27,14 +27,11 @@
  * # <b>type_error</b> - [Input is not a number] - An error message to use when
  *                                                 input is not a number.
  *
- * WARNING: This class is deprecated and will be removed in symfony 1.2.
- *
  * @package    symfony
  * @subpackage validator
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Sean Kerr <sean@code-box.org>
  * @version    SVN: $Id$
- * @deprecated Deprecated since symfony 1.1
  */
 class sfNumberValidator extends sfValidator
 {

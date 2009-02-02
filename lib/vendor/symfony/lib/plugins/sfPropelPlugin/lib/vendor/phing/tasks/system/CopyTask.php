@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: CopyTask.php 235 2007-09-05 18:42:02Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -33,7 +33,7 @@ include_once 'phing/mappers/FlattenMapper.php';
  * exist. It is possible to explictly overwrite existing files.
  *
  * @author   Andreas Aderhold, andi@binarycloud.com
- * @version  $Revision: 1.16 $ $Date: 2006-06-12 21:46:05 +0200 (Mon, 12 Jun 2006) $
+ * @version  $Revision: 1.16 $ $Date: 2007-09-05 14:42:02 -0400 (Wed, 05 Sep 2007) $
  * @package  phing.tasks.system
  */
 class CopyTask extends Task {
@@ -49,11 +49,12 @@ class CopyTask extends Task {
 
     protected $fileCopyMap   = array(); // asoc array containing mapped file names
     protected $dirCopyMap    = array(); // asoc array containing mapped file names
+    protected $completeDirMap= array(); // asoc array containing complete dir names
     protected $fileUtils     = null;    // a instance of fileutils
     protected $filesets      = array(); // all fileset objects assigned to this task
     protected $filterChains  = array(); // all filterchains objects assigned to this task
 
-    protected $verbosity     = PROJECT_MSG_VERBOSE;
+    protected $verbosity     = Project::MSG_VERBOSE;
 
     /**
      * Sets up this object internal stuff. i.e. the Fileutils instance
@@ -84,9 +85,9 @@ class CopyTask extends Task {
      */
     function setVerbose($verbosity) {
         if ($verbosity) {
-            $this->verbosity = PROJECT_MSG_INFO;
+            $this->verbosity = Project::MSG_INFO;
         } else {
-            $this->verbosity = PROJECT_MSG_VERBOSE;
+            $this->verbosity = Project::MSG_VERBOSE;
         }
     }
     
@@ -231,6 +232,12 @@ class CopyTask extends Task {
             $fromDir  = $fs->getDir($project);
             $srcFiles = $ds->getIncludedFiles();
             $srcDirs  = $ds->getIncludedDirectories();
+            
+            if (!$this->flatten && $this->mapperElement === null)
+            {
+				$this->completeDirMap[$fromDir->getAbsolutePath()] = $this->destDir->getAbsolutePath();
+			}
+            
             $this->_scan($fromDir, $this->destDir, $srcFiles, $srcDirs);
         }
 
@@ -249,7 +256,7 @@ class CopyTask extends Task {
      * @return  void
      * @throws  BuildException
      */
-    private function validateAttributes() {
+    protected function validateAttributes() {
     
         if ($this->file === null && count($this->filesets) === 0) {
             throw new BuildException("CopyTask. Specify at least one source - a file or a fileset.");
@@ -336,7 +343,7 @@ class CopyTask extends Task {
      * @return  void
      * @throws  BuildException
      */
-    private function doWork() {
+    protected function doWork() {
 		
 		// These "slots" allow filters to retrieve information about the currently-being-process files		
 		$fromSlot = $this->getRegisterSlot("currentFromFile");
@@ -373,7 +380,7 @@ class CopyTask extends Task {
 			
                     $count++;
                 } catch (IOException $ioe) {
-                    $this->log("Failed to copy " . $from . " to " . $to . ": " . $ioe->getMessage(), PROJECT_MSG_ERR);
+                    $this->log("Failed to copy " . $from . " to " . $to . ": " . $ioe->getMessage(), Project::MSG_ERR);
                 }
             }
         }
@@ -386,7 +393,7 @@ class CopyTask extends Task {
                 $d = new PhingFile((string) $destdir);
                 if (!$d->exists()) {
                     if (!$d->mkdirs()) {
-                        $this->log("Unable to create directory " . $d->__toString(), PROJECT_MSG_ERR);
+                        $this->log("Unable to create directory " . $d->__toString(), Project::MSG_ERR);
                     } else {
                         $count++;
                     }

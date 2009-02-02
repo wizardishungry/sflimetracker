@@ -3,7 +3,7 @@
 /*
  * This file is part of the symfony package.
  * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
- * 
+ *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -25,37 +25,37 @@ $b->
   responseContains('foo')->
 
   get('/exception/throwsException')->
-  isStatusCode(200)->
+  isStatusCode(500)->
   isRequestParameter('module', 'exception')->
   isRequestParameter('action', 'throwsException')->
   throwsException('Exception')->
 
   get('/exception/throwsException')->
-  isStatusCode(200)->
+  isStatusCode(500)->
   isRequestParameter('module', 'exception')->
   isRequestParameter('action', 'throwsException')->
   throwsException('Exception', '/Exception message/')->
 
   get('/exception/throwsException')->
-  isStatusCode(200)->
+  isStatusCode(500)->
   isRequestParameter('module', 'exception')->
   isRequestParameter('action', 'throwsException')->
   throwsException('Exception', '/message/')->
 
   get('/exception/throwsException')->
-  isStatusCode(200)->
+  isStatusCode(500)->
   isRequestParameter('module', 'exception')->
   isRequestParameter('action', 'throwsException')->
   throwsException(null, '!/sfException/')->
 
   get('/exception/throwsSfException')->
-  isStatusCode(200)->
+  isStatusCode(500)->
   isRequestParameter('module', 'exception')->
   isRequestParameter('action', 'throwsSfException')->
   throwsException('sfException')->
 
   get('/exception/throwsSfException')->
-  isStatusCode(200)->
+  isStatusCode(500)->
   isRequestParameter('module', 'exception')->
   isRequestParameter('action', 'throwsSfException')->
   throwsException('sfException', 'sfException message')
@@ -75,7 +75,7 @@ try
   $b->checkResponseElement('h1', 'text');
   $b->test()->fail('The DOM is not accessible if the response content type is not HTML');
 }
-catch (sfException $e)
+catch (LogicException $e)
 {
   $b->test()->pass('The DOM is not accessible if the response content type is not HTML');
 }
@@ -84,9 +84,111 @@ catch (sfException $e)
 $b->
   get('/browser/responseHeader')->
   isStatusCode()->
-  isResponseHeader('content-type', 'text/plain; charset=utf-8')->
-  isResponseHeader('foo', 'bar')->
-  isResponseHeader('foo', 'foobar')
+  with('response')->begin()->
+    isHeader('content-type', 'text/plain; charset=utf-8')->
+    isHeader('content-type', '#text/plain#')->
+    isHeader('content-type', '!#text/html#')->
+    isHeader('foo', 'bar')->
+    isHeader('foo', 'foobar')->
+  end()
+;
+
+// cookies
+$b->
+  setCookie('foo', 'bar')->
+  setCookie('bar', 'foo')->
+  setCookie('foofoo', 'foo', time() - 10)->
+
+  get('/cookie')->
+  with('request')->begin()->
+    hasCookie('foofoo', false)->
+    hasCookie('foo')->
+    isCookie('foo', 'bar')->
+    isCookie('foo', '/a/')->
+    isCookie('foo', '!/z/')->
+  end()->
+  checkResponseElement('p', 'bar.foo-')->
+  get('/cookie')->
+  with('request')->begin()->
+    hasCookie('foo')->
+    isCookie('foo', 'bar')->
+    isCookie('foo', '/a/')->
+    isCookie('foo', '!/z/')->
+  end()->
+  checkResponseElement('p', 'bar.foo-')->
+  removeCookie('foo')->
+  get('/cookie')->
+  with('request')->begin()->
+    hasCookie('foo', false)->
+    hasCookie('bar')->
+  end()->
+  checkResponseElement('p', '.foo-')->
+  clearCookies()->
+  get('/cookie')->
+  with('request')->begin()->
+    hasCookie('foo', false)->
+    hasCookie('bar', false)->
+  end()->
+  checkResponseElement('p', '.-')
+;
+
+$b->
+  setCookie('foo', 'bar')->
+  setCookie('bar', 'foo')->
+
+  get('/cookie/setCookie')->
+
+  get('/cookie')->
+  with('request')->begin()->
+    hasCookie('foo')->
+    isCookie('foo', 'bar')->
+    isCookie('foo', '/a/')->
+    isCookie('foo', '!/z/')->
+  end()->
+  checkResponseElement('p', 'bar.foo-barfoo')->
+  get('/cookie')->
+  with('request')->begin()->
+    hasCookie('foo')->
+    isCookie('foo', 'bar')->
+    isCookie('foo', '/a/')->
+    isCookie('foo', '!/z/')->
+  end()->
+  checkResponseElement('p', 'bar.foo-barfoo')->
+  removeCookie('foo')->
+  get('/cookie')->
+  with('request')->begin()->
+    hasCookie('foo', false)->
+    hasCookie('bar')->
+  end()->
+  checkResponseElement('p', '.foo-barfoo')->
+
+  get('/cookie/removeCookie')->
+
+  get('/cookie')->
+  with('request')->begin()->
+    hasCookie('foo', false)->
+    hasCookie('bar')->
+  end()->
+  checkResponseElement('p', '.foo-')->
+
+  get('/cookie/setCookie')->
+
+  clearCookies()->
+  get('/cookie')->
+  with('request')->begin()->
+    hasCookie('foo', false)->
+    hasCookie('bar', false)->
+  end()->
+  checkResponseElement('p', '.-')
+;
+
+$b->
+  get('/browser')->
+  with('request')->isMethod('get')->
+  post('/browser')->
+  with('request')->isMethod('post')->
+  call('/browser', 'put')->
+  with('request')->isMethod('put')
 ;
 
 // sfBrowser: clean the custom view templates

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: PhpNameGenerator.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: PhpNameGenerator.php 718 2007-10-26 01:31:34Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,15 +27,19 @@ include_once 'propel/engine/database/model/NameGenerator.php';
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
  * @author     Byron Foster <byron_foster@yahoo.com> (Torque)
- * @version    $Revision: 536 $
+ * @author     Bernd Goldschmidt <bgoldschmidt@rapidsoft.de>
+ * @version    $Revision: 718 $
  * @package    propel.engine.database.model
  */
 class PhpNameGenerator implements NameGenerator {
 
 	/**
-	 * <code>inputs</code> should consist of two elements, the
+	 * <code>inputs</code> should consist of two (three) elements, the
 	 * original name of the database element and the method for
-	 * generating the name.  There are currently three methods:
+	 * generating the name.
+	 * The optional third element may contain a prefix that will be
+	 * stript from name prior to generate the resulting name.
+	 * There are currently three methods:
 	 * <code>CONV_METHOD_NOCHANGE</code> - xml names are converted
 	 * directly to php names without modification.
 	 * <code>CONV_METHOD_UNDERSCORE</code> will capitalize the first
@@ -44,8 +48,9 @@ class PhpNameGenerator implements NameGenerator {
 	 * works the same as the <code>CONV_METHOD_PHPNAME</code> method
 	 * but will not lowercase any characters.
 	 *
-	 * @param      inputs list expected to contain two parameters, element
-	 * 0 contains name to convert, element 1 contains method for conversion.
+	 * @param      inputs list expected to contain two (optional: three) parameters,
+	 * element 0 contains name to convert, element 1 contains method for conversion,
+	 * optional element 2 contains prefix to be striped from name
 	 * @return     The generated name.
 	 * @see        NameGenerator
 	 */
@@ -53,6 +58,14 @@ class PhpNameGenerator implements NameGenerator {
 	{
 		$schemaName = $inputs[0];
 		$method = $inputs[1];
+
+		if (count($inputs)>2) {
+			$prefix = $inputs[2];
+			if ($prefix != '' && substr($schemaName, 0, strlen($prefix)) == $prefix) {
+				$schemaName = substr($schemaName, strlen($prefix));
+			}
+		}
+
 		$phpName = null;
 
 		if ($method == self::CONV_METHOD_UNDERSCORE) {
@@ -87,7 +100,7 @@ class PhpNameGenerator implements NameGenerator {
 	{
 		$name = "";
 		$tok = strtok($schemaName, self::STD_SEPARATOR_CHAR);
-		while($tok) {
+		while ($tok) {
 			$name .= ucfirst(strtolower($tok));
 			$tok = strtok(self::STD_SEPARATOR_CHAR);
 		}
@@ -110,7 +123,7 @@ class PhpNameGenerator implements NameGenerator {
 	{
 		$name = "";
 		$tok = strtok($schemaName, self::STD_SEPARATOR_CHAR);
-		while($tok) {
+		while ($tok) {
 			$name .= ucfirst($tok);
 			$tok = strtok(self::STD_SEPARATOR_CHAR);
 		}

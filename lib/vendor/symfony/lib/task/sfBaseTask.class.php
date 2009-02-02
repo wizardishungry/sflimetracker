@@ -39,35 +39,20 @@ abstract class sfBaseTask extends sfCommandApplicationTask
 
     $this->checkProjectExists();
 
-    $application = $commandManager->getArgumentSet()->hasArgument('application') ? $commandManager->getArgumentValue('application') : null;
-    $env         = $commandManager->getOptionSet()->hasOption('env') ? $commandManager->getOptionValue('env') : 'test';
-    if (!is_null($application))
-    {
-      $this->checkAppExists($application);
+    $application = $commandManager->getArgumentSet()->hasArgument('application') ? $commandManager->getArgumentValue('application') : ($commandManager->getOptionSet()->hasOption('application') ? $commandManager->getOptionValue('application') : null);
+    $env = $commandManager->getOptionSet()->hasOption('env') ? $commandManager->getOptionValue('env') : 'test';
 
-      require_once sfConfig::get('sf_config_dir').'/ProjectConfiguration.class.php';
-
-      $isDebug = $commandManager->getOptionSet()->hasOption('debug') ? $commandManager->getOptionValue('debug') : true;
-      $this->configuration = ProjectConfiguration::getApplicationConfiguration($application, $env, $isDebug, null, $this->dispatcher);
-    }
-    else
+    if (true === $application)
     {
-      if (file_exists(sfConfig::get('sf_config_dir').'/ProjectConfiguration.class.php'))
+      $application = $this->getFirstApplication();
+
+      if ($commandManager->getOptionSet()->hasOption('application'))
       {
-        require_once sfConfig::get('sf_config_dir').'/ProjectConfiguration.class.php';
-        $this->configuration = new ProjectConfiguration(null, $this->dispatcher);
-      }
-      else
-      {
-        $this->configuration = new sfProjectConfiguration(getcwd(), $this->dispatcher);
+        $commandManager->setOption($commandManager->getOptionSet()->getOption('application'), $application);
       }
     }
 
-    $autoloader = sfSimpleAutoload::getInstance(sfConfig::get('sf_cache_dir').'/project_autoload.cache');
-    foreach ($this->configuration->getModelDirs() as $dir)
-    {
-      $autoloader->addDirectory($dir);
-    }
+    $this->configuration = $this->createConfiguration($application, $env);
 
     if (!is_null($this->commandApplication) && !$this->commandApplication->withTrace())
     {
@@ -145,5 +130,63 @@ abstract class sfBaseTask extends sfCommandApplicationTask
     {
       throw new sfException(sprintf('Module "%s/%s" does not exist.', $app, $module));
     }
+  }
+
+  /**
+   * Creates a configuration object.
+   *
+   * @param string  $application The application name
+   * @param string  $env         The environment name
+   *
+   * @return sfProjectConfiguration A sfProjectConfiguration instance
+   */
+  protected function createConfiguration($application, $env)
+  {
+    if (!is_null($application))
+    {
+      $this->checkAppExists($application);
+
+      require_once sfConfig::get('sf_config_dir').'/ProjectConfiguration.class.php';
+
+      $configuration = ProjectConfiguration::getApplicationConfiguration($application, $env, true, null, $this->dispatcher);
+    }
+    else
+    {
+      if (file_exists(sfConfig::get('sf_config_dir').'/ProjectConfiguration.class.php'))
+      {
+        require_once sfConfig::get('sf_config_dir').'/ProjectConfiguration.class.php';
+        $configuration = new ProjectConfiguration(null, $this->dispatcher);
+      }
+      else
+      {
+        $configuration = new sfProjectConfiguration(getcwd(), $this->dispatcher);
+      }
+
+      if (!is_null($env))
+      {
+        sfConfig::set('sf_environment', $env);
+      }
+
+      $autoloader = sfSimpleAutoload::getInstance(sfConfig::get('sf_cache_dir').'/project_autoload.cache');
+      $autoloader->addFiles(sfFinder::type('file')->prune('symfony')->follow_link()->name('*.php')->in(sfConfig::get('sf_lib_dir')));
+      $autoloader->register();
+    }
+
+    return $configuration;
+  }
+
+  /**
+   * Returns the first application in apps.
+   *
+   * @return string The Application name
+   */
+  protected function getFirstApplication()
+  {
+    if (count($dirs = sfFinder::type('dir')->maxdepth(0)->follow_link()->relative()->in(sfConfig::get('sf_apps_dir'))))
+    {
+      return $dirs[0];
+    }
+
+    return null;
   }
 }

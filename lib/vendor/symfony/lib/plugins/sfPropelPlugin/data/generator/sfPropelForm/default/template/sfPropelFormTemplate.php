@@ -1,14 +1,14 @@
 [?php
 
 /**
- * <?php echo $this->table->getPhpName() ?> form.
+ * <?php echo $this->table->getClassname() ?> form.
  *
- * @package    form
- * @subpackage <?php echo $this->table->getName() ?>
-
+ * @package    ##PROJECT_NAME##
+ * @subpackage form
+ * @author     ##AUTHOR_NAME##
  * @version    SVN: $Id$
  */
-class <?php echo $this->table->getPhpName() ?>Form extends Base<?php echo $this->table->getPhpName() ?>Form
+class <?php echo $this->table->getClassname() ?>Form extends Base<?php echo $this->table->getClassname() ?>Form
 {
   public function configure()
   {

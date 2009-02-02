@@ -10,7 +10,7 @@
 
 require_once(dirname(__FILE__).'/../../bootstrap/unit.php');
 
-$t = new lime_test(59, new lime_output_color());
+$t = new lime_test(69, new lime_output_color());
 
 $tmpDir = sfToolkit::getTmpDir();
 $content = 'This is an ASCII file.';
@@ -75,7 +75,7 @@ if (!function_exists('finfo_open'))
 else
 {
   $v = new testValidatorFile();
-  $t->is($v->guessFromFileinfo($tmpDir.'/test.txt'), 'text/plain', '->guessFromFileinfo() guesses the type of a given file');
+  $t->is($v->guessFromFileinfo($tmpDir.'/test.txt'), (version_compare(PHP_VERSION, '5.3', '<')) ? 'text/plain' : 'text/plain; charset=us-ascii', '->guessFromFileinfo() guesses the type of a given file');
   $t->is($v->guessFromFileinfo($tmpDir.'/foo.txt'), null, '->guessFromFileinfo() returns null if the file type is not guessable');
 }
 
@@ -88,7 +88,7 @@ if (!function_exists('mime_content_type'))
 else
 {
   $v = new testValidatorFile();
-  $t->is($v->guessFromMimeContentType($tmpDir.'/test.txt'), 'text/plain', '->guessFromMimeContentType() guesses the type of a given file');
+  $t->is($v->guessFromMimeContentType($tmpDir.'/test.txt'), (version_compare(PHP_VERSION, '5.3', '<')) ? 'text/plain' : 'text/plain; charset=us-ascii', '->guessFromMimeContentType() guesses the type of a given file');
   $t->is($v->guessFromMimeContentType($tmpDir.'/foo.txt'), null, '->guessFromMimeContentType() returns null if the file type is not guessable');
 }
 
@@ -102,7 +102,7 @@ $t->is($v->guessFromFileBinary('/bin/ls'), (PHP_OS != 'Darwin') ? 'application/x
 // ->getMimeType()
 $t->diag('->getMimeType()');
 $v = new testValidatorFile();
-$t->is($v->getMimeType($tmpDir.'/test.txt', 'image/png'), 'text/plain', '->getMimeType() guesses the type of a given file');
+$t->is($v->getMimeType($tmpDir.'/test.txt', 'image/png'), (version_compare(PHP_VERSION, '5.3', '<')) ? 'text/plain' : 'text/plain; charset=us-ascii', '->getMimeType() guesses the type of a given file');
 $t->is($v->getMimeType($tmpDir.'/foo.txt', 'text/plain'), 'text/plain', '->getMimeType() returns the default type if the file type is not guessable');
 
 $v->setOption('mime_type_guessers', array_merge(array(array($v, 'guessFromNothing')), $v->getOption('mime_type_guessers')));
@@ -126,7 +126,7 @@ $f = $v->clean(array('tmp_name' => $tmpDir.'/test.txt'));
 $t->ok($f instanceof sfValidatedFile, '->clean() returns a sfValidatedFile instance');
 $t->is($f->getOriginalName(), '', '->clean() returns a sfValidatedFile with an empty original name if the name is not passed in the initial value');
 $t->is($f->getSize(), strlen($content), '->clean() returns a sfValidatedFile with a computed file size if the size is not passed in the initial value');
-$t->is($f->getType(), 'text/plain', '->clean() returns a sfValidatedFile with a guessed content type');
+$t->is($f->getType(), (version_compare(PHP_VERSION, '5.3', '<')) ? 'text/plain' : 'text/plain; charset=us-ascii', '->clean() returns a sfValidatedFile with a guessed content type');
 
 class myValidatedFile extends sfValidatedFile
 {
@@ -228,10 +228,37 @@ $t->diag('->save() ->isSaved() ->getSavedName()');
 $f = new sfValidatedFile('test.txt', 'text/plain', $tmpDir.'/test.txt', strlen($content));
 $t->is($f->isSaved(), false, '->isSaved() returns false if the file has not been saved');
 $t->is($f->getSavedName(), null, '->getSavedName() returns null if the file has not been saved');
-$f->save($tmpDir.'/foo/test1.txt');
+$filename = $f->save($tmpDir.'/foo/test1.txt');
+$t->is($filename, $tmpDir.'/foo/test1.txt', '->save() returns the saved filename');
 $t->is(file_get_contents($tmpDir.'/foo/test1.txt'), file_get_contents($tmpDir.'/test.txt'), '->save() saves the file to the given path');
 $t->is($f->isSaved(), true, '->isSaved() returns true if the file has been saved');
 $t->is($f->getSavedName(), $tmpDir.'/foo/test1.txt', '->getSavedName() returns the saved file name');
+
+$f = new sfValidatedFile('test.txt', 'text/plain', $tmpDir.'/test.txt', strlen($content), $tmpDir);
+$filename = $f->save($tmpDir.'/foo/test1.txt');
+$t->is($filename, 'foo/test1.txt', '->save() returns the saved filename relative to the path given');
+$t->is(file_get_contents($tmpDir.'/foo/test1.txt'), file_get_contents($tmpDir.'/test.txt'), '->save() saves the file to the given path');
+$t->is($f->getSavedName(), $tmpDir.'/foo/test1.txt', '->getSavedName() returns the saved file name');
+
+$filename = $f->save('foo/test1.txt');
+$t->is($filename, 'foo/test1.txt', '->save() returns the saved filename relative to the path given');
+$t->is(file_get_contents($tmpDir.'/foo/test1.txt'), file_get_contents($tmpDir.'/test.txt'), '->save() saves the file to the given path and uses the path if the file is not absolute');
+$t->is($f->getSavedName(), $tmpDir.'/foo/test1.txt', '->getSavedName() returns the saved file name');
+
+$filename = $f->save();
+$t->is(file_get_contents($tmpDir.'/'.$filename), file_get_contents($tmpDir.'/test.txt'), '->save() returns the generated file name is none was given');
+$t->is($f->getSavedName(), $tmpDir.'/'.$filename, '->getSavedName() returns the saved file name');
+
+try
+{
+  $f = new sfValidatedFile('test.txt', 'text/plain', $tmpDir.'/test.txt', strlen($content));
+  $f->save();
+  $t->fail('->save() throws an Exception if you don\'t give a filename and the path is empty');
+}
+catch (Exception $e)
+{
+  $t->pass('->save() throws an Exception if you don\'t give a filename and the path is empty');
+}
 
 try
 {

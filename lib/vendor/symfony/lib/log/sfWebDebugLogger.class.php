@@ -16,13 +16,12 @@
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @version    SVN: $Id$
  */
-class sfWebDebugLogger extends sfLogger
+class sfWebDebugLogger extends sfVarLogger
 {
   protected
     $context       = null,
     $dispatcher    = null,
-    $webDebug      = null,
-    $xdebugLogging = false;
+    $webDebugClass = null;
 
   /**
    * Initializes this logger.
@@ -30,32 +29,24 @@ class sfWebDebugLogger extends sfLogger
    * Available options:
    *
    * - web_debug_class: The web debug class (sfWebDebug by default).
-   * - xdebugLogging:   Whether to add xdebug trace to the logs (false by default).
    *
    * @param  sfEventDispatcher $dispatcher  A sfEventDispatcher instance
    * @param  array             $options     An array of options.
    *
-   * @return Boolean      true, if initialization completes successfully, otherwise false.
+   * @return Boolean           true, if initialization completes successfully, otherwise false.
+   *
+   * @see sfVarLogger
    */
   public function initialize(sfEventDispatcher $dispatcher, $options = array())
   {
     $this->context    = sfContext::getInstance();
     $this->dispatcher = $dispatcher;
 
-    $class = isset($options['web_debug_class']) ? $options['web_debug_class'] : 'sfWebDebug';
-    $this->webDebug = new $class($dispatcher);
+    $this->webDebugClass = isset($options['web_debug_class']) ? $options['web_debug_class'] : 'sfWebDebug';
 
-    $dispatcher->connect('response.filter_content', array($this, 'filterResponseContent'));
-
-    if (isset($options['xdebug_logging']))
+    if (sfConfig::get('sf_web_debug'))
     {
-      $this->xdebugLogging = $options['xdebug_logging'];
-    }
-
-    // disable xdebug when an HTTP debug session exists (crashes Apache, see #2438)
-    if (isset($_GET['XDEBUG_SESSION_START']) || isset($_COOKIE['XDEBUG_SESSION']))
-    {
-      $this->xdebugLogging = false;
+      $dispatcher->connect('response.filter_content', array($this, 'filterResponseContent'));
     }
 
     return parent::initialize($dispatcher, $options);
@@ -90,8 +81,9 @@ class sfWebDebugLogger extends sfLogger
     // * if not rendering to the client
     // * if HTTP headers only
     $response = $event->getSubject();
+    $request  = $this->context->getRequest();
     if (!$this->context->has('request') || !$this->context->has('response') || !$this->context->has('controller') ||
-      $this->context->getRequest()->isXmlHttpRequest() ||
+      $request->isXmlHttpRequest() ||
       strpos($response->getContentType(), 'html') === false ||
       $response->getStatusCode() == 304 ||
       $this->context->getController()->getRenderMode() != sfView::RENDER_CLIENT ||
@@ -101,73 +93,10 @@ class sfWebDebugLogger extends sfLogger
       return $content;
     }
 
-    // add needed assets for the web debug toolbar
-    $root = $this->context->getRequest()->getRelativeUrlRoot();
-    $assets = sprintf('
-      <script type="text/javascript" src="%s"></script>
-      <link rel="stylesheet" type="text/css" media="screen" href="%s" />',
-      $root.sfConfig::get('sf_web_debug_web_dir').'/js/main.js',
-      $root.sfConfig::get('sf_web_debug_web_dir').'/css/main.css'
+    $webDebug = new $this->webDebugClass($this->dispatcher, $this, array(
+      'image_root_path' => ($request->getRelativeUrlRoot() ? $request->getRelativeUrlRoot().'/' : '').sfConfig::get('sf_web_debug_web_dir').'/images')
     );
-    $content = str_ireplace('</head>', $assets.'</head>', $content);
 
-    // add web debug information to response content
-    $webDebugContent = $this->webDebug->getResults();
-    $count = 0;
-    $content = str_ireplace('</body>', $webDebugContent.'</body>', $content, $count);
-    if (!$count)
-    {
-      $content .= $webDebugContent;
-    }
-
-    return $content;
-  }
-
-  /**
-   * Logs a message.
-   *
-   * @param string $message   Message
-   * @param string $priority  Message priority
-   */
-  protected function doLog($message, $priority)
-  {
-    // if we have xdebug and dev has not disabled the feature, add some stack information
-    $debugStack = array();
-    if ($this->xdebugLogging && function_exists('xdebug_get_function_stack'))
-    {
-      foreach (xdebug_get_function_stack() as $i => $stack)
-      {
-        if (
-          (isset($stack['function']) && !in_array($stack['function'], array('emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug', 'log')))
-          || !isset($stack['function'])
-        )
-        {
-          $tmp = '';
-          if (isset($stack['function']))
-          {
-            $tmp .= sprintf('in "%s" ', $stack['function']);
-          }
-          $tmp .= sprintf('from "%s" line %s', $stack['file'], $stack['line']);
-          $debugStack[] = $tmp;
-        }
-      }
-    }
-
-    // get log type in {}
-    $type = 'sfOther';
-    if (preg_match('/^\s*{([^}]+)}\s*(.+?)$/s', $message, $matches))
-    {
-      $type    = $matches[1];
-      $message = $matches[2];
-    }
-
-    // send the log object containing the complete log information
-    $this->webDebug->log(array(
-      'priority'   => $priority,
-      'time'       => time(),
-      'message'    => $message,
-      'type'       => $type,
-      'debugStack' => $debugStack,
-    ));
+    return $webDebug->injectToolbar($content);
   }
 }

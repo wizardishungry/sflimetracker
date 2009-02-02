@@ -6,7 +6,7 @@
     <column name="title" type="varchar" size="255" required="true" />
     <column name="body" type="longvarchar" />
     <column name="online" type="boolean" />
-    <column name="EXCERPT" type="varchar" />
+    <column name="excerpt" type="varchar" />
     <column name="category_id" type="integer" required="true" />
     <foreign-key foreignTable="category">
       <reference local="category_id" foreign="id" />
@@ -17,7 +17,7 @@
     <foreign-key foreignTable="book">
       <reference local="book_id" foreign="id" onDelete="setnull" />
     </foreign-key>
-    
+
     <unique name="unique_title_category">
       <unique-column name="title" />
       <unique-column name="category_id" />
@@ -56,6 +56,20 @@
     </foreign-key>
   </table>
 
+  <table name="product" phpName="Product" isI18N="true" i18nTable="product_i18n">
+    <column autoIncrement="false" name="id" type="integer" required="true" primaryKey="true" autoincrement="true"/>
+    <column primaryKey="false" required="false" autoIncrement="false" name="price" type="float"/>
+  </table>
+
+  <table name="product_i18n" phpName="ProductI18n">
+    <column autoIncrement="false" name="id" type="integer" required="true" primaryKey="true"/>
+    <column autoIncrement="false" name="culture" isCulture="true" type="varchar" size="7" required="true" primaryKey="true"/>
+    <column primaryKey="false" required="false" autoIncrement="false" name="name" type="varchar" size="50"/>
+    <foreign-key onDelete="none" onUpdate="none" foreignTable="product">
+      <reference local="id" foreign="id"/>
+    </foreign-key>
+  </table>
+
   <table name="movie" isI18N="true" i18nTable="movie_i18n">
     <column name="id" type="integer" required="true" primaryKey="true" autoincrement="true" />
     <column name="director" type="varchar" size="255" />
@@ -72,8 +86,12 @@
 
   <table name="attachment">
     <column name="id" type="integer" required="true" primaryKey="true" autoincrement="true" />
+    <column name="article_id" type="integer" />
     <column name="name" type="varchar" size="255" />
     <column name="file" type="varchar" size="255" />
+    <foreign-key foreignTable="article">
+      <reference local="article_id" foreign="id" onDelete="setnull" />
+    </foreign-key>
   </table>
 
 </database>

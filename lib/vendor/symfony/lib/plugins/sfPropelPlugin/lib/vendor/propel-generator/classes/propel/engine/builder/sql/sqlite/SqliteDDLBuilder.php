@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id$
+ *  $Id: SqliteDDLBuilder.php 949 2008-01-30 22:41:59Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -41,7 +41,7 @@ class SqliteDDLBuilder extends DDLBuilder {
 		$platform = $this->getPlatform();
 
 		$script .= "
-DROP TABLE ".$this->quoteIdentifier($table->getName()).";
+DROP TABLE ".$this->quoteIdentifier($this->prefixTablename($table->getName())).";
 ";
 	}
 
@@ -64,7 +64,7 @@ DROP TABLE ".$this->quoteIdentifier($table->getName()).";
 
 		$script .= "
 
-CREATE TABLE ".$this->quoteIdentifier($table->getName())."
+CREATE TABLE ".$this->quoteIdentifier($this->prefixTablename($table->getName()))."
 (
 	";
 
@@ -98,10 +98,10 @@ CREATE TABLE ".$this->quoteIdentifier($table->getName())."
 		foreach ($table->getIndices() as $index) {
 			$script .= "
 CREATE ";
-			if($index->getIsUnique()) {
+			if ($index->getIsUnique()) {
 				$script .= "UNIQUE";
 			}
-			$script .= "INDEX ".$this->quoteIdentifier($index->getName())." ON ".$this->quoteIdentifier($table->getName())." (".$this->getColumnList($index->getColumns()).");
+			$script .= "INDEX ".$this->quoteIdentifier($index->getName())." ON ".$this->quoteIdentifier($this->prefixTablename($table->getName()))." (".$this->getColumnList($index->getColumns()).");
 ";
 		}
 	}
@@ -118,7 +118,7 @@ CREATE ";
 		foreach ($table->getForeignKeys() as $fk) {
 			$script .= "
 -- SQLite does not support foreign keys; this is just for reference
--- FOREIGN KEY (".$this->getColumnList($fk->getLocalColumns()).") REFERENCES ".$fk->getForeignTableName()." (".$this->getColumnList($fk->getForeignColumns()).")
+-- FOREIGN KEY (".$this->getColumnList($fk->getLocalColumns()).") REFERENCES ".$this->prefixTablename($fk->getForeignTableName())." (".$this->getColumnList($fk->getForeignColumns()).")
 ";
 		}
 	}

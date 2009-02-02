@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: Table.php 803 2007-11-13 21:24:21Z dwhittle $
+ *  $Id: Table.php 1043 2008-05-08 13:27:19Z ron $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -40,45 +40,247 @@ include_once 'propel/engine/database/model/Validator.php';
  * @author     John McNally <jmcnally@collab.net> (Torque)
  * @author     Daniel Rall <dlr@collab.net> (Torque)
  * @author     Byron Foster <byron_foster@yahoo.com> (Torque)
- * @version    $Revision: 803 $
+ * @version    $Revision: 1043 $
  * @package    propel.engine.database.model
  */
 class Table extends XMLElement implements IDMethod {
 
-	/** enables debug output */
+	/**
+	 * Enables some debug printing.
+	 */
 	const DEBUG = false;
 
-	//private attributes;
-	private $columnList;
-	private $validatorList;
-	private $foreignKeys;
-	private $indices;
-	private $unices;
-	private $idMethodParameters;
+	/**
+	 * Columns for this table.
+	 *
+	 * @var        array Column[]
+	 */
+	private $columnList = array();
+
+	/**
+	 * Validators for this table.
+	 *
+	 * @var        array Validator[]
+	 */
+	private $validatorList = array();
+
+	/**
+	 * Foreign keys for this table.
+	 *
+	 * @var        array ForeignKey[]
+	 */
+	private $foreignKeys = array();
+
+	/**
+	 * Indexes for this table.
+	 *
+	 * @var        array Index[]
+	 */
+	private $indices = array();
+
+	/**
+	 * Unique indexes for this table.
+	 *
+	 * @var        array Unique[]
+	 */
+	private $unices = array();
+
+	/**
+	 * Any parameters for the ID method (currently supports changing sequence name).
+	 *
+	 * @var        array
+	 */
+	private $idMethodParameters = array();
+
+	/**
+	 * Table name.
+	 *
+	 * @var        string
+	 */
 	private $name;
+
+	/**
+	 * Table description.
+	 *
+	 * @var        string
+	 */
 	private $description;
+
+	/**
+	 * phpName for the table.
+	 *
+	 * @var        string
+	 */
 	private $phpName;
+
+	/**
+	 * ID method for the table (e.g. IDMethod::NATIVE, IDMethod::NONE).
+	 *
+	 * @var        string
+	 */
 	private $idMethod;
+
+	/**
+	 * Wether an INSERT with set PK is allowed on tables with IDMethod::NATIVE
+	 *
+	 * @var        boolean
+	 */
+	private $allowPkInsert;
+
+	/**
+	 * Strategry to use for converting column name to phpName.
+	 *
+	 * @var        string
+	 */
 	private $phpNamingMethod;
-	private $tableParent;
+
+	/**
+	 * The Database that this table belongs to.
+	 *
+	 * @var        Database
+	 */
+	private $database;
+
+	/**
+	 * Foreign Keys that refer to this table.
+	 *
+	 * @var        array ForeignKey[]
+	 */
 	private $referrers = array();
+
+	/**
+	 * Names of foreign tables.
+	 *
+	 * @var        array string[]
+	 */
 	private $foreignTableNames;
+
+	/**
+	 * Whether this table contains a foreign primary key.
+	 *
+	 * @var        boolean
+	 */
 	private $containsForeignPK;
+
+	/**
+	 * The inheritance column for this table (if any).
+	 *
+	 * @var        Column
+	 */
 	private $inheritanceColumn;
+
+	/**
+	 * Whether to skip generation of SQL for this table.
+	 *
+	 * @var        boolean
+	 */
 	private $skipSql;
+
+	/**
+	 * Whether this table is "read-only".
+	 *
+	 * @var        boolean
+	 */
 	private $readOnly;
+
+	/**
+	 * Whether this table should result in abstract OM classes.
+	 *
+	 * @var        boolean
+	 */
 	private $abstractValue;
+
+	/**
+	 * Whether this table is an alias for another table.
+	 *
+	 * @var        string
+	 */
 	private $alias;
+
+	/**
+	 * The interface that the generated "object" class should implement.
+	 *
+	 * @var        string
+	 */
 	private $enterface;
+
+	/**
+	 * The package for the generated OM.
+	 *
+	 * @var        string
+	 */
 	private $pkg;
+
+	/**
+	 * The base class to extend for the generated "object" class.
+	 *
+	 * @var        string
+	 */
 	private $baseClass;
+
+	/**
+	 * The base peer class to extend for generated "peer" class.
+	 *
+	 * @var        string
+	 */
 	private $basePeer;
-	private $columnsByName;
-	private $columnsByPhpName;
-	private $needsTransactionInPostgres;//maybe this can be retrieved from vendorSpecificInfo?
+
+	/**
+	 * Map of columns by name.
+	 *
+	 * @var        array
+	 */
+	private $columnsByName = array();
+
+	/**
+	 * Map of columns by phpName.
+	 *
+	 * @var        array
+	 */
+	private $columnsByPhpName = array();
+
+	/**
+	 * Whether this table needs to use transactions in Postgres.
+	 *
+	 * @var        string
+	 * @deprecated
+	 */
+	private $needsTransactionInPostgres;
+
+	/**
+	 * Whether to perform additional indexing on this table.
+	 *
+	 * @var        boolean
+	 */
 	private $heavyIndexing;
+
+	/**
+	 * Whether this table is for reference only.
+	 *
+	 * @var        boolean
+	 */
 	private $forReferenceOnly;
-	private $isTree;
+
+	/**
+	 * The tree mode (nested set, etc.) implemented by this table.
+	 *
+	 * @var        string
+	 */
+	private $treeMode;
+
+	/**
+	 * Whether to reload the rows in this table after insert.
+	 *
+	 * @var        boolean
+	 */
+	private $reloadOnInsert;
+
+	/**
+	 * Whether to reload the rows in this table after update.
+	 *
+	 * @var        boolean
+	 */
+	private $reloadOnUpdate;
 
 	/**
 	 * Constructs a table object with a name
@@ -88,17 +290,9 @@ class Table extends XMLElement implements IDMethod {
 	public function __construct($name = null)
 	{
 		$this->name = $name;
-		$this->columnList = array();
-		$this->validatorList = array();
-		$this->foreignKeys = array();
-		$this->indices = array();
-		$this->unices = array();
-		$this->columnsByName = array();
-		$this->columnsByPhpName = array();
-		$this->vendorSpecificInfo = array();
 	}
 
-   /**
+	/**
 	 * Sets up the Rule object based on the attributes that were passed to loadFromXML().
 	 * @see        parent::loadFromXML()
 	 */
@@ -107,6 +301,7 @@ class Table extends XMLElement implements IDMethod {
 		$this->name = $this->getAttribute("name");
 		$this->phpName = $this->getAttribute("phpName");
 		$this->idMethod = $this->getAttribute("idMethod", $this->getDatabase()->getDefaultIdMethod());
+		$this->allowPkInsert = $this->booleanValue($this->getAttribute("allowPkInsert"));
 
 		// retrieves the method for converting from specified name to a PHP name.
 		$this->phpNamingMethod = $this->getAttribute("phpNamingMethod", $this->getDatabase()->getDefaultPhpNamingMethod());
@@ -121,11 +316,14 @@ class Table extends XMLElement implements IDMethod {
 		$this->alias = $this->getAttribute("alias");
 
 		$this->heavyIndexing = ( $this->booleanValue($this->getAttribute("heavyIndexing"))
-				|| ("false" !== $this->getAttribute("heavyIndexing")
-						&& $this->getDatabase()->isHeavyIndexing() ) );
+		|| ("false" !== $this->getAttribute("heavyIndexing")
+		&& $this->getDatabase()->isHeavyIndexing() ) );
 		$this->description = $this->getAttribute("description");
 		$this->enterface = $this->getAttribute("interface"); // sic ('interface' is reserved word)
-		$this->isTree = $this->booleanValue($this->getAttribute("isTree"));
+		$this->treeMode = $this->getAttribute("treeMode");
+
+		$this->reloadOnInsert = $this->booleanValue($this->getAttribute("reloadOnInsert"));
+		$this->reloadOnUpdate = $this->booleanValue($this->getAttribute("reloadOnUpdate"));
 	}
 
 	/**
@@ -144,23 +342,33 @@ class Table extends XMLElement implements IDMethod {
 			$this->doHeavyIndexing();
 		}
 
+		// If there is no PK, then throw an error.  Propel 1.3 requires primary keys.
+		$pk = $this->getPrimaryKey();
+		if (empty($pk)) {
+			throw new EngineException("Table '".$this->getName()."' does not have a primary key defined.  Propel requires all tables to have a primary key.");
+		}
+
 		// Name any indices which are missing a name using the
 		// appropriate algorithm.
 		$this->doNaming();
 
 		// if idMethod is "native" and in fact there are no autoIncrement
 		// columns in the table, then change it to "none"
-		if ($this->getIdMethod() === IDMethod::NATIVE) {
-			$anyAutoInc = false;
-			foreach($this->getColumns() as $col) {
-				if ($col->isAutoIncrement()) {
-					$anyAutoInc = true;
-					break;
-				}
+		$anyAutoInc = false;
+		$hasPK = false;
+		foreach ($this->getColumns() as $col) {
+			if ($col->isAutoIncrement()) {
+				$anyAutoInc = true;
 			}
-			if (!$anyAutoInc) {
-				$this->setIdMethod(IDMethod::NO_ID_METHOD);
+			if ($col->isPrimaryKey()) {
+				$hasPK = true;
 			}
+		}
+		if ($this->getIdMethod() === IDMethod::NATIVE && !$anyAutoInc) {
+			$this->setIdMethod(IDMethod::NO_ID_METHOD);
+		}
+		if (!$hasPK) {
+			throw new EngineException("Table '" . $this->getName() . "' does not define a primary key column!");
 		}
 	}
 
@@ -190,16 +398,13 @@ class Table extends XMLElement implements IDMethod {
 		$pk = $this->getPrimaryKey();
 		$size = count($pk);
 
-		try {
-			// We start at an offset of 1 because the entire column
-			// list is generally implicitly indexed by the fact that
-			// it's a primary key.
-			for ($i=1; $i < $size; $i++) {
-				$this->addIndex(new Index($this, array_slice($pk, $i, $size)));
-			}
-		} catch (EngineException $e) {
-			print $e->getMessage() . "\n";
-			print $e->getTraceAsString();
+		// We start at an offset of 1 because the entire column
+		// list is generally implicitly indexed by the fact that
+		// it's a primary key.
+		for ($i=1; $i < $size; $i++) {
+			$idx = new Index();
+			$idx->setColumns(array_slice($pk, $i, $size));
+			$this->addIndex($idx);
 		}
 	}
 
@@ -325,7 +530,7 @@ class Table extends XMLElement implements IDMethod {
 	public function addColumn($data)
 	{
 		if ($data instanceof Column) {
-			$col = $data; // alias
+			$col = $data;
 			$col->setTable($this);
 			if ($col->isInheritance()) {
 				$this->inheritanceColumn = $col;
@@ -344,40 +549,37 @@ class Table extends XMLElement implements IDMethod {
 		}
 	}
 
-   /**
-	* Add a validator to this table.
-	*
-	* Supports two signatures:
-	* - addValidator(Validator $validator)
-	* - addValidator(array $attribs)
-	*
-	* @param      mixed $data Validator object or XML attribs (array) from <validator /> element.
-	* @return     Validator The added Validator.
-	* @throws     EngineException
-	*/
-   public function addValidator($data)
-   {
-	 if ($data instanceof Validator)
-	 {
-	  $validator = $data;
-	  $col = $this->getColumn($validator->getColumnName());
-	  if($col == null) {
-		throw new EngineException("Failed adding validator to table '" . $this->getName() .
-		  "': column '" . $validator->getColumnName() . "' does not exist !");
-	  }
-	  $validator->setColumn($col);
-	  $validator->setTable($this);
-	  $this->validatorList[] = $validator;
-	  return $validator;
-	 }
-	 else
-	 {
-	  $validator = new Validator();
-	  $validator->setTable($this);
-	  $validator->loadFromXML($data);
-	  return $this->addValidator($validator);
-	 }
-   }
+	/**
+	 * Add a validator to this table.
+	 *
+	 * Supports two signatures:
+	 * - addValidator(Validator $validator)
+	 * - addValidator(array $attribs)
+	 *
+	 * @param      mixed $data Validator object or XML attribs (array) from <validator /> element.
+	 * @return     Validator The added Validator.
+	 * @throws     EngineException
+	 */
+	public function addValidator($data)
+	{
+		if ($data instanceof Validator) {
+			$validator = $data;
+			$col = $this->getColumn($validator->getColumnName());
+			if ($col == null) {
+				throw new EngineException("Failed adding validator to table '" . $this->getName() .
+				"': column '" . $validator->getColumnName() . "' does not exist !");
+			}
+			$validator->setColumn($col);
+			$validator->setTable($this);
+			$this->validatorList[] = $validator;
+			return $validator;
+		} else {
+			$validator = new Validator();
+			$validator->setTable($this);
+			$validator->loadFromXML($data);
+			return $this->addValidator($validator);
+		}
+	}
 
 	/**
 	 * A utility function to create a new foreign key
@@ -407,7 +609,7 @@ class Table extends XMLElement implements IDMethod {
 	/**
 	 * Gets the column that subclasses of the class representing this
 	 * table can be produced from.
-	 * @return     string
+	 * @return     Column
 	 */
 	public function getChildrenColumn()
 	{
@@ -421,7 +623,7 @@ class Table extends XMLElement implements IDMethod {
 	public function getChildrenNames()
 	{
 		if ($this->inheritanceColumn === null
-				|| !$this->inheritanceColumn->isEnumeratedClasses()) {
+		|| !$this->inheritanceColumn->isEnumeratedClasses()) {
 			return null;
 		}
 		$children = $this->inheritanceColumn->getChildren();
@@ -625,6 +827,18 @@ class Table extends XMLElement implements IDMethod {
 	}
 
 	/**
+	 * Whether we allow to insert primary keys on tables with
+	 * idMethod=native
+	 *
+	 * @return     boolean
+	 */
+	public function isAllowPkInsert()
+	{
+		return $this->allowPkInsert;
+	}
+
+
+	/**
 	 * Set the method for generating pk's
 	 */
 	public function setIdMethod($idMethod)
@@ -659,6 +873,24 @@ class Table extends XMLElement implements IDMethod {
 	public function setSkipSql($v)
 	{
 		$this->skipSql = $v;
+	}
+
+	/**
+	 * Whether to force object to reload on INSERT.
+	 * @return     boolean
+	 */
+	public function isReloadOnInsert()
+	{
+		return $this->reloadOnInsert;
+	}
+
+	/**
+	 * Whether to force object to reload on UPDATE.
+	 * @return     boolean
+	 */
+	public function isReloadOnUpdate()
+	{
+		return $this->reloadOnUpdate;
 	}
 
 	/**
@@ -756,6 +988,7 @@ class Table extends XMLElement implements IDMethod {
 
 	/**
 	 * Returns an Array containing all the columns in the table
+	 * @return     array Column[]
 	 */
 	public function getColumns()
 	{
@@ -776,7 +1009,7 @@ class Table extends XMLElement implements IDMethod {
 	public function getNumLazyLoadColumns()
 	{
 		$count = 0;
-		foreach($this->columnList as $col) {
+		foreach ($this->columnList as $col) {
 			if ($col->isLazyLoad()) {
 				$count++;
 			}
@@ -786,14 +1019,16 @@ class Table extends XMLElement implements IDMethod {
 
 	/**
 	 * Returns an Array containing all the validators in the table
+	 * @return     array Validator[]
 	 */
 	public function getValidators()
 	{
-	  return $this->validatorList;
+		return $this->validatorList;
 	}
 
 	/**
-	 * Returns an Array containing all the FKs in the table
+	 * Returns an Array containing all the FKs in the table.
+	 * @return     array ForeignKey[]
 	 */
 	public function getForeignKeys()
 	{
@@ -810,37 +1045,8 @@ class Table extends XMLElement implements IDMethod {
 	}
 
 	/**
-	 * A name to use for creating a sequence if one is not specified.
-	 */
-	public function getSequenceName()
-	{
-		static $longNamesMap = array();
-		$result = null;
-		if ($this->getIdMethod() == self::NATIVE) {
-			$idMethodParams = $this->getIdMethodParameters();
-			if ($idMethodParams === null) {
-				$maxIdentifierLength = $this->getDatabase()->getPlatform()->getMaxColumnNameLength();
-				if(strlen($this->getName() . "_SEQ") > $maxIdentifierLength)
-				{
-				  if(!isset($longNamesMap[$this->getName()]))
-				  {
-					$longNamesMap[$this->getName()] = strval(count($longNamesMap) + 1);
-				  }
-				  $result = substr($this->getName(), 0, $maxIdentifierLength - strlen("_SEQ_" . $longNamesMap[$this->getName()])) . "_SEQ_" . $longNamesMap[$this->getName()];
-				}
-				else
-				{
-				  $result = $this->getName() . "_SEQ";
-				}
-			} else {
-				$result = $idMethodParams[0]->getValue();
-			}
-		}
-		return $result;
-	}
-
-	/**
 	 * Returns an Array containing all the FKs in the table
+	 * @return     array Index[]
 	 */
 	public function getIndices()
 	{
@@ -849,6 +1055,7 @@ class Table extends XMLElement implements IDMethod {
 
 	/**
 	 * Returns an Array containing all the UKs in the table
+	 * @return     array Unique[]
 	 */
 	public function getUnices()
 	{
@@ -857,7 +1064,7 @@ class Table extends XMLElement implements IDMethod {
 
 	/**
 	 * Returns a specified column.
-	 * @return     Return a Column object or null if it does not exist.
+	 * @return     Column Return a Column object or null if it does not exist.
 	 */
 	public function getColumn($name)
 	{
@@ -866,7 +1073,7 @@ class Table extends XMLElement implements IDMethod {
 
 	/**
 	 * Returns a specified column.
-	 * @return     Return a Column object or null if it does not exist.
+	 * @return     Column Return a Column object or null if it does not exist.
 	 */
 	public function getColumnByPhpName($phpName)
 	{
@@ -874,27 +1081,36 @@ class Table extends XMLElement implements IDMethod {
 	}
 
 	/**
-	 * Return the first foreign key that includes col in it's list
-	 * of local columns.  Eg. Foreign key (a,b,c) refrences tbl(x,y,z)
-	 * will be returned of col is either a,b or c.
-	 * @param      string $col
-	 * @return     Return a Column object or null if it does not exist.
+	 * Get all the foreign keys from this table to the specufued tabke.
+	 * @return     array ForeignKey[]
 	 */
-	public function getForeignKey($col)
+	public function getForeignKeysReferencingTable($tablename)
 	{
-		$firstFK = null;
-		for($i=0,$size=count($this->foreignKeys); $i < $size; $i++) {
-			$key = $this->foreignKeys[$i];
-			if (in_array($col, $key->getLocalColumns())) {
-				if ($firstFK === null) {
-					$firstFK = $key;
-				} else {
-					throw new EngineException($col . " has ben declared as a foreign key multiple times.  This is not"
-								       . " being handled properly. (Try moving foreign key declarations to the foreign table.)");
-				}
+		$matches = array();
+		$keys = $this->getForeignKeys();
+		foreach ($keys as $fk) {
+			if ($fk->getForeignTableName() === $tablename) {
+				$matches[] = $fk;
 			}
 		}
-		return $firstFK;
+		return $matches;
+	}
+
+	/**
+	 * Return the foreign keys that includes col in it's list of local columns.
+	 * Eg. Foreign key (a,b,c) refrences tbl(x,y,z) will be returned of col is either a,b or c.
+	 * @param      string $col
+	 * @return     array ForeignKey[] or null if there is no FK for specified column.
+	 */
+	public function getColumnForeignKeys($colname)
+	{
+		$matches = array();
+		foreach ($this->foreignKeys as $fk) {
+			if (in_array($colname, $fk->getLocalColumns())) {
+				$matches[] = $fk;
+			}
+		}
+		return $matches;
 	}
 
 	/**
@@ -911,29 +1127,29 @@ class Table extends XMLElement implements IDMethod {
 	}
 
 	/**
-	 * Set the parent of the table
+	 * Set the database that contains this table.
 	 *
-	 * @param      parent the parant database
+	 * @param      Database $db
 	 */
-	public function setDatabase($parent)
+	public function setDatabase(Database $db)
 	{
-		$this->tableParent = $parent;
+		$this->database = $db;
 	}
 
 	/**
-	 * Get the parent of the table
+	 * Get the database that contains this table.
 	 *
-	 * @return     the parant database
+	 * @return     Database
 	 */
 	public function getDatabase()
 	{
-		return $this->tableParent;
+		return $this->database;
 	}
 
 	/**
 	 * Flag to determine if code/sql gets created for this table.
 	 * Table will be skipped, if return true.
-	 * @return     value of forReferenceOnly.
+	 * @return     boolean
 	 */
 	public function isForReferenceOnly()
 	{
@@ -943,147 +1159,135 @@ class Table extends XMLElement implements IDMethod {
 	/**
 	 * Flag to determine if code/sql gets created for this table.
 	 * Table will be skipped, if set to true.
-	 * @param      v  Value to assign to forReferenceOnly.
+	 * @param      boolean $v
 	 */
 	public function setForReferenceOnly($v)
 	{
 		$this->forReferenceOnly = (boolean) $v;
 	}
 
-   /**
-	 * Flag to determine if tree node class should be generated for this table.
-	 * @return     valur of isTree
-	*/
-   public function isTree()
-   {
-		return $this->isTree;
-   }
-
 	/**
 	 * Flag to determine if tree node class should be generated for this table.
-	 * @param      v  Value to assign to isTree.
+	 * @return     valur of treeMode
 	 */
-	public function setIsTree($v)
+	public function treeMode()
 	{
-		$this->isTree = (boolean) $v;
+		return $this->treeMode;
 	}
 
 	/**
-	 * Returns a XML representation of this table.
-	 *
-	 * @return     XML representation of this table
+	 * Flag to determine if tree node class should be generated for this table.
+	 * @param      v  Value to assign to treeMode.
 	 */
-	public function toString() {
+	public function setTreeMode($v)
+	{
+		$this->treeMode = $v;
+	}
 
-		$result = "<table name=\"" . $this->name . "\"";
+	/**
+	 * Appends XML nodes to passed-in DOMNode.
+	 *
+	 * @param      DOMNode $node
+	 */
+	public function appendXml(DOMNode $node)
+	{
+		$doc = ($node instanceof DOMDocument) ? $node : $node->ownerDocument;
+
+		$tableNode = $node->appendChild($doc->createElement('table'));
+		$tableNode->setAttribute('name', $this->getName());
 
 		if ($this->phpName !== null) {
-			$result .= " phpName=\""
-				  . $this->phpName
-				  . '"';
+			$tableNode->setAttribute('phpName', $this->phpName);
 		}
 
 		if ($this->idMethod !== null) {
-			$result .= " idMethod=\""
-				  . $this->idMethod
-				  . '"';
+			$tableNode->setAttribute('idMethod', $this->idMethod);
 		}
 
-		if ($this->skipSql) {
-			$result .= " skipSql=\""
-				  . ($this->skipSql ? "true" : "false")
-				  . '"';
+		if ($this->skipSql !== null) {
+			$tableNode->setAttribute('idMethod', var_export($this->skipSql, true));
 		}
 
-		if ($this->readOnly) {
-			$result .= " readOnly=\""
-				  . ($this->readOnly ? "true" : "false")
-				  . '"';
+		if ($this->readOnly !== null) {
+			$tableNode->setAttribute('readOnly', var_export($this->readOnly, true));
 		}
 
-		if ($this->isTree) {
-			$result .= " isTree=\""
-				  . ($this->isTree ? "true" : "false")
-				  . '"';
+		if ($this->treeMode !== null) {
+			$tableNode->setAttribute('treeMode', $this->treeMode);
 		}
 
-		if ($this->forReferenceOnly) {
-			$result .= " forReferenceOnly=\""
-				  . ($this->forReferenceOnly ? "true" : "false")
-				  . '"';
+		if ($this->reloadOnInsert !== null) {
+			$tableNode->setAttribute('reloadOnInsert', var_export($this->reloadOnInsert, true));
 		}
 
-		if ($this->abstractValue) {
-			$result .= " abstract=\""
-				  . ($this->abstractValue ? "true" : "false")
-				  . '"';
+		if ($this->reloadOnUpdate !== null) {
+			$tableNode->setAttribute('reloadOnUpdate', var_export($this->reloadOnUpdate, true));
+		}
+
+		if ($this->forReferenceOnly !== null) {
+			$tableNode->setAttribute('forReferenceOnly', var_export($this->forReferenceOnly, true));
+		}
+
+		if ($this->abstractValue !== null) {
+			$tableNode->setAttribute('abstract', var_export($this->abstractValue, true));
 		}
 
 		if ($this->enterface !== null) {
-			$result .= " interface=\""
-				  . $this->enterface
-				  . '"';
+			$tableNode->setAttribute('interface', $this->enterface);
 		}
 
 		if ($this->description !== null) {
-			$result .= " description=\""
-				  . $this->description
-				  . '"';
+			$tableNode->setAttribute('description', $this->description);
 		}
 
 		if ($this->baseClass !== null) {
-			$result .= " baseClass=\""
-				  . $this->baseClass
-				  . '"';
+			$tableNode->setAttribute('baseClass', $this->baseClass);
 		}
 
 		if ($this->basePeer !== null) {
-			$result .= " basePeer=\""
-				  . $this->basePeer
-				  . '"';
+			$tableNode->setAttribute('basePeer', $this->basePeer);
 		}
 
-		$result .= ">\n";
-
-		if ($this->columnList !== null) {
-			for($i=0,$_i=count($this->columnList); $i < $_i; $i++) {
-				$result .= $this->columnList[$i]->toString();
-			}
+		foreach ($this->columnList as $col) {
+			$col->appendXml($tableNode);
 		}
 
-		if ($this->validatorList !== null) {
-			for($i=0,$_i=count($this->validatorList); $i < $_i; $i++) {
-				$result .= $this->validatorList[$i]->toString();
-			}
+		foreach ($this->validatorList as $validator) {
+			$validator->appendXml($tableNode);
 		}
 
-		if ($this->foreignKeys !== null) {
-			for($i=0,$_i=count($this->foreignKeys); $i < $_i; $i++) {
-				$result .= $this->foreignKeys[$i]->toString();
-			}
+		foreach ($this->foreignKeys as $fk) {
+			$fk->appendXml($tableNode);
 		}
 
-		if ($this->idMethodParameters !== null) {
-			for($i=0,$_i=count($this->idMethodParameters); $i < $_i; $i++) {
-				$result .= $this->idMethodParameters[$i]->toString();
-			}
+		foreach ($this->idMethodParameters as $param) {
+			$param->appendXml($tableNode);
 		}
 
-		$result .= "</table>\n";
+		foreach ($this->indices as $index) {
+			$index->appendXml($tableNode);
+		}
 
-		return $result;
+		foreach ($this->unices as $unique) {
+			$unique->appendXml($tableNode);
+		}
+
+		foreach ($this->vendorInfos as $vi) {
+			$vi->appendXml($tableNode);
+		}
+
 	}
 
 	/**
 	 * Returns the collection of Columns which make up the single primary
 	 * key for this table.
 	 *
-	 * @return     array A list of the primary key parts.
+	 * @return     array Column[] A list of the primary key parts.
 	 */
 	public function getPrimaryKey()
 	{
 		$pk = array();
-		for($i=0,$_i=count($this->columnList); $i < $_i; $i++) {
+		for ($i=0,$_i=count($this->columnList); $i < $_i; $i++) {
 			$col = $this->columnList[$i];
 			if ($col->isPrimaryKey()) {
 				$pk[] = $col;
@@ -1121,6 +1325,24 @@ class Table extends XMLElement implements IDMethod {
 	}
 
 	/**
+	 * Gets the auto increment PK
+	 *
+	 * @return    Column if any auto increment PK column
+	 */
+	public function getAutoIncrementPrimaryKey()
+	{
+		if ($this->getIdMethod() != IDMethod::NO_ID_METHOD) {
+			$pks =$this->getPrimaryKey();
+			foreach ($pks as $pk) {
+				if ($pk->isAutoIncrement()) {
+					return $pk;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Returns all parts of the primary key, separated by commas.
 	 *
 	 * @return     A CSV list of primary key parts.
@@ -1140,7 +1362,7 @@ class Table extends XMLElement implements IDMethod {
 	private function printList($list){
 		$result = "";
 		$comma = 0;
-		for($i=0,$_i=count($list); $i < $_i; $i++) {
+		for ($i=0,$_i=count($list); $i < $_i; $i++) {
 			$col = $list[$i];
 			if ($col->isPrimaryKey()) {
 				$result .= ($comma++ ? ',' : '') . $this->getDatabase()->getPlatform()->quoteIdentifier($col->getName());

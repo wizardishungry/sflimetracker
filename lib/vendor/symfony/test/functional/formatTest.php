@@ -70,17 +70,6 @@ $b->
 ;
 
 $b->
-  setHttpHeader('Accept', 'application/javascript')->
-  get('/format/jsWithAccept')->
-  isStatusCode(200)->
-  isRequestParameter('module', 'format')->
-  isRequestParameter('action', 'jsWithAccept')->
-  isRequestFormat('js')->
-  isResponseHeader('content-type', 'application/javascript')
-;
-$b->test()->like($b->getResponse()->getContent(), '/This is a js file/', 'response content is ok');
-
-$b->
   get('/format/js')->
   isStatusCode(200)->
   isRequestParameter('module', 'format')->
@@ -100,4 +89,9 @@ $b->
   isResponseHeader('content-type', 'text/html; charset=utf-8')->
   checkResponseElement('#content', 'This is an HTML file for the iPhone')->
   checkResponseElement('link[href*="iphone.css"]')
+;
+
+$b->
+  getAndCheck('format', 'throwsException', null, 500)->
+  throwsException('Exception', '/message/')
 ;

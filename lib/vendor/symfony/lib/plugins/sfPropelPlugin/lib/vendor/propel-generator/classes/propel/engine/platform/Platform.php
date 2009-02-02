@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: Platform.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: Platform.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -24,16 +24,51 @@
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Martin Poeschl <mpoeschl@marmot.at> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 989 $
  * @package    propel.engine.platform
  */
 interface Platform {
 
-	/** constant for native id method */
+	/**
+	 * Constant for auto-increment id method.
+	 */
 	const IDENTITY = "identity";
 
-	/** constant for native id method */
+	/**
+	 * Constant for sequence id method.
+	 */
 	const SEQUENCE = "sequence";
+
+	/**
+	 * Constant for serial id method (postgresql).
+	 */
+	const SERIAL = "serial";
+
+	/**
+	 * Sets a database connection to use (for quoting, etc.).
+	 * @param      PDO $con The database connection to use in this Platform class.
+	 */
+	public function setConnection(PDO $con = null);
+
+	/**
+	 * Returns the database connection to use for this Platform class.
+	 * @return     PDO The database connection or NULL if none has been set.
+	 */
+	public function getConnection();
+
+	/**
+	 * Sets the GeneratorConfig which contains any generator build properties.
+	 *
+	 * @param      GeneratorConfig $config
+	 */
+	public function setGeneratorConfig(GeneratorConfig $config);
+
+	/**
+	 * Gets the GeneratorConfig object.
+	 *
+	 * @return     GeneratorConfig
+	 */
+	public function getGeneratorConfig();
 
 	/**
 	 * Returns the short name of the database type that this platform represents.
@@ -92,11 +127,11 @@ interface Platform {
 	public function hasScale($sqlType);
 
 	/**
-	 * Escape the string for RDBMS.
+	 * Quote and escape needed characters in the string for unerlying RDBMS.
 	 * @param      string $text
 	 * @return     string
 	 */
-	public function escapeText($text);
+	public function quote($text);
 
 	/**
 	 * Quotes identifiers used in database SQL.
@@ -125,4 +160,27 @@ interface Platform {
 	 */
 	public function getBooleanString($tf);
 
+	/**
+	 * Whether the underlying PDO driver for this platform returns BLOB columns as streams (instead of strings).
+	 * @return     boolean
+	 */
+	public function hasStreamBlobImpl();
+
+	/**
+	 * Gets the preferred timestamp formatter for setting date/time values.
+	 * @return     string
+	 */
+	public function getTimestampFormatter();
+
+	/**
+	 * Gets the preferred date formatter for setting time values.
+	 * @return     string
+	 */
+	public function getDateFormatter();
+
+	/**
+	 * Gets the preferred time formatter for setting time values.
+	 * @return     string
+	 */
+	public function getTimeFormatter();
 }

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: MaxLengthValidator.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: MaxLengthValidator.php 521 2007-01-05 13:29:36Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,8 +18,6 @@
  * and is licensed under the LGPL. For more information please see
  * <http://propel.phpdb.org>.
  */
-
-require_once 'propel/validator/BasicValidator.php';
 
 /**
  * A validator for maximum string length.
@@ -39,7 +37,7 @@ require_once 'propel/validator/BasicValidator.php';
  * </code>
  *
  * @author     Michael Aichler <aichler@mediacluster.de>
- * @version    $Revision: 536 $
+ * @version    $Revision: 521 $
  * @package    propel.validator
  */
 class MaxLengthValidator implements BasicValidator

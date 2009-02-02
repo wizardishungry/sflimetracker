@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: DirectoryScanner.php 277 2007-11-01 01:25:23Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -698,11 +698,13 @@ class DirectoryScanner implements SelectorScanner {
      */
     protected function isSelected($name, $file) {
         if ($this->selectors !== null) {
-            for ($i=0,$size=count($this->selectors); $i < $size; $i++) {
-                if (($this->selectors[$i]->isSelected(new PhingFile($this->basedir), $name, new PhingFile($file))) === false) {
-                    return false;
-                }
-            }
+        	$basedir = new PhingFile($this->basedir);
+        	$file = new PhingFile($file);
+        	foreach($this->selectors as $selector) {
+        		if (!$selector->isSelected($basedir, $name, $file)) {
+        			return false;
+        		}
+        	}
         }
         return true;
     }

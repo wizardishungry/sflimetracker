@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id$
+ *  $Id: Properties.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -135,7 +135,7 @@ class Properties {
     public function toString() {
         $buf = "";        
         foreach($this->properties as $key => $item) {
-            $buf .= $key . "=" . $this->outVal($item) . Phing::getProperty('line.separator');
+            $buf .= $key . "=" . $this->outVal($item) . PHP_EOL;
         }
         return $buf;    
     }
@@ -154,9 +154,8 @@ class Properties {
         // file prior, this method stores them in the file used by load()        
         try {
             $fw = new FileWriter($file);
-            $fw->open();
             if ($header !== null) {
-                $fw->write( "# " . $header . Phing::getProperty("line.separator") );
+                $fw->write( "# " . $header . PHP_EOL );
             }
             $fw->write($this->toString());
             $fw->close();
@@ -215,7 +214,10 @@ class Properties {
      * @return mixed Old property value or NULL if none was set.
      */
     function setProperty($key, $value) {
-        $oldValue = @$this->properties[$key];       
+    	$oldValue = null;
+    	if (isset($this->properties[$key])) {
+    		$oldValue = $this->properties[$key];
+    	}
         $this->properties[$key] = $value;
         return $oldValue;
     }
@@ -267,4 +269,4 @@ class Properties {
     }
 
 }
-?>
+

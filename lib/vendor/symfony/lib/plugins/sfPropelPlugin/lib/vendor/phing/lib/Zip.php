@@ -16,7 +16,7 @@
 // | Author: Vincent Blavet <vincent@blavet.net>                          |
 // +----------------------------------------------------------------------+
 //
-// $Id$
+// $Id: Zip.php 325 2007-12-20 15:44:58Z hans $
 
   // ----- Constants
   define( 'ARCHIVE_ZIP_READ_BLOCK_SIZE', 2048 );
@@ -1268,6 +1268,8 @@ class Archive_Zip
     // ----- Look for partial path remove
     else if ($p_remove_dir != "")
     {
+      $p_remove_dir = $this->_tool_TranslateWinPath($p_remove_dir, false);
+    	
       if (substr($p_remove_dir, -1) != '/')
         $p_remove_dir .= "/";
 
@@ -3585,4 +3587,4 @@ class Archive_Zip
   }
   // End of class
 
-?>
+

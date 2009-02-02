@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$  
+ *  $Id: ResolvePathTask.php 144 2007-02-05 15:19:00Z hans $  
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -115,7 +115,7 @@ class ResolvePathTask extends Task {
             $resolved = $this->project->resolveFile($this->file);
         }
         
-        $this->log("Resolved " . $this->file . " to " . $resolved->getAbsolutePath(), PROJECT_MSG_INFO);
+        $this->log("Resolved " . $this->file . " to " . $resolved->getAbsolutePath(), Project::MSG_INFO);
         $this->project->setProperty($this->propertyName, $resolved->getAbsolutePath());
     }
 

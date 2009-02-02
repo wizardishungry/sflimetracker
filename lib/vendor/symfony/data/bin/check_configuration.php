@@ -67,11 +67,19 @@ if (is_cli())
 
 // mandatory
 echo "\n** Mandatory requirements **\n\n";
-check(version_compare(phpversion(), '5.1.3', '>='), 'requires PHP >= 5.1.3', 'Current version is '.phpversion(), true);
+check(version_compare(phpversion(), '5.2.4', '>='), 'requires PHP >= 5.2.4', 'Current version is '.phpversion(), true);
 check(!ini_get('zend.ze1_compatibility_mode'), 'php.ini: requires zend.ze1_compatibility_mode set to off', sprintf('Set it to off in php.ini (%s)', get_ini_path()), true);
 
 // warnings
 echo "\n** Optional checks **\n\n";
+check(class_exists('PDO'), 'PDO is installed', 'Install PDO (mandatory for Propel and Doctrine)', false);
+if (class_exists('PDO'))
+{
+  $drivers = PDO::getAvailableDrivers();
+  check(count($drivers), 'PDO has some drivers installed: '.implode(', ', $drivers), 'Install PDO drivers (mandatory for Propel and Doctrine)');
+}
+check(class_exists('DomDocument'), 'PHP-XML module installed', 'Install the php-xml module (required by Propel)', false);
+check(class_exists('XSLTProcessor'), 'XSL module installed', 'Install the XSL module (recommended for Propel)', false);
 check(function_exists('token_get_all'), 'can use token_get_all()', 'Install token_get_all() function (highly recommended)', false);
 check(function_exists('mb_strlen'), 'can use mb_strlen()', 'Install mb_strlen() function', false);
 check(function_exists('iconv'), 'can use iconv()', 'Install iconv() function', false);
@@ -84,11 +92,12 @@ $accelerator =
   ||
   function_exists('xcache_set')
 ;
-check($accelerator, 'has a PHP accelerator', 'Install a PHP accelerator (highly recommended)', false);
+check($accelerator, 'has a PHP accelerator', 'Install a PHP accelerator like APC (highly recommended)', false);
 
-check(!ini_get('magic_quotes_gpc'), 'php.ini: magic_quotes_gpc set to off', 'Set it to off in php.ini');
-check(!ini_get('register_globals'), 'php.ini: register_globals set to off', 'Set it to off in php.ini');
-check(!ini_get('session.auto_start'), 'php.ini: session.auto_start set to off', 'Set it to off in php.ini');
+check(!ini_get('short_open_tag'), 'php.ini: short_open_tag set to off', 'Set it to off in php.ini', false);
+check(!ini_get('magic_quotes_gpc'), 'php.ini: magic_quotes_gpc set to off', 'Set it to off in php.ini', false);
+check(!ini_get('register_globals'), 'php.ini: register_globals set to off', 'Set it to off in php.ini', false);
+check(!ini_get('session.auto_start'), 'php.ini: session.auto_start set to off', 'Set it to off in php.ini', false);
 
 if (!is_cli())
 {

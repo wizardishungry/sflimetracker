@@ -15,7 +15,7 @@ require_once(dirname(__FILE__).'/../../../lib/helper/TagHelper.php');
 require_once(dirname(__FILE__).'/../../../lib/helper/UrlHelper.php');
 require_once(dirname(__FILE__).'/../../../lib/helper/AssetHelper.php');
 
-$t = new lime_test(54, new lime_output_color());
+$t = new lime_test(61, new lime_output_color());
 
 class myRequest
 {
@@ -58,18 +58,26 @@ $context->request->relativeUrlRoot = '';
 $t->is(_compute_public_path('foo.css?foo=bar', 'css', 'css'), '/css/foo.css?foo=bar', '_compute_public_path() takes into account query strings');
 $t->is(_compute_public_path('foo?foo=bar', 'css', 'css'), '/css/foo.css?foo=bar', '_compute_public_path() takes into account query strings');
 
+$compatMode = sfConfig::get('sf_compat_10');
+sfConfig::set('sf_compat_10', false);
 // image_tag()
 $t->diag('image_tag()');
 $t->is(image_tag(''), '', 'image_tag() returns nothing when called without arguments');
-$t->is(image_tag('test'), '<img src="/images/test.png" alt="Test" />', 'image_tag() takes an image name as its first argument');
-$t->is(image_tag('test.png'), '<img src="/images/test.png" alt="Test" />', 'image_tag() can take an image name with an extension');
-$t->is(image_tag('/images/test.png'), '<img src="/images/test.png" alt="Test" />', 'image_tag() can take an absolute image path');
-$t->is(image_tag('/images/test'), '<img src="/images/test.png" alt="Test" />', 'image_tag() can take an absolute image path without extension');
-$t->is(image_tag('test.jpg'), '<img src="/images/test.jpg" alt="Test" />', 'image_tag() can take an image name with an extension');
+$t->is(image_tag('test'), '<img src="/images/test.png" />', 'image_tag() takes an image name as its first argument');
+$t->is(image_tag('test.png'), '<img src="/images/test.png" />', 'image_tag() can take an image name with an extension');
+$t->is(image_tag('/images/test.png'), '<img src="/images/test.png" />', 'image_tag() can take an absolute image path');
+$t->is(image_tag('/images/test'), '<img src="/images/test.png" />', 'image_tag() can take an absolute image path without extension');
+$t->is(image_tag('test.jpg'), '<img src="/images/test.jpg" />', 'image_tag() can take an image name with an extension');
 $t->is(image_tag('test', array('alt' => 'Foo')), '<img alt="Foo" src="/images/test.png" />', 'image_tag() takes an array of options as its second argument to override alt');
-$t->is(image_tag('test', array('size' => '10x10')), '<img src="/images/test.png" alt="Test" height="10" width="10" />', 'image_tag() takes a size option');
-$t->is(image_tag('test', array('absolute' => true)), '<img src="http://localhost/images/test.png" alt="Test" />', 'image_tag() can take an absolute parameter');
-$t->is(image_tag('test', array('class' => 'bar')), '<img class="bar" src="/images/test.png" alt="Test" />', 'image_tag() takes whatever option you want');
+$t->is(image_tag('test', array('size' => '10x10')), '<img src="/images/test.png" height="10" width="10" />', 'image_tag() takes a size option');
+$t->is(image_tag('test', array('absolute' => true)), '<img src="http://localhost/images/test.png" />', 'image_tag() can take an absolute parameter');
+$t->is(image_tag('test', array('class' => 'bar')), '<img class="bar" src="/images/test.png" />', 'image_tag() takes whatever option you want');
+$t->is(image_tag('test', array('alt_title' => 'Foo')), '<img src="/images/test.png" alt="Foo" title="Foo" />', 'image_tag() takes an array of options as its second argument to create alt and title');
+$t->is(image_tag('test', array('alt_title' => 'Foo', 'title' => 'Bar')), '<img title="Bar" src="/images/test.png" alt="Foo" />', 'image_tag() takes an array of options as its second argument to create alt and title');
+sfConfig::set('sf_compat_10', true);
+$t->is(image_tag('test'), '<img src="/images/test.png" alt="Test" />', 'image_tag() creates alt attribute from filename if sf_compat_10 is on');
+
+sfConfig::set('sf_compat_10', $compatMode);
 
 // stylesheet_tag()
 $t->diag('stylesheet_tag()');
@@ -89,6 +97,9 @@ $t->is(stylesheet_tag('style', array('absolute' => true)),
 $t->is(stylesheet_tag('style', array('raw_name' => true)), 
   '<link rel="stylesheet" type="text/css" media="screen" href="style" />'."\n", 
   'stylesheet_tag() can take a raw_name option to bypass file name decoration');
+$t->is(stylesheet_tag('style', array('condition' => 'IE 6')),
+  '<!--[if IE 6]><link rel="stylesheet" type="text/css" media="screen" href="/css/style.css" /><![endif]-->'."\n",
+  'stylesheet_tag() can take a condition option');
 
 // javascript_include_tag()
 $t->diag('javascript_include_tag()');
@@ -108,6 +119,9 @@ $t->is(javascript_include_tag('xmlhr', array('raw_name' => true)),
 $t->is(javascript_include_tag('xmlhr', array('defer' => 'defer')),
   '<script type="text/javascript" src="/js/xmlhr.js" defer="defer"></script>'."\n", 
   'javascript_include_tag() can take additional html options like defer');
+$t->is(javascript_include_tag('xmlhr', array('condition' => 'IE 6')),
+  '<!--[if IE 6]><script type="text/javascript" src="/js/xmlhr.js"></script><![endif]-->'."\n",
+  'javascript_include_tag() can take a condition option');
 
 // javascript_path()
 $t->diag('javascript_path()');
@@ -199,3 +213,32 @@ $t->is(get_stylesheets(),
   '<link rel="stylesheet" type="text/css" media="screen" href="module/action?sf_format=css" />'."\n", 
   'use_dynamic_stylesheet() register a dynamic stylesheet in the response'
 );
+
+class MyForm extends sfForm
+{
+  public function getStylesheets()
+  {
+    return array('/path/to/a/foo.css' => 'all', '/path/to/a/bar.css' => 'print');
+  }
+
+  public function getJavaScripts()
+  {
+    return array('/path/to/a/foo.js', '/path/to/a/bar.js');
+  }
+}
+
+// get_javascripts_for_form() get_stylesheets_for_form()
+$t->diag('get_javascripts_for_form() get_stylesheets_for_form()');
+$form = new MyForm();
+$t->is(get_javascripts_for_form($form), <<<EOF
+<script type="text/javascript" src="/path/to/a/foo.js"></script>
+<script type="text/javascript" src="/path/to/a/bar.js"></script>
+
+EOF
+, 'get_javascripts_for_form() returns script tags');
+$t->is(get_stylesheets_for_form($form), <<<EOF
+<link rel="stylesheet" type="text/css" media="all" href="/path/to/a/foo.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/path/to/a/bar.css" />
+
+EOF
+, 'get_stylesheets_for_form() returns link tags');

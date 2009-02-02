@@ -52,14 +52,15 @@ class sfSessionStorage extends sfStorage
     $cookieDefaults = session_get_cookie_params();
 
     $options = array_merge(array(
-      'session_name' => 'symfony',
-      'session_id'   => null,
-      'auto_start' => true,
+      'session_name'            => 'symfony',
+      'session_id'              => null,
+      'auto_start'              => true,
       'session_cookie_lifetime' => $cookieDefaults['lifetime'],
-      'session_cookie_path' => $cookieDefaults['path'],
-      'session_cookie_domain' => $cookieDefaults['domain'],
-      'session_cookie_secure' => $cookieDefaults['secure'],
+      'session_cookie_path'     => $cookieDefaults['path'],
+      'session_cookie_domain'   => $cookieDefaults['domain'],
+      'session_cookie_secure'   => $cookieDefaults['secure'],
       'session_cookie_httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
+      'session_cache_limiter'   => 'none',
     ), $options);
 
     // initialize parent
@@ -80,13 +81,11 @@ class sfSessionStorage extends sfStorage
     $domain   = $this->options['session_cookie_domain'];
     $secure   = $this->options['session_cookie_secure'];
     $httpOnly = $this->options['session_cookie_httponly'];
-    if (version_compare(phpversion(), '5.2', '>='))
+    session_set_cookie_params($lifetime, $path, $domain, $secure, $httpOnly);
+
+    if (!is_null($this->options['session_cache_limiter']))
     {
-      session_set_cookie_params($lifetime, $path, $domain, $secure, $httpOnly);
-    }
-    else
-    {
-      session_set_cookie_params($lifetime, $path, $domain, $secure);
+      session_cache_limiter($this->options['session_cache_limiter']);
     }
 
     if ($this->options['auto_start'] && !self::$sessionStarted)

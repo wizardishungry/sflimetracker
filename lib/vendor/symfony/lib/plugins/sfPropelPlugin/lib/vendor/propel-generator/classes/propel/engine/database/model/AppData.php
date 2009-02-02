@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: AppData.php 803 2007-11-13 21:24:21Z dwhittle $
+ *  $Id: AppData.php 521 2007-01-05 13:29:36Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,7 +29,7 @@ include_once 'propel/engine/database/model/Database.php';
  * @author     Leon Messerschmidt <leon@opticode.co.za> (Torque)
  * @author     John McNally <jmcnally@collab.net> (Torque)
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
- * @version    $Revision: 803 $
+ * @version    $Revision: 521 $
  * @package    propel.engine.database.model
  */
 class AppData {
@@ -141,7 +141,7 @@ class AppData {
 			return $this->dbList[0];
 		}
 
-		for($i=0,$size=count($this->dbList); $i < $size; $i++) {
+		for ($i=0,$size=count($this->dbList); $i < $size; $i++) {
 			$db = $this->dbList[$i];
 			if ($db->getName() === $name) {
 				return $db;
@@ -181,7 +181,7 @@ class AppData {
 	private function doFinalInitialization()
 	{
 		if (!$this->isInitialized) {
-			for($i=0, $size=count($this->dbList); $i < $size; $i++) {
+			for ($i=0, $size=count($this->dbList); $i < $size; $i++) {
 				$this->dbList[$i]->doFinalInitialization();
 			}
 			$this->isInitialized = true;

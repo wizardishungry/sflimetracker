@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id$
+ * $Id: ProjectHandler.php 132 2007-01-25 19:38:05Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,7 +28,7 @@ require_once 'phing/system/io/PhingFile.php';
  *
  * @author      Andreas Aderhold <andi@binarycloud.com>
  * @copyright (c) 2001,2002 THYRELL. All rights reserved
- * @version   $Revision: 1.14 $ $Date: 2005/10/04 19:13:44 $
+ * @version   $Revision: 1.14 $ $Date: 2007-01-25 14:38:05 -0500 (Thu, 25 Jan 2007) $
  * @access    public
  * @package   phing.parser
  */
@@ -67,6 +67,7 @@ class ProjectHandler extends AbstractHandler {
         $def = null;
         $name = null;
         $id    = null;
+        $desc = null;
         $baseDir = null;
 
         // some shorthands
@@ -82,6 +83,8 @@ class ProjectHandler extends AbstractHandler {
                 $id = $value;
             } elseif ($key === "basedir") {
                 $baseDir = $value;
+            } elseif ($key === "description") {
+                $desc = $value;
             } else {
                 throw new ExpatParseException("Unexpected attribute '$key'");
             }
@@ -99,6 +102,10 @@ class ProjectHandler extends AbstractHandler {
         if ($id !== null) {
             $project->addReference($id, $project);
         }
+        
+        if ($desc !== null) {
+            $project->setDescription($desc);
+        }        
 
         if ($project->getProperty("project.basedir") !== null) {
             $project->setBasedir($project->getProperty("project.basedir"));

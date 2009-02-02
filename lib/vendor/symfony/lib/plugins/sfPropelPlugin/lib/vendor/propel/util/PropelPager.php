@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: PropelPager.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: PropelPager.php 563 2007-02-01 09:45:55Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -45,33 +45,33 @@
  * <table>
  * <tr>
  * <td>
- * <?if($link = $pager->getFirstPage):?>
+ * <?if ($link = $pager->getFirstPage):?>
  * <a href="somescript?page=<?=$link?>"><?=$link?></a>|
  * <?endif?>
  * </td>
  * <td>
- * <?if($link = $pager->getPrev()):?>
+ * <?if ($link = $pager->getPrev()):?>
  * <a href="somescript?page=<?=$link?>">Previous</a>|
  * <?endif?>
  * </td>
  * <td>
- * <?foreach($pager->getPrevLinks() as $link):?>
+ * <?foreach ($pager->getPrevLinks() as $link):?>
  * <a href="somescript?page=<?=$link?>"><?=$link?></a>|
  * <?endforeach?>
  * </td>
  * <td><?=$pager->getPage()?></td>
  * <td>
- * <?foreach($pager->getNextLinks() as $link):?>
+ * <?foreach ($pager->getNextLinks() as $link):?>
  * | <a href="somescript?page=<?=$link?>"><?=$link?></a>
  * <?endforeach?>
  * </td>
  * <td>
- * <?if($link = $pager->getNext()):?>
+ * <?if ($link = $pager->getNext()):?>
  * <a href="somescript?page=<?=$link?>">Last</a>|
  * <?endif?>
  * </td>
  * <td>
- * <?if($link = $pager->getLastPage()):?>
+ * <?if ($link = $pager->getLastPage()):?>
  * <a href="somescript?page=<?=$link?>"><?=$link?></a>|
  * <?endif?>
  * </td>
@@ -84,7 +84,7 @@
  * <th>Date</th>
  * <th>comments</th>
  * </tr>
- * <?foreach($pager->getResult() as $poem):?>
+ * <?foreach ($pager->getResult() as $poem):?>
  * <tr>
  * <td><?=$poem->getTitle()?></td>
  * <td><?=$poem->getPoemUsers()->getUname()?></td>
@@ -96,7 +96,7 @@
  *
  *
  * @author     Rob Halff <info@rhalff.com>
- * @version    $Revision: 536 $
+ * @version    $Revision: 563 $
  * @copyright  Copyright (c) 2004 Rob Halff: LGPL - See LICENCE
  * @package    propel.util
  */
@@ -128,7 +128,7 @@ class PropelPager {
 	 */
 	public function __construct($c = null, $peerClass = null, $peerSelectMethod = null, $page = 1, $rowsPerPage = 25)
 	{
-		if(!isset($c)) {
+		if (!isset($c)) {
 			$c = new Criteria();
 		}
 		$this->setCriteria($c);
@@ -268,7 +268,7 @@ class PropelPager {
 	 */
 	public function getResult()
 	{
-		if(!isset($this->rs)) {
+		if (!isset($this->rs)) {
 			$this->doRs();
 		}
 
@@ -343,9 +343,9 @@ class PropelPager {
 	 * @return     int $this->pages
 	 */
 	public function getTotalPages() {
-		if(!isset($this->pages)) {
+		if (!isset($this->pages)) {
 			$recordCount = $this->getTotalRecordCount();
-			if($this->max > 0) {
+			if ($this->max > 0) {
 					$this->pages = ceil($recordCount/$this->max);
 			} else {
 					$this->pages = 0;
@@ -367,8 +367,8 @@ class PropelPager {
 		$end = $this->getPage() - $range;
 		$first =  $this->getFirstPage();
 		$links = array();
-		for($i=$start; $i>$end; $i--) {
-			if($i < $first) {
+		for ($i=$start; $i>$end; $i--) {
+			if ($i < $first) {
 					break;
 			}
 			$links[] = $i;
@@ -390,8 +390,8 @@ class PropelPager {
 		$end = $this->getPage() + $range;
 		$last =  $this->getLastPage();
 		$links = array();
-		for($i=$start; $i<$end; $i++) {
-			if($i > $last) {
+		for ($i=$start; $i<$end; $i++) {
+			if ($i > $last) {
 					break;
 			}
 			$links[] = $i;
@@ -416,7 +416,7 @@ class PropelPager {
 	 * @return     mixed $prev
 	 */
 	public function getPrev() {
-		if($this->getPage() != $this->getFirstPage()) {
+		if ($this->getPage() != $this->getFirstPage()) {
 				$prev = $this->getPage() - 1;
 		} else {
 				$prev = false;
@@ -430,7 +430,7 @@ class PropelPager {
 	 * @return     mixed $next
 	 */
 	public function getNext() {
-		if($this->getPage() != $this->getLastPage()) {
+		if ($this->getPage() != $this->getLastPage()) {
 				$next = $this->getPage() + 1;
 		} else {
 				$next = false;
@@ -498,11 +498,11 @@ class PropelPager {
 	public function getTotalRecordCount()
 	{
 
-				if(!isset($this->rs)) {
+				if (!isset($this->rs)) {
 					$this->doRs();
 				}
 
-				if(empty($this->recordCount)) {
+				if (empty($this->recordCount)) {
 						$this->countCriteria = clone $this->criteria;
 						$this->countCriteria->setLimit(0);
 						$this->countCriteria->setOffset(0);

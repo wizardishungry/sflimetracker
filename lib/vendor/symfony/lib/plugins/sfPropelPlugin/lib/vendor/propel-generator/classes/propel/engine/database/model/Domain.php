@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: Domain.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: Domain.php 989 2008-03-11 14:29:30Z heltem $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -22,26 +22,53 @@
 require_once 'propel/engine/database/model/XMLElement.php';
 
 /**
- * A Class for holding data about a column used in an Application.
+ * A class for holding data about a domain used in the schema.
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Martin Poeschl <mpoeschl@marmot.at> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 989 $
  * @package    propel.engine.database.model
  */
 class Domain extends XMLElement {
 
+	/**
+	 * @var        string The name of this domain
+	 */
 	private $name;
+
+	/**
+	 * @var        string Description for this domain.
+	 */
 	private $description;
+
+	/**
+	 * @var        int Size
+	 */
 	private $size;
+
+	/**
+	 * @var        int Scale
+	 */
 	private $scale;
 
-	/** type as defined in schema.xml */
+	/**
+	 * @var        int Propel type from schema
+	 */
 	private $propelType;
+
+	/**
+	 * @var        string The SQL type to use for this column
+	 */
 	private $sqlType;
+
+	/**
+	 * @var        ColumnDefaultValue A default value
+	 */
 	private $defaultValue;
 
-	/** Database object -- in the event this Domain is specified in the XML. */
+	/**
+	 * @var        Database
+	 */
 	private $database;
 
 	/**
@@ -61,6 +88,10 @@ class Domain extends XMLElement {
 		$this->scale = $scale;
 	}
 
+	/**
+	 * Copy the values from current object into passed-in Domain.
+	 * @param      Domain $domain Domain to copy values into.
+	 */
 	public function copy(Domain $domain)
 	{
 		$this->defaultValue = $domain->getDefaultValue();
@@ -72,7 +103,7 @@ class Domain extends XMLElement {
 		$this->propelType = $domain->getType();
 	}
 
-   /**
+	/**
 	 * Sets up the Domain object based on the attributes that were passed to loadFromXML().
 	 * @see        parent::loadFromXML()
 	 */
@@ -84,8 +115,13 @@ class Domain extends XMLElement {
 		//Name
 		$this->name = $this->getAttribute("name");
 
-		//Default column value.
-		$this->defaultValue = $this->getAttribute("default"); // may need to adjust -- e.g. for boolean values
+		// Default value
+		$defval = $this->getAttribute("defaultValue", $this->getAttribute("default"));
+		if ($defval !== null) {
+			$this->setDefaultValue(new ColumnDefaultValue($defval, ColumnDefaultValue::TYPE_VALUE));
+		} elseif ($this->getAttribute("defaultExpr") !== null) {
+			$this->setDefaultValue(new ColumnDefaultValue($this->getAttribute("defaultExpr"), ColumnDefaultValue::TYPE_EXPR));
+		}
 
 		$this->size = $this->getAttribute("size");
 		$this->scale = $this->getAttribute("scale");
@@ -94,20 +130,24 @@ class Domain extends XMLElement {
 
 	/**
 	 * Sets the owning database object (if this domain is being setup via XML).
+	 * @param      Database $database
 	 */
-	public function setDatabase(Database $database) {
+	public function setDatabase(Database $database)
+	{
 		$this->database = $database;
 	}
 
 	/**
 	 * Gets the owning database object (if this domain was setup via XML).
+	 * @return     Database
 	 */
-	public function getDatabase() {
+	public function getDatabase()
+	{
 		return $this->database;
 	}
 
 	/**
-	 * @return     Returns the description.
+	 * @return     string Returns the description.
 	 */
 	public function getDescription()
 	{
@@ -115,7 +155,7 @@ class Domain extends XMLElement {
 	}
 
 	/**
-	 * @param      description The description to set.
+	 * @param      string $description The description to set.
 	 */
 	public function setDescription($description)
 	{
@@ -123,7 +163,7 @@ class Domain extends XMLElement {
 	}
 
 	/**
-	 * @return     Returns the name.
+	 * @return     string Returns the name.
 	 */
 	public function getName()
 	{
@@ -131,7 +171,7 @@ class Domain extends XMLElement {
 	}
 
 	/**
-	 * @param      name The name to set.
+	 * @param      string $name The name to set.
 	 */
 	public function setName($name)
 	{
@@ -139,7 +179,7 @@ class Domain extends XMLElement {
 	}
 
 	/**
-	 * @return     Returns the scale.
+	 * @return     string Returns the scale.
 	 */
 	public function getScale()
 	{
@@ -147,7 +187,7 @@ class Domain extends XMLElement {
 	}
 
 	/**
-	 * @param      scale The scale to set.
+	 * @param      string $scale The scale to set.
 	 */
 	public function setScale($scale)
 	{
@@ -157,7 +197,7 @@ class Domain extends XMLElement {
 	/**
 	 * Replaces the size if the new value is not null.
 	 *
-	 * @param      value The size to set.
+	 * @param      string $value The size to set.
 	 */
 	public function replaceScale($value)
 	{
@@ -167,7 +207,7 @@ class Domain extends XMLElement {
 	}
 
 	/**
-	 * @return     Returns the size.
+	 * @return     int Returns the size.
 	 */
 	public function getSize()
 	{
@@ -175,7 +215,7 @@ class Domain extends XMLElement {
 	}
 
 	/**
-	 * @param      size The size to set.
+	 * @param      int $size The size to set.
 	 */
 	public function setSize($size)
 	{
@@ -185,7 +225,7 @@ class Domain extends XMLElement {
 	/**
 	 * Replaces the size if the new value is not null.
 	 *
-	 * @param      value The size to set.
+	 * @param      int $value The size to set.
 	 */
 	public function replaceSize($value)
 	{
@@ -211,9 +251,9 @@ class Domain extends XMLElement {
 	}
 
 	/**
-	 * Replaces the default value if the new value is not null.
+	 * Replaces the type if the new value is not null.
 	 *
-	 * @param      value The defaultValue to set.
+	 * @param      string $value The tyep to set.
 	 */
 	public function replaceType($value)
 	{
@@ -223,14 +263,12 @@ class Domain extends XMLElement {
 	}
 
 	/**
-	 * Gets the "raw" default value, suitable for use in SQL.
-	 * @return     string Returns the defaultValue.
+	 * Gets the default value object.
+	 * @return     ColumnDefaultValue The default value object for this domain.
 	 */
 	public function getDefaultValue()
 	{
-		if ($this->defaultValue !== null) {
-			return $this->defaultValue;
-		}
+		return $this->defaultValue;
 	}
 
 	/**
@@ -242,35 +280,32 @@ class Domain extends XMLElement {
 	{
 		if ($this->defaultValue === null) {
 			return null;
-		} elseif ($this->propelType === PropelTypes::BOOLEAN) {
-			// convert "true" => TRUE
-			return $this->booleanValue($this->defaultValue);
-		} elseif ($this->propelType === PropelTypes::DATE || $this->propelType === PropelTypes::TIME || $this->propelType === PropelTypes::TIMESTAMP) {
-			// DATE/TIME vals need to be converted to integer timestamp
-			$ts = strtotime($this->defaultValue);
-			if ($ts === -1 || $ts === false) { // in PHP 5.1 return value changes to FALSE
-				throw new EngineException("Unable to parse default value as date/time value: " . var_export($this->defaultValue, true));
-			}
-			return $ts;
 		} else {
-			return $this->defaultValue;
+			if ($this->defaultValue->isExpression()) {
+				throw new EngineException("Cannot get PHP version of default value for default value EXPRESSION.");
+			}
+			if ($this->propelType === PropelTypes::BOOLEAN) {
+				return $this->booleanValue($this->defaultValue->getValue());
+			} else {
+				return $this->defaultValue->getValue();
+			}
 		}
 	}
 
 	/**
-	 * @param      defaultValue The defaultValue to set.
+	 * @param      ColumnDefaultValue $value The column default value to set.
 	 */
-	public function setDefaultValue($defaultValue)
+	public function setDefaultValue(ColumnDefaultValue $value)
 	{
-		$this->defaultValue = $defaultValue;
+		$this->defaultValue = $value;
 	}
 
 	/**
 	 * Replaces the default value if the new value is not null.
 	 *
-	 * @param      string $value The defaultValue to set.
+	 * @param      ColumnDefaultValue $value The defualt value object
 	 */
-	public function replaceDefaultValue($value)
+	public function replaceDefaultValue(ColumnDefaultValue $value = null)
 	{
 		if ($value !== null) {
 			$this->defaultValue = $value;
@@ -278,7 +313,7 @@ class Domain extends XMLElement {
 	}
 
 	/**
-	 * @return     Returns the sqlType.
+	 * @return     string Returns the sqlType.
 	 */
 	public function getSqlType()
 	{
@@ -294,9 +329,20 @@ class Domain extends XMLElement {
 	}
 
 	/**
+	 * Replaces the SQL type if the new value is not null.
+	 * @param      string $sqlType The native SQL type to use for this domain.
+	 */
+	public function replaceSqlType($sqlType)
+	{
+		if ($sqlType !== null) {
+			$this->sqlType = $sqlType;
+		}
+	}
+
+	/**
 	 * Return the size and scale in brackets for use in an sql schema.
 	 *
-	 * @return     size and scale or an empty String if there are no values
+	 * @return     string Size and scale or an empty String if there are no values
 	 *         available.
 	 */
 	public function printSize()
@@ -307,6 +353,43 @@ class Domain extends XMLElement {
 			return '(' . $this->size . ')';
 		} else {
 			return "";
+		}
+	}
+
+	/**
+	 * @see        XMLElement::appendXml(DOMNode)
+	 */
+	public function appendXml(DOMNode $node)
+	{
+		$doc = ($node instanceof DOMDocument) ? $node : $node->ownerDocument;
+
+		$domainNode = $node->appendChild($doc->createElement('domain'));
+		$domainNode->setAttribute('type', $this->getType());
+		$domainNode->setAttribute('name', $this->getName());
+
+		if ($this->sqlType !== $this->getType()) {
+			$domainNode->setAttribute('sqlType', $this->sqlType);
+		}
+
+		$def = $this->getDefaultValue();
+		if ($def) {
+			if ($def->isExpression()) {
+				$domainNode->setAttribute('defaultExpr', $def->getValue());
+			} else {
+				$domainNode->setAttribute('defaultValue', $def->getValue());
+			}
+		}
+
+		if ($this->size) {
+			$domainNode->setAttribute('size', $this->size);
+		}
+
+		if ($this->scale) {
+			$domainNode->setAttribute('scale', $this->scale);
+		}
+
+		if ($this->description) {
+			$domainNode->setAttribute('description', $this->description);
 		}
 	}
 

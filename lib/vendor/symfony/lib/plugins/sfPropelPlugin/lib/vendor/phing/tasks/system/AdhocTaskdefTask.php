@@ -1,7 +1,7 @@
 <?php
 
 /*
- * $Id$
+ * $Id: AdhocTaskdefTask.php 144 2007-02-05 15:19:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -84,7 +84,7 @@ class AdhocTaskdefTask extends AdhocTask {
             throw new BuildException("The adhoc class you defined must be an instance of phing.Task", $this->location);
         }
         
-        $this->log("Task " . $this->name . " will be handled by class " . $classname, PROJECT_MSG_VERBOSE);
+        $this->log("Task " . $this->name . " will be handled by class " . $classname, Project::MSG_VERBOSE);
         $this->project->addTaskDefinition($this->name, $classname);        
     }
 }

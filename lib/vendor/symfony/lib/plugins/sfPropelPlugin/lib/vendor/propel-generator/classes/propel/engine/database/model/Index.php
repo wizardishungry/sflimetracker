@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: Index.php 536 2007-01-10 14:30:38Z heltem $
+ *  $Id: Index.php 1027 2008-04-09 10:37:52Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,7 +28,7 @@ include_once 'propel/engine/EngineException.php';
  *
  * @author     Jason van Zyl <vanzyl@apache.org>
  * @author     Daniel Rall <dlr@finemaltcoding.com>
- * @version    $Revision: 536 $
+ * @version    $Revision: 1027 $
  * @package    propel.engine.database.model
  */
 class Index extends XMLElement {
@@ -46,25 +46,13 @@ class Index extends XMLElement {
 	private $indexColumnSizes = array();
 
 	/**
-	 * Creates a new instance with default characteristics (no name or
-	 * parent table, small column list size allocation, non-unique).
+	 * Creates a new Index instance.
 	 *
-	 * @param      Table $table
-	 * @param      array $indexColumns
+	 * @param      string $name
 	 */
-	public function __construct(Table $table, $indexColumns = array())
+	public function __construct($name=null)
 	{
-		$this->indexColumns = $indexColumns;
-		$this->setTable($table);
-		if (!empty($indexColumns)) {
-
-			$this->createName();
-
-			if (self::DEBUG) {
-				print("Created Index named " . $this->getName()
-						. " with " . count($indexColumns) . " columns\n");
-			}
-		}
+		$this->indexName = $name;
 	}
 
 	private function createName()
@@ -86,7 +74,7 @@ class Index extends XMLElement {
 		}
 
 		$this->indexName = NameFactory::generateName(
-				NameFactory::CONSTRAINT_GENERATOR, $inputs);
+		NameFactory::CONSTRAINT_GENERATOR, $inputs);
 	}
 
 	/**
@@ -137,7 +125,7 @@ class Index extends XMLElement {
 				// still no name
 			}
 		}
-		return $this->indexName;
+		return substr($this->indexName, 0, $this->getTable()->getDatabase()->getPlatform()->getMaxColumnNameLength());
 	}
 
 	/**
@@ -183,14 +171,37 @@ class Index extends XMLElement {
 
 	/**
 	 * Adds a new column to an index.
-	 * @param      array $attrib The attribute array from XML parser.
+	 * @param      mixed $data Column or attributes from XML.
 	 */
-	public function addColumn($attrib)
+	public function addColumn($data)
 	{
-		$name = $attrib["name"];
-		$this->indexColumns[] = $name;
-		if (isset($attrib["size"])) {
-			$this->indexColumnSizes[$name] = $attrib["size"];
+		if ($data instanceof Column) {
+			$column = $data;
+			$this->indexColumns[] = $column->getName();
+			if ($column->getSize()) {
+				$this->indexColumnSizes[$column->getName()] = $column->getSize();
+			}
+		} else {
+			$attrib = $data;
+			$name = $attrib["name"];
+			$this->indexColumns[] = $name;
+			if (isset($attrib["size"])) {
+				$this->indexColumnSizes[$name] = $attrib["size"];
+			}
+		}
+	}
+
+	/**
+	 * Sets array of columns to use for index.
+	 *
+	 * @param      array $indexColumns Column[]
+	 */
+	public function setColumns(array $indexColumns)
+	{
+		$this->indexColumns = array();
+		$this->indexColumnSizes = array();
+		foreach ($indexColumns as $col) {
+			$this->addColumn($col);
 		}
 	}
 
@@ -254,23 +265,22 @@ class Index extends XMLElement {
 	}
 
 	/**
-	 * String representation of the index. This is an xml representation.
+	 * @see        XMLElement::appendXml(DOMNode)
 	 */
-	public function toString()
+	public function appendXml(DOMNode $node)
 	{
+		$doc = ($node instanceof DOMDocument) ? $node : $node->ownerDocument;
 
-		$result = " <index name=\""
-			  . $this->getName()
-			  .'"';
+		$idxNode = $node->appendChild($doc->createElement('index'));
+		$idxNode->setAttribute('name', $this->getName());
 
-		$result .= ">\n";
-
-		for ($i=0, $size=count($this->indexColumns); $i < $size; $i++) {
-			$result .= "  <index-column name=\""
-				. $this->indexColumns[$i]
-				. "\"/>\n";
+		foreach ($this->indexColumns as $colname) {
+			$idxColNode = $idxNode->appendChild($doc->createElement('index-column'));
+			$idxColNode->setAttribute('name', $colname);
 		}
-		$result .= " </index>\n";
-		return $result;
+
+		foreach ($this->vendorInfos as $vi) {
+			$vi->appendXml($idxNode);
+		}
 	}
 }

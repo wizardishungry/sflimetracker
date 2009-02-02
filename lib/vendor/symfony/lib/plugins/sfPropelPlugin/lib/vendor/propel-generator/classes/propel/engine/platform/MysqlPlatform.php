@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id$
+ *  $Id: MysqlPlatform.php 949 2008-01-30 22:41:59Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'propel/engine/platform/DefaultPlatform.php';
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Martin Poeschl <mpoeschl@marmot.at> (Torque)
- * @version    $Revision: 536 $
+ * @version    $Revision: 949 $
  * @package    propel.engine.platform
  */
 class MysqlPlatform extends DefaultPlatform {
@@ -37,15 +37,15 @@ class MysqlPlatform extends DefaultPlatform {
 	protected function initialize()
 	{
 		parent::initialize();
+		$this->setSchemaDomainMapping(new Domain(PropelTypes::BOOLEAN, "TINYINT"));
 		$this->setSchemaDomainMapping(new Domain(PropelTypes::NUMERIC, "DECIMAL"));
 		$this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARCHAR, "TEXT"));
-		$this->setSchemaDomainMapping(new Domain(PropelTypes::TIMESTAMP, "DATETIME"));
-		$this->setSchemaDomainMapping(new Domain(PropelTypes::BU_TIMESTAMP, "DATETIME"));
 		$this->setSchemaDomainMapping(new Domain(PropelTypes::BINARY, "BLOB"));
 		$this->setSchemaDomainMapping(new Domain(PropelTypes::VARBINARY, "MEDIUMBLOB"));
 		$this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARBINARY, "LONGBLOB"));
 		$this->setSchemaDomainMapping(new Domain(PropelTypes::BLOB, "LONGBLOB"));
 		$this->setSchemaDomainMapping(new Domain(PropelTypes::CLOB, "LONGTEXT"));
+		$this->setSchemaDomainMapping(new Domain(PropelTypes::TIMESTAMP, "DATETIME"));
 	}
 
 	/**
@@ -70,9 +70,9 @@ class MysqlPlatform extends DefaultPlatform {
 	public function supportsNativeDeleteTrigger()
 	{
 		$usingInnoDB = false;
-		if(class_exists('DataModelBuilder', false))
+		if (class_exists('DataModelBuilder', false))
 		{
-			$usingInnoDB = strtolower(DataModelBuilder::getBuildProperty('mysqlTableType')) == 'innodb';
+			$usingInnoDB = strtolower($this->getBuildProperty('mysqlTableType')) == 'innodb';
 		}
 		return $usingInnoDB || false;
 	}
@@ -80,7 +80,8 @@ class MysqlPlatform extends DefaultPlatform {
 	/**
 	 * @see        Platform#hasSize(String)
 	 */
-	public function hasSize($sqlType) {
+	public function hasSize($sqlType)
+	{
 		return !("MEDIUMTEXT" == $sqlType || "LONGTEXT" == $sqlType
 				|| "BLOB" == $sqlType || "MEDIUMBLOB" == $sqlType
 				|| "LONGBLOB" == $sqlType);
@@ -91,8 +92,13 @@ class MysqlPlatform extends DefaultPlatform {
 	 * @param      string $text
 	 * @return     string
 	 */
-	public function escapeText($text) {
-		return mysql_escape_string($text);
+	public function disconnectedEscapeText($text)
+	{
+		if (function_exists('mysql_escape_string')) {
+			return mysql_escape_string($text);
+		} else {
+			return addslashes($text);
+		}
 	}
 
 	/**
@@ -101,5 +107,14 @@ class MysqlPlatform extends DefaultPlatform {
 	public function quoteIdentifier($text)
 	{
 		return '`' . $text . '`';
+	}
+
+	/**
+	 * Gets the preferred timestamp formatter for setting date/time values.
+	 * @return     string
+	 */
+	public function getTimestampFormatter()
+	{
+		return 'Y-m-d H:i:s';
 	}
 }
