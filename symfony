@@ -15,5 +15,4 @@ if (version_compare(PHP_VERSION, '5.1.0') === -1) {
 
 chdir(dirname(__FILE__));
 require_once(dirname(__FILE__).'/config/ProjectConfiguration.class.php');
-$configuration = new ProjectConfiguration();
-include($configuration->getSymfonyLibDir().'/command/cli.php');
+include(sfCoreAutoload::getInstance()->getBaseDir().'/command/cli.php');
