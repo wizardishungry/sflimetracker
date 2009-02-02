@@ -25,7 +25,7 @@
         <li>Format: <?php echo $torrent->getFeed()->getTags(); ?>
         <li>Address: <?php echo link_to($torrent->getUrl(false),$torrent->getUrl(false)); ?>
         <li>Torrent: <?php echo link_to($torrent->getUrl(),$torrent->getUrl()) ?>
-        <li>Hash: <?php echo link_to($torrent->getFileSha1(),$torrent->getMagnet()); ?> </li>
+        <li>Hash: <?php echo '<a href="',$torrent->getMagnet(),'">',$torrent->getFileSha1(),'</a>'; ?> </li>
         <?php if($sf_user->isAuthenticated()): ?>
           <li>
             <?php echo delete_form_for_object($torrent); ?>
