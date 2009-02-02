@@ -53,5 +53,10 @@ class sfValidatedFileFromUrl extends sfValidatedFile
         throw new sfException('Unable to retrieve Sha1 from disconnectedCurl instance');
     return $v;
   }
+
+  public function getUrl()
+  {
+    return $this->original_url;
+  }
 }
 ?>

@@ -67,7 +67,7 @@ class Torrent extends BaseTorrent
         if($file instanceof sfValidatedFileFromUrl)
         {
             @unlink($file->getSavedName());
-            $torrent->setWebUrl($request->getParameter('web_url'));
+            $this->setWebUrl($file->getUrl());
         }
     }
 
