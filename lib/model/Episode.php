@@ -19,7 +19,7 @@ class Episode extends BaseEpisode
     return '@episode?slug='.$this->getSlug().'&podcast_slug='.$this->getPodcast()->getSlug();
   }
 
-  public function delete($con = null)
+  public function delete(PropelPDO $con = null)
   {
     $torrents=$this->getTorrents();
     foreach($torrents as $torrent)

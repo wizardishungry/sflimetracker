@@ -19,7 +19,7 @@ class Podcast extends BasePodcast
     return '@podcast?slug='.$this->getSlug();
   }
 
-  public function delete($con = null)
+  public function delete(PropelPDO $con = null)
   {
     $episodes=$this->getEpisodes();
     foreach($episodes as $episode)

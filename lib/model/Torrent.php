@@ -8,6 +8,7 @@
  * @package lib.model
  */
 
+// todo replace with sfApplicationConfiguration
 sfLoader::loadHelpers(Array('Asset','Url'));
 
 class Torrent extends BaseTorrent
@@ -182,7 +183,7 @@ class Torrent extends BaseTorrent
         @unlink($this->getOriginalFilePath());
       }
     }
-    public function delete($con = null)
+    public function delete(PropelPDO $con = null)
     {
       try {
         $ret=parent::delete($con);
@@ -200,7 +201,7 @@ class Torrent extends BaseTorrent
       return $ret;
     }
 
-    public function getClients($criteria= null, $con = null)
+    public function getClients($criteria= null, PropelPDO $con = null)
     {
       if(! $criteria instanceof Criteria)
       {

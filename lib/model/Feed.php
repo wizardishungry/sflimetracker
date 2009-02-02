@@ -73,7 +73,7 @@ class Feed extends BaseFeed
     }
 
 
-    public function save($con=null)
+    public function save(PropelPDO $con=null)
     {
         if($this->getRssUrl() && !$this->has_validation_run)
             throw new sfException('Cannot save podcast with unvalidated feed');
