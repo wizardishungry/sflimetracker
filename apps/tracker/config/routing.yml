@@ -15,11 +15,11 @@ podcast:
   param: { module: podcast, action: view }
 
 feed_default:
-  url:   /feed/:format/:podcast_slug
+  url:   /feed/:podcast_slug/:format
   param: { module: feed, action: feed, slug: default }
 
 feed:
-  url:   /feed/:format/:podcast_slug/:slug
+  url:   /feed/:podcast_slug/:slug/:format
   param: { module: feed, action: feed }
 
 episode:
