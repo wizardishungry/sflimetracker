@@ -30,7 +30,7 @@ class accountActions extends sfActions
 
         if($form->getValue('remember_me'))
         {
-          $this->getRequest()->remember();
+          $user->remember();
         }
 
         if($request->getReferer())
@@ -55,7 +55,7 @@ class accountActions extends sfActions
     $user=$this->getUser();
     if($request->getMethod () == sfRequest::POST && $user->isAuthenticated())
     {
-      $this->getRequest()->remember(true); // also known as "forget"
+      $user->remember(true); // also known as "forget"
       $user->setAuthenticated(false);
       $this->redirect('@homepage');
     }
