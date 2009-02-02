@@ -7,6 +7,7 @@
         echo $form;
       ?>
       <tr>
+        <td>&nbsp;</td>
         <td><?php
           echo link_to('Change',"account/password")
         ?></td>
