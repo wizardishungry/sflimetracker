@@ -28,9 +28,10 @@ class myWebRequest extends sfWebRequest
 
   // FIXME I probably really need to move the code under here to trackerUser
 
-  public function initialize(sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array())
+  public function initialize(sfEventDispatcher $dispatcher, $parameters = array(), $attributes = array(), $options = array())
   {
-    $ret = parent::initialize($dispatcher,$parameters,$attributes);
+    parent::initialize($dispatcher, $parameters, $attributes, $options);
+
     if(!$ret) return false;
 
     if(!$this->getUser()->isAuthenticated())
@@ -45,8 +46,6 @@ class myWebRequest extends sfWebRequest
         $this->getUser()->setAuthenticated(true);
       }
     }
-
-    return $ret;
   }
   public function remember($cookie_eraser=false)
   {
