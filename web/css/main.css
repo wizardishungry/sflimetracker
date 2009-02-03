@@ -439,3 +439,6 @@ padding: 0 0 14px 0;
 .podcasts h3 {
   margin: 0;
 }
+body.module_account #header {
+    display: none;
+}
