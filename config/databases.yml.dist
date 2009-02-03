@@ -1,28 +1,17 @@
 all:
   propel:
-    class:          sfPropelDatabase
+    class:  sfPropelDatabase
     param:
+      classname:    PropelPDO
       encoding:     binary
       persistent:   true
-
-    ## mysql
-    #param:
-    #  dsn:          mysql://user:password@localhost/limetracker
-
-    # sqlite
-    param:
-      phptype:  sqlite
-      database: %SF_DATA_DIR%/tracker.db
-
-## For developers only!
-#dev:
-#  propel:
-#    param:
-#      dsn:          mysql://localhost/limetracker
-
-# this environment included to help with project builds
-sqlite:
-  propel:
-    param:
-      phptype:  sqlite
-      database: %SF_DATA_DIR%/tracker.db
+      pooling:      true 
+      ##mysql
+      #dsn:        mysql:host=localhost;dbname=limetracker
+      #username:   user
+      #password:   password
+      #sqlite
+      phptype:    sqlite
+      dsn:        'sqlite:%SF_DATA_DIR%/tracker.db'
+      username:   root
+      password:   null
