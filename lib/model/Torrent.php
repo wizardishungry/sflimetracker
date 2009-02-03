@@ -117,12 +117,12 @@ class Torrent extends BaseTorrent
         {
             case 'web':
                 $params['url']=_compute_public_path($this->getFileName(),'uploads','',true);
-                $params['length']=$this->getFileSize();
+                $params['length']=$this->getSize();
                 $params['mimeType']=$this->getMimeType();
                 break;
             case 'magnet':
                 $params['url']=$this->getMagnet();
-                $params['length']=$this->getFileSize();
+                $params['length']=$this->getSize();
                 $params['mimeType']=$this->getMimeType();
                 break;
             case 'torrent':
@@ -218,11 +218,14 @@ class Torrent extends BaseTorrent
       return ClientPeer::reap($this->getClients(),$try_to_do_global);
     }
 
-    public function getFileSize()
+    public function getSize()
     {
         // todo remote files need to have this information cached
         // NB: this will look negative if >= 2**31 use sprintf 
-        return filesize($this->getOriginalFilePath());
+        if($this->getWebUrl()!='')
+            return parent::getSize();
+        else
+            return filesize($this->getOriginalFilePath());
     }
 
     public function getTitle() // convenience method for sfFeed2Plugin

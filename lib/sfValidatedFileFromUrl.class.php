@@ -18,8 +18,8 @@ class sfValidatedFileFromUrl extends sfValidatedFile
     );
 
 
-    $original_url=$url;
-    $original_name=preg_replace('#^.*/#','',$original_url); // we'll need to do this for redirects fixme
+    $this->original_url=$url;
+    $original_name=preg_replace('#^.*/#','',$this->original_url); // we'll need to do this for redirects fixme
 
     $this->b = $b = new disconnectedCurl($url,$options);
     // probably want to have a way to gather statistics here

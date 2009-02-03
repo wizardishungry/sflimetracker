@@ -20,7 +20,7 @@
 <ul>
   <?php foreach($torrents as $torrent): ?>
     <li>
-      <?php echo $torrent->getFileName(), '(', $torrent->getMimeType(), ') ', pretty_size($torrent->getFileSize()) ?>
+      <?php echo $torrent->getFileName(), '(', $torrent->getMimeType(), ') ', pretty_size($torrent->getSize()) ?>
       <ul>
         <li>Format: <?php echo $torrent->getFeed()->getTags(); ?>
         <li>Address: <?php echo link_to($torrent->getUrl(false),$torrent->getUrl(false)); ?>
