@@ -37,6 +37,7 @@ class accountActions extends sfActions
         {
           $this->redirect($request->getReferer());
         }
+        else
         {
           $this->redirect('@homepage');
         }
@@ -57,7 +58,8 @@ class accountActions extends sfActions
     {
       $user->remember(true); // also known as "forget"
       $user->setAuthenticated(false);
-      $this->redirect('@homepage');
+      $this->redirect('@root');
+      // todo add flash
     }
   }
   public function executePassword($request)

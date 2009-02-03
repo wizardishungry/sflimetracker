@@ -1,6 +1,10 @@
 # default rules
-homepage:
+root:
   url:   /
+  param: { module: account, action: login }
+
+homepage:
+  url:   /home
   param: { module: podcast, action: list }
 
 default_symfony:

@@ -2,3 +2,5 @@ add:
   is_secure: on
 edit:
   is_secure: on
+list:
+  is_secure: on
