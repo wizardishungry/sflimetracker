@@ -105,8 +105,9 @@ class disconnectedCurl
         {
             if($line!='')
             {
-                list($k,$v)=explode(': ',$line,2);
-                $this->headers[$k]=$v;
+                @list($k,$v)=@explode(': ',$line,2);
+                if($k && $v)
+                    $this->headers[$k]=$v;
             }
         }
 
