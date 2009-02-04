@@ -1,5 +1,5 @@
 <?php
-    $iframe="torrent_iframe_".$form->getValue('feed_id');
+    $iframe="torrent_iframe_".$form->getDefault('feed_id');
 ?>
 <form target="<?php echo $iframe;
 ?>" action="<?php echo url_for('torrent/add') ?>" method="POST" enctype="multipart/form-data">
