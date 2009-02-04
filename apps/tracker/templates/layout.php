@@ -8,6 +8,7 @@
 <?php include_title() ?>
 
 <?php include_slot('feed') ?>
+<link rel="icon" type="image/png" href="<?php echo image_path('icons/lime_sm') ?>"/>
 
 </head>
 <body class="<?php
