@@ -434,6 +434,27 @@ padding: 0 0 14px 0;
 }
 
 /**
+ * Forms
+ **/
+
+#body table
+{
+    width: 100%;
+}
+table input,
+table textarea,
+table iframe
+{
+    width: 100% !important;
+}
+table input[type="button"],
+table input[type="submit"]
+{
+    width: auto !important;
+}
+
+
+/**
 * Podcast
 **/
 .podcasts h3 {
@@ -441,4 +462,8 @@ padding: 0 0 14px 0;
 }
 body.module_account #header {
     display: none;
+}
+
+iframe {
+    border: 0;
 }
