@@ -56,46 +56,6 @@
             </li>
           </ul>
                       
-
-<div class="quick_signin global palette top_bar" style="display: none;">
-  <div class="titlebar">
-          <a href="#" class="close">Exit</a>
-      </div>
-  <div class="message">
-    <?php if ($sf_user->hasFlash('notice')): ?>
-      <?php echo $sf_user->getFlash('notice') ?>
-    <?php endif; ?>
-  </div>
-                      
-  <div class="contents">
-    <form action="/session" method="post"><div style="margin: 0pt; padding: 0pt;"><input name="authenticity_token" value="479d51aeb685fb93d2d43cff20e8d2bf8543b228" type="hidden"></div>      <div class="field">
-        <label for="login_global">User</label>
-        <div>
-          <input id="login_global" class="text login" name="user[login]" type="text">
-        </div>
-      </div>
-      <div class="field">
-        <label for="password_global">Pass</label>
-        <div>
-          <input id="password_global" class="text password" name="user[password]" type="password">
-        </div>
-      </div>
-      <div class="field sign_up" style="display: none;">
-        <label for="email_global">Email</label>
-        <div>
-          <input id="email_global" class="text email" name="user[email]" type="text">
-        </div>
-      </div>
-
-      <div class="response_container">
-        <a href="http://limecast.com/forgot">I forgot my password</a>      </div>
-
-      <div class="controls">
-        <input class="button signup_button" id="signup_global" name="commit" value="Sign Up" type="submit">
-        <input class="button signin_button" id="signin_global" name="commit" value="Sign In" type="submit">
-      </div>
-    </form>  </div>
-</div>
                   </div>
       </div>
     </div>
