@@ -14,21 +14,24 @@ class PodcastForm extends BasePodcastForm
         'id' => new sfWidgetFormInputHidden(),
         'cover'       => new sfWidgetFormInputFile(), // dummy FIXME
         'title'       => new sfWidgetFormInput(),
-        'author'      => new sfWidgetFormInput(), // dummy FIXME
-        'name'        => new sfWidgetFormInput(), // dummy FIXME
-        'email'       => new sfWidgetFormInput(), // dummy FIXME
-        'link'        => new sfWidgetFormInput(), // dummy FIXME
         'slug'        => new sfWidgetFormInput(),
+        'author'      => new sfWidgetFormInput(),
+        'name'        => new sfWidgetFormInput(),
+        'email'       => new sfWidgetFormInput(),
+        'link'        => new sfWidgetFormInput(),
         'description' => new sfWidgetFormTextarea(),
-        'itunes_id'   => new sfWidgetFormInput(), // dummy FIXME
-        'custom_xml'  => new sfWidgetFormTextarea(), // dummy FIXME
+        'itunes_id'   => new sfWidgetFormInput(),
     ));
    $this->setValidators(array(
-        'id' => new sfValidatorInteger(array('required' => false)),
+        'id'          => new sfValidatorInteger(array('required' => false)),
         'title'       => new sfValidatorString(array('required' => true)),
         'slug'        => new sfValidatorString(array('required' => false)),
+        'author'      => new sfValidatorString(array('required' => false)),
+        'name'        => new sfValidatorString(array('required' => false)),
+        'email'       => new sfValidatorString(array('required' => false)),
+        'link'        => new sfValidatorString(array('required' => false)),
         'description' => new sfValidatorString(array('required' => false)),
+        'itunes_id'   => new sfValidatorString(array('required' => false)),
     ));
-    $this->validatorSchema->setOption('allow_extra_fields', true); // remove this eventually FIXME
   }
 }
