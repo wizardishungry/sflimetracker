@@ -56,7 +56,4 @@
     </li>
   <?php endforeach; ?>
 <?php endif; ?>
-<?php if($sf_user->isAuthenticated()): ?>
-  <li><?php echo link_to_with_icon('Add New Format…', "add", '@homepage');?></li>
-<?php endif; ?>
 </ul>
