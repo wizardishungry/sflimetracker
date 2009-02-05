@@ -4,7 +4,7 @@ root:
   param: { module: account, action: login }
 
 homepage:
-  url:   /home
+  url:   /admin
   param: { module: podcast, action: list }
 
 default_symfony:
