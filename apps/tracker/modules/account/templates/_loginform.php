@@ -9,10 +9,9 @@
       <tr>
         <td>&nbsp;</td>
         <td><?php
-          echo link_to('Change',"account/password")
-        ?></td>
-        <td><?php
-          echo link_to('I forget',"http://limecast.com/tracker")
+          echo link_to('Change',"account/password"),
+          ' ',
+          link_to('I forget',"http://limecast.com/tracker");
         ?></td>
       </tr>
       <tr>
