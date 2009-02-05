@@ -39,7 +39,7 @@ EOF;
 
     if($options['build-db'])
     {
-      $tasks[]=Array(new sfPropelBuildDbTask($this->dispatcher, $this->formatter),Array(),Array() );
+      //$tasks[]=Array(new sfPropelBuildDbTask($this->dispatcher, $this->formatter),Array(),Array() );
       // todo ^ this doesn't work
       // todo copy tracker.db to tracker.db.dist
     }
