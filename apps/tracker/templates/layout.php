@@ -60,21 +60,19 @@
       </div>
     </div>
     <div id="body_wrapper">
+
       <div id="body">
-        
-        <!-- New Content -->
         <div id="full_width">
           
-<div class="content">
-  <?php echo $sf_content ?>
-</div>
+            <div class="content">
+            <?php echo $sf_content ?>
+            </div>
 
-          </div>
         </div>
+      </div>
 
         <div style="clear: both;">&nbsp;</div>
 
-      </div>
     </div>
   </div>
 </div>
