@@ -7,7 +7,7 @@ class ProjectConfiguration extends sfProjectConfiguration
 {
   public function setup()
   {
-      $this->enableAllPluginsExcept(array('sfDoctrinePlugin', 'sfCompat10Plugin'));
+      $this->enableAllPluginsExcept(array('sfDoctrinePlugin'));
   // fix for dumb PEAR
     set_include_path(get_include_path().PATH_SEPARATOR.$this->getRootDir().DIRECTORY_SEPARATOR.'lib');
   }
