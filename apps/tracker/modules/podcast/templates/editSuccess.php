@@ -1,4 +1,4 @@
-<h1><?php echo $podcast->getTitle() ?></h1>
+<h1><?php echo link_to($podcast->getTitle(),$podcast->getUri()) ?></h1>
 
 <form action="<?php echo url_for('podcast/edit') ?>" method="POST" enctype="multipart/form-data">
 <table>

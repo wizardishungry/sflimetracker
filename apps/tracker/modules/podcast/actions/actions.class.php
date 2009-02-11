@@ -40,7 +40,7 @@ class podcastActions extends sfActions
                 $podcast->setDefaultFeed($feed);
                 $podcast->save();
             }
-            $this->redirect($podcast->getUri());
+            $this->redirect('podcast/edit?id='.$podcast->getId());
         }
     }
   }
