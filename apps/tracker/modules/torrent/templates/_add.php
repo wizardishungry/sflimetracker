@@ -16,11 +16,6 @@
         <td>&nbsp;</td>
         <td colspan="2">
         <input type="submit" value="add"/>
-        You should be able to upload up to about 
-        <?php
-            $bytes=file_upload_max_size(); 
-            echo "<span title='$bytes bytes'>",pretty_size($bytes),'</span>.';
-        ?>
         </td>
     </tr>
     </table>

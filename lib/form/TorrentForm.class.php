@@ -15,7 +15,7 @@ class TorrentForm extends BaseTorrentForm
         'episode_id' => new sfWidgetFormInputHidden(),
         'feed_id' => new sfWidgetFormInputHidden(),
         'web_url'=> new sfWidgetFormInput(),
-        'file'=> new sfWidgetFormInputFile(),
+  //      'file'=> new sfWidgetFormInputFile(),
     ));
 
     $this->setValidators(array(
