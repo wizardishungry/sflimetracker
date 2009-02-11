@@ -10,35 +10,36 @@ class podcastActions extends sfActions
 
   public function executeAdd($request)
   {
-    $this->form=new PodcastForm();
-    if ($request->isMethod('post'))
-    {
-        $this->form->bind($request->getPostParameters(),Array()); // FIXME bind to real files array
-        if($this->form->isValid())
-        {
-            $podcast=$this->form->save();
-            $feed=new Feed(); // add a sensible default feed
-            $feed->setTags('default');
-            $feed->setSlug('default');
-            $podcast->addFeed($feed);
-            $feed->save();
-            $podcast->setDefaultFeed($feed);
-            $podcast->save();
-            $this->redirect($podcast->getUri());
-        }
-    }
+    return $this->executeEdit($request,true);
   }
 
-  public function executeEdit($request)
+  public function executeEdit($request,$new=false)
   {
-    $this->form=new PodcastForm(PodcastPeer::retrieveByPk($request->getParameter('id')));
-    if ($request->isMethod('post'))
+    $this->form=new PodcastForm($new?null:PodcastPeer::retrieveByPk($request->getParameter('id')));
+    $this->podcast=$this->form->getObject();
+    $this->episodes=$this->podcast->getEpisodes();
+    $this->feeds=$this->podcast->getFeeds();
+    $this->podcast_feed_form=new FeedForm();
+    $this->podcast_feed_form->setDefaults(Array(
+        'podcast_id'=>$this->podcast->getId(),
+    ),Array());
+
+    if($request->isMethod('post'))
     {
         $this->form->bind($request->getPostParameters(),Array()); // FIXME bind to real files array
         if($this->form->isValid())
         {
             $podcast=$this->form->save();
-            $podcast->save();
+            if($new)
+            {
+                $feed=new Feed(); // add a sensible default feed
+                $feed->setTags('default');
+                $feed->setSlug('default');
+                $podcast->addFeed($feed);
+                $feed->save();
+                $podcast->setDefaultFeed($feed);
+                $podcast->save();
+            }
             $this->redirect($podcast->getUri());
         }
     }
@@ -49,11 +50,6 @@ class podcastActions extends sfActions
     $this->podcast=$podcast=CommonBehavior::retrieveBySlug('PodcastPeer',$request->getParameter('slug'));
     $this->forward404Unless($this->podcast); 
     $this->form=new PodcastForm($podcast);
-
-    $this->podcast_feed_form=new FeedForm();
-    $this->podcast_feed_form->setDefaults(Array(
-        'podcast_id'=>$podcast->getId(),
-    ),Array());
 
     $this->episodes=$this->podcast->getEpisodes();
     $this->feeds=$this->podcast->getFeeds();
