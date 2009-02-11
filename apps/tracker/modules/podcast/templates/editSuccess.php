@@ -69,12 +69,3 @@
     }
   ?>
 </ul>
-<?php slot('feed');
-foreach($feeds as $feed)  foreach($feed->getUris() as $format => $uri) 
-{
-  echo auto_discovery_link_tag ('rss',$uri,Array(
-    'title'=>($feed->getTags()=='default'?'':$feed->getTags().' ').'via '.$format,
-  ));
-}
-end_slot();
-?>
