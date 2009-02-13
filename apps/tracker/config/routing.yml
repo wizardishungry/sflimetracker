@@ -7,6 +7,12 @@ homepage:
   url:   /admin
   param: { module: podcast, action: list }
 
+
+settings:
+  url:   /admin/settings
+  param: { module: account, action: settings }
+
+
 default_symfony:
   url:   /symfony/:action/*
   param: { module: default }

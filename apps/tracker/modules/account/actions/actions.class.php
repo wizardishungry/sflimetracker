@@ -89,4 +89,7 @@ class accountActions extends sfActions
     }
   }
 
+  public function executeSettings($request)
+  {
+  }
 }
