@@ -17,7 +17,7 @@ class podcast_feedActions extends sfActions
         if($this->form->isValid())
         {
             $feed=$this->form->save();
-            $this->redirect($feed->getPodcast()->getUri());
+            $this->redirect('podcast/edit?id='.$feed->getPodcast()->getId());
         }
     }
   }
@@ -31,6 +31,6 @@ class podcast_feedActions extends sfActions
     $this->forward404Unless($feed); 
     $this->getUser()->setFlash('notice','Deleted feed '.$feed->getTitle());
     $feed->delete();
-    $this->redirect($feed->getPodcast()->getUri());
+    $this->redirect('podcast/edit?id='.$feed->getPodcast()->getId());
   } 
 }
