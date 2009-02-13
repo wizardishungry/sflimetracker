@@ -41,7 +41,7 @@
 foreach($feeds as $feed)  foreach($feed->getUris() as $format => $uri) 
 {
   echo auto_discovery_link_tag ('rss',$uri,Array(
-    'title'=>($feed->getTags()=='default'?'':$feed->getTags().' ').'via '.$format,
+    'title'=>($feed->getTitle()=='default'?'':$feed->getTitle().' ').'via '.$format,
   ));
 }
 end_slot();

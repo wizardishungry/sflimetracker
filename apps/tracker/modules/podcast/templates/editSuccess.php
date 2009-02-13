@@ -22,7 +22,7 @@
   <?php foreach($feeds as $feed): ?>
     <li>
       <?php 
-        echo $feed->getTags();
+        echo $feed->getTitle();
       ?>
     </li>
   <?php endforeach; ?>

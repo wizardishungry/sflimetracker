@@ -34,7 +34,7 @@ class feedActions extends sfActions
 
     $feed->initialize(array(
         'title'       => $podcast->getTitle().
-            ($podcast_feed->getTags()=='default'?'':'['.$podcast_feed->getTags().']').
+            ($podcast_feed->getTitle()=='default'?'':'['.$podcast_feed->getTitle().']').
             ($format=='web'?'':" - via $format"),
             'link'        => $link,
 //        'authorEmail' => 'herman@example.com',

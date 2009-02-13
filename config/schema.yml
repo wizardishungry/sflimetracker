@@ -103,7 +103,7 @@ propel:
     created_at:
     updated_at:
 
-    tags:           longvarchar
+    title:           longvarchar
     slug:           varchar(255)
     rss_url:        longvarchar
     rss_url_hash:   

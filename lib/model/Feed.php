@@ -23,7 +23,7 @@ class Feed extends BaseFeed
 
     public function __toString()
     {
-      return $this->getTags();
+      return $this->getTitle();
     }
 
     public function getUri($format='web')
@@ -233,7 +233,7 @@ class Feed extends BaseFeed
     }
 
 }
-$columns_map = array('from'   => FeedPeer::TAGS,
+$columns_map = array('from'   => FeedPeer::TITLE,
                        'to'     => FeedPeer::SLUG);
 
 sfPropelBehavior::add('Feed', array('sfPropelActAsSluggableBehavior' => array('scope' => Array(FeedPeer::PODCAST_ID), 'columns' => $columns_map, 'separator' => '_', 'permanent' => true)));

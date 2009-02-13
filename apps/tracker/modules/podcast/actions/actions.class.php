@@ -33,7 +33,7 @@ class podcastActions extends sfActions
             if($new)
             {
                 $feed=new Feed(); // add a sensible default feed
-                $feed->setTags('default');
+                $feed->setTitle('default');
                 $feed->setSlug('default');
                 $podcast->addFeed($feed);
                 $feed->save();
