@@ -56,7 +56,7 @@
       <?php foreach($episodes as $episode): ?>
         <li>
           <?php echo link_to_with_icon($episode->getCreatedAt('Y M d').
-            ' - '.$episode->getTitle(),'episode', $episode->getUri()) ?>
+            ' - '.$episode->getTitle(),'episode', 'episode/edit?id='.$episode->getId()) ?>
         </li>
       <?php endforeach; ?>
   <?php else: ?>

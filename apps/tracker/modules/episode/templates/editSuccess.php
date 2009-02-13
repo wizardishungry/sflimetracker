@@ -1,7 +1,7 @@
 <?php use_helper('ApacheConfig'); ?>
-<h2><?php echo 'Episode "', $episode->getTitle(),'" - ',link_to($podcast->getTitle(),$podcast->getUri()) ?></h2>
+<h2><?php echo 'Episode "', $episode->getTitle(),'" - ',
+    link_to($podcast->getTitle(),'episode/edit?id='.$episode->getId()) ?></h2>
 
-<?php if($sf_user->isAuthenticated()): ?>
 <form action="<?php echo url_for('episode/edit') ?>" method="POST" enctype="multipart/form-data">
     <table>
       <?php echo $form ?>
@@ -14,7 +14,6 @@
     </table>
   </form>
   <?php echo delete_form_for_object($episode); ?>
-<?php endif; ?>
 
 <h3>Files</h3>
 <ul>
@@ -26,11 +25,7 @@
         <li>Address: <?php echo link_to($torrent->getUrl(false),$torrent->getUrl(false)); ?>
         <li>Torrent: <?php echo link_to($torrent->getUrl(),$torrent->getUrl()) ?>
         <li>Hash: <?php echo '<a href="',$torrent->getMagnet(),'">',$torrent->getFileSha1(),'</a>'; ?> </li>
-        <?php if($sf_user->isAuthenticated()): ?>
-          <li>
-            <?php echo delete_form_for_object($torrent); ?>
-          </li>
-        <?php endif; ?>
+        <li><?php echo delete_form_for_object($torrent); ?></li>
       </ul>
     </li>
   <?php endforeach; ?>
@@ -50,9 +45,7 @@
   ?>
     <li>
       <?php echo $feed ?>
-      <?php if($sf_user->isAuthenticated()): ?>
-           <?php include_partial('torrent/add',Array('form'=>$form)); ?>
-       <?php endif; ?>
+      <?php include_partial('torrent/add',Array('form'=>$form)); ?>
     </li>
   <?php endforeach; ?>
 <?php endif; ?>

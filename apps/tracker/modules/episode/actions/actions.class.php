@@ -33,17 +33,30 @@ class episodeActions extends sfActions
   public function executeEdit($request)
   {
     $this->form=new EpisodeForm(EpisodePeer::retrieveByPk($request->getParameter('id')));
+    $episode=$this->episode=$this->form->getObject();
     if ($request->isMethod('post'))
     {
         $this->form->bind($request->getPostParameters());
         if($this->form->isValid())
         {
-            $episode=$this->form->save();
-            $this->redirect($episode->getUri());
+            $this->form->save();
+            $this->redirect($request->getUri()); // GET to current uri
         } 
         else
           return sfView::ERROR;
     }
+
+    $podcast=$this->podcast=$episode->getPodcast();
+    $this->feeds=$feeds=$podcast->getFeeds();
+    $this->torrents=$torrents=$episode->getTorrentsJoinFeed();
+    $has_feeds=Array();
+    foreach($torrents as $torrent)
+    {
+      $has_feeds[]=$torrent->getFeed();
+    }
+    $this->missing_feeds=array_diff($feeds,$has_feeds);
+
+
   }
 
   public function executeView($request)
@@ -59,17 +72,8 @@ class episodeActions extends sfActions
     $this->episode=$episode=CommonBehavior::retrieveBySlug('EpisodePeer',$slug,$c);
     $this->forward404Unless($episode); 
 
-
     $this->torrents=$torrents=$episode->getTorrentsJoinFeed();
     $this->feeds=$feeds=$podcast->getFeeds();
-
-    $has_feeds=Array();
-    foreach($torrents as $torrent)
-    {
-      $has_feeds[]=$torrent->getFeed();
-    }
-    $this->missing_feeds=array_diff($feeds,$has_feeds);
-
     $this->form=new EpisodeForm($episode);
   }
 
