@@ -1,6 +1,6 @@
 <?php use_helper('ApacheConfig'); ?>
 <h2><?php echo 'Episode "', $episode->getTitle(),'" - ',
-    link_to($podcast->getTitle(),'episode/edit?id='.$episode->getId()) ?></h2>
+    link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId()) ?></h2>
 
 <form action="<?php echo url_for('episode/edit') ?>" method="POST" enctype="multipart/form-data">
     <table>

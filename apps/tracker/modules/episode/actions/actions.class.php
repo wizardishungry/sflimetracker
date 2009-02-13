@@ -18,8 +18,7 @@ class episodeActions extends sfActions
         if($this->form->isValid())
         {
             $episode=$this->form->save();
-            // redirect to default feed
-            $this->redirect($episode->getUri());
+            $this->redirect('episode/edit?id='.$episode->getId());
         } 
         else
           return;
@@ -40,7 +39,7 @@ class episodeActions extends sfActions
         if($this->form->isValid())
         {
             $this->form->save();
-            $this->redirect($request->getUri()); // GET to current uri
+            $this->redirect($request->getUri().'?id='.$episode->getId()); // GET to current uri
         } 
         else
           return sfView::ERROR;
@@ -86,6 +85,6 @@ class episodeActions extends sfActions
     $this->forward404Unless($episode); 
     $this->getUser()->setFlash('notice','Deleted episode'.$episode->getTitle());
     $episode->delete();
-    $this->redirect($episode->getPodcast()->getUri());
+    $this->redirect('podcast/edit?id='.$episode->getPodcast()->getId());
   }
 }
