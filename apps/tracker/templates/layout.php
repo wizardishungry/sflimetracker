@@ -41,7 +41,7 @@
               <?php echo link_to_with_icon('Home', 'house', '@homepage'); ?>
             </li>
             <li class="">
-              <?php echo link_to_with_icon('Settings', 'cog', '@homepage'); ?>
+              <?php echo link_to_with_icon('Settings', 'cog', '@settings'); ?>
             </li>
             <li class="">
               <?php echo link_to_with_icon('Help', 'help', 'http://limecast.com/tracker'); ?>
