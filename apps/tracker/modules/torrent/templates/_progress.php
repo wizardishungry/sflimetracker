@@ -24,9 +24,12 @@
     if($info['download_content_length'])
         $percent=$info['size_download']/$info['download_content_length'] *100.0;
     else
-    $percent=0;
+       $percent=0;
 ?>
 <html>
+<?php if($percent=='100'): ?>
+    <body><script>window.top.location.reload();</script></body>
+<?php else: ?>
     <head>
         <title><?php echo $verb,$suffix ?></title>
     </head>
@@ -43,4 +46,5 @@
         </pre> -->
         <?php echo '<!--',str_repeat(' ',1024),'-->'; ?>
     </body>
+<?php endif; ?>
 </html>
