@@ -85,6 +85,6 @@ class episodeActions extends sfActions
     $this->forward404Unless($episode); 
     $this->getUser()->setFlash('notice','Deleted episode'.$episode->getTitle());
     $episode->delete();
-    $this->redirect('podcast/edit?id='.$episode->getPodcast()->getId());
+    $this->redirect('podcast/edit?id='.$episode->getPodcastId());
   }
 }
