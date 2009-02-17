@@ -21,20 +21,20 @@ class feedActions extends sfActions
 
       $c = new Criteria();
       $c->add(EpisodePeer::PODCAST_ID,$podcast->getId());
-
-      $podcast_feed=CommonBehavior::retrieveBySlug('FeedPeer',$request->getParameter('slug'),$c);
-
-      if(!$podcast_feed)
+      if(!$podcast)
         $this->forward404();
 
       $link=$podcast->getUri();
+
+      $podcast_feed=CommonBehavior::retrieveBySlug('FeedPeer',$request->getParameter('slug'),$c);
+
     }
 
     $format=$request->getParameter('format'); // not "content format" but "delivery method enclosure format"
 
     $feed->initialize(array(
         'title'       => $podcast->getTitle().
-            ($podcast_feed->getTitle()=='default'?'':'['.$podcast_feed->getTitle().']').
+            (!$podcast_feed||$podcast_feed->getTitle()=='default'?'':'['.$podcast_feed->getTitle().']').
             ($format=='web'?'':" - via $format"),
             'link'        => $link,
 //        'authorEmail' => 'herman@example.com',
