@@ -70,7 +70,7 @@ class torrentActions extends sfActions
 
 
     if(!$is_replace)
-        $this->redirect($torrent->getEpisode()->getUri());
+        $this->redirect('episode/edit?id='.$torrent->getEpisodeId());
     else
     {
         exit;
@@ -89,7 +89,7 @@ class torrentActions extends sfActions
     $this->forward404Unless($torrent); 
     $this->getUser()->setFlash('notice','Deleted torrent '.$torrent->getFileName());
     $torrent->delete();
-    $this->redirect($torrent->getEpisode()->getUri());
+    $this->redirect('episode/edit?id='.$torrent->getEpisodeId());
   }
 
     public function progress($o,$done)
