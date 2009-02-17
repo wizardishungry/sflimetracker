@@ -4,16 +4,14 @@
     <h3>
         <?php echo link_to_with_icon($podcast->getTitle(), "web", $podcast->getUri()); ?>
     </h3>
-    <?php if($sf_user->isAuthenticated()): ?>
-      <ul>
+    <ul>
         <li>
-          <div> &nbsp; 
+            <div> &nbsp; 
             <?php echo link_to_with_icon('Edit', "cog", 'podcast/edit?id='.$podcast->getId()); ?>
             <?php echo link_to_with_icon('Add episode', "add", 'episode/add?podcast_id='.$podcast->getId()); ?>
-          </div>
+            </div>
         </li>
-      </ul>
-    <?php endif; ?>
+    </ul>
   <?php endforeach; ?>
   <?php if($sf_user->isAuthenticated()): ?>
     <p><?php echo link_to_with_icon('New podcast…', "add", 'podcast/add'); ?></p>
