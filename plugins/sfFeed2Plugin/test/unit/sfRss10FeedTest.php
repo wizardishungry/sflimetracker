@@ -1,5 +1,7 @@
 <?php
 
+define('SF_ROOT_DIR', realpath(dirname(__FILE__).'/../../../..'));
+define('SF_APP',      'frontend');
 include(dirname(__FILE__).'/../../../../test/bootstrap/functional.php');
 
 $b = new sfTestBrowser();
@@ -16,7 +18,7 @@ $feedParams = array(
   'subtitle' => 'hey, foo, this is bar', 
   'categories' => array('foo', 'bar'),
   'feedUrl' => 'http://www.example.com',
-  'encoding' => 'utf-8'
+  'encoding' => 'UTF-16'
 );
 
 $enclosureParams = array(
@@ -89,7 +91,7 @@ $t->is((string) $feedXml->item[0]->creator, $itemParams['authorName'], '<item><d
 
 $t->diag('asXML() - generated feed');
 $feedString = $feed->asXml();
-$t->is(sfContext::getInstance()->getResponse()->getContentType(), 'application/rss+xml; charset=utf-8', 'The reponse comes with the correct Content-Type');
+$t->is(sfContext::getInstance()->getResponse()->getContentType(), 'application/rss+xml; charset=UTF-16', 'The reponse comes with the correct Content-Type');
 
 $t->diag('fromXML() - generated feed');
 $generatedFeed = new sfRss10Feed();
@@ -116,7 +118,7 @@ $t->is($generatedItem->getContent(), $feedItem->getContent(), 'The content prope
 $t->isnt($generatedItem->getAuthorEmail(), $feedItem->getAuthorEmail(), 'The author email property cannot be set from a RSS 1.0 feed');
 $t->is($generatedItem->getAuthorName(), $feedItem->getAuthorName(), 'The author name property is properly set');
 $t->isnt($generatedItem->getAuthorLink(), $feedItem->getAuthorLink(), 'The author link property cannot be set from a RSS 1.0 feed');
-$t->is($generatedItem->getPubdate(), $feedItem->getPubdate(), 'The publication date property is properly set');
+$t->is($generatedItem->getPubDate(), $feedItem->getPubdate(), 'The publication date property is properly set');
 $t->isnt($generatedItem->getComments(), $feedItem->getComments(), 'The comments property cannot be set from a RSS 1.0 feed');
 $t->isnt($generatedItem->getUniqueId(), $feedItem->getUniqueId(), 'The unique id property cannot be set from a RSS 1.0 feed');
 $t->is($generatedItem->getEnclosure(), '', 'The enclosure property cannot be set from a RSS 1.0 feed');

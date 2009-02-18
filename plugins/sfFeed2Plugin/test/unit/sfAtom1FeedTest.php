@@ -1,5 +1,7 @@
 <?php
 
+define('SF_ROOT_DIR', realpath(dirname(__FILE__).'/../../../..'));
+define('SF_APP',      'frontend');
 include(dirname(__FILE__).'/../../../../test/bootstrap/functional.php');
 
 $b = new sfTestBrowser();
@@ -16,7 +18,7 @@ $feedParams = array(
   'subtitle' => 'hey, foo, this is bar', 
   'categories' => array('foo', 'bar'),
   'feedUrl' => 'http://www.example.com',
-  'encoding' => 'utf-8'
+  'encoding' => 'UTF-16'
 );
 
 $enclosureParams = array(
@@ -72,7 +74,7 @@ $feedImage = new sfFeedImage();
 $feedImage->initialize($image_params);
 $feed->setImage($feedImage);
 
-$t = new lime_test(56, new lime_output_color());
+$t = new lime_test(57, new lime_output_color());
 
 $t->diag('toXML() - generated feed');
 $feedString = $feed->toXml();
@@ -115,7 +117,7 @@ $t->is((string) $feedXml->entry[0]->link[1]['type'], $enclosureParams['mimeType'
 
 $t->diag('asXML() - generated feed');
 $feedString = $feed->asXml();
-$t->is(sfContext::getInstance()->getResponse()->getContentType(), 'application/atom+xml; charset=utf-8', 'The response comes with the correct Content-Type');
+$t->is(sfContext::getInstance()->getResponse()->getContentType(), 'application/atom+xml; charset=UTF-16', 'The response comes with the correct Content-Type');
 
 $t->diag('fromXML() - generated feed');
 $generatedFeed = new sfAtom1Feed();
@@ -133,10 +135,12 @@ $t->is($generatedFeed->getFeedUrl(), $feed->getFeedUrl(), 'The feedUrl property 
 $t->is($generatedFeed->getEncoding(), $feed->getEncoding(), 'The encoding property is properly set');
 $t->is($generatedFeed->getImage()->getFavicon(), $feed->getImage()->getFavicon(), 'The feed favicon property is properly set');
 $t->is($generatedFeed->getImage()->getImage(), $feed->getImage()->getImage(), 'The feed logo property is properly set');
+$t->is($generatedFeed->getLatestPostDate(), $feed->getLatestPostDate(), 'The latest post date is correct');
 
 $t->diag('fromXML() - generated feed items');
 $items = $generatedFeed->getItems();
 $generatedItem = $items[0];
+
 $t->is($generatedItem->getTitle(), $feedItem->getTitle(), 'The title property is properly set');
 $t->is($generatedItem->getLink(), $feedItem->getLink(), 'The link property is properly set');
 $t->is($generatedItem->getDescription(), $feedItem->getDescription(), 'The description property is properly set');

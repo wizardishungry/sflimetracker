@@ -189,7 +189,7 @@ class sfRssFeed extends sfFeed
     $xml[] = '    <title>'.$this->getTitle().'</title>';
     $xml[] = '    <link>'.$this->context->getController()->genUrl($this->getLink(), true).'</link>';
     $xml[] = '    <description>'.$this->getDescription().'</description>';
-    $xml[] = '    <pubDate>'.date(DATE_RFC822, $this->getLatestPostDate()).'</pubDate>';
+    $xml[] = '    <pubDate>'.date(DATE_RSS, $this->getLatestPostDate()).'</pubDate>';
     if ($this->getAuthorEmail())
     {
       $xml[] = '    <managingEditor>'.$this->getAuthorEmail().($this->getAuthorName() ? ' ('.$this->getAuthorName().')' : '').'</managingEditor>';
@@ -263,7 +263,7 @@ class sfRssFeed extends sfFeed
         }
         if ($item->getPubdate())
         {
-          $xml[] = '      <pubDate>'.date(DATE_RFC822, $item->getPubdate()).'</pubDate>';
+          $xml[] = '      <pubDate>'.date(DATE_RSS, $item->getPubdate()).'</pubDate>';
         }
         if (is_string($item->getComments()))
         {

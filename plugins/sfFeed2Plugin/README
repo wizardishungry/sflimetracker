@@ -35,9 +35,16 @@ Unit tests are available in the SVN repository.
 
 == Installation ==
 
-  * Install the plugin
+Installation of the plugin differs on the version of symfony you are using.
+
+  * Install the plugin (symfony 1.0):
 {{{
 $ symfony plugin-install http://plugins.symfony-project.com/sfFeed2Plugin
+}}}
+
+  * Install the plugin (symfony 1.1+):
+{{{
+$ symfony plugin:install sfFeed2Plugin
 }}}
 
   * Alternatively, if you don't have PEAR installed, you can download the latest package attached to this plugin's wiki page and extract it under your project's `plugins/` directory
