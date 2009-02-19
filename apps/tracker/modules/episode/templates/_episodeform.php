@@ -1,4 +1,5 @@
 <?php echo $form['podcast_id'] ?>
+<?php echo $form['id'] ?>
 <?php echo $form['_csrf_token'] ?>
 <tr>
     <td colspan="2">
