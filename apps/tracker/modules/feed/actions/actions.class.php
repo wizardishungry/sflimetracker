@@ -24,7 +24,7 @@ class feedActions extends sfActions
       if(!$podcast)
         $this->forward404();
 
-      $link=$podcast->getUri();
+      $link=$podcast->getLink()?$this->getLink():$this->getUri();
 
       $podcast_feed=CommonBehavior::retrieveBySlug('FeedPeer',$request->getParameter('slug'),$c);
 
@@ -36,9 +36,9 @@ class feedActions extends sfActions
         'title'       => $podcast->getTitle().
             (!$podcast_feed||$podcast_feed->getTitle()=='default'?'':'['.$podcast_feed->getTitle().']').
             ($format=='web'?'':" - via $format"),
-            'link'        => $link,
-//        'authorEmail' => 'herman@example.com',
-//        'authorName'  => 'T. Herman Zweibel'
+        'link'=>$link,
+        'authorEmail' => $podcast->getEmail(),
+        'authorName'  => $podcast->getAuthor(),
     ));
 
     $pager=$this->getPager($request);
