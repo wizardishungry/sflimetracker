@@ -1,6 +1,6 @@
 <form action="<?php echo url_for('episode/add') ?>" method="POST" enctype="multipart/form-data">
   <table>
-    <?php echo $form ?>
+    <?php include_partial('episode/episodeform', Array('form'=>$form)); ?>
     <tr>
       <td>&nbsp;</td>
       <td colspan="2">
