@@ -4,14 +4,8 @@
 <form target="<?php echo $iframe;
 ?>" action="<?php echo url_for('torrent/add') ?>" method="POST" enctype="multipart/form-data">
     <table>
-    <tr>
-        <td>
-        </td>
-        <td>
-            <iframe height="120" width="100%" name="<?php echo $iframe;?>"> </iframe>
-        </td>
-    </tr>
-    <?php echo $form ?>
+
+    <?php include_partial('torrent/torrentform', Array('form'=>$form,'iframe'=>$iframe)) ?>
     <tr>
         <td>&nbsp;</td>
         <td colspan="2">
