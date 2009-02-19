@@ -2,7 +2,7 @@
 
 <form action="<?php echo url_for('podcast/edit') ?>" method="POST" enctype="multipart/form-data">
 <table>
-    <?php echo $form ?>
+    <?php include_partial('podcast/podcastform', Array('form'=>$form)); ?>
     <tr>
     <td>&nbsp;</td>
     <td>
