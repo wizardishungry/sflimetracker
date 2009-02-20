@@ -44,7 +44,14 @@ class Torrent extends BaseTorrent
         $MakeTorrent->setAnnounce(url_for('client/announce',true));
         $MakeTorrent->setComment('TODO');
         $MakeTorrent->setPieceLength(256); // KiB
-        $meta = $MakeTorrent->buildTorrent();
+        
+        $info=Array();
+        if($file instanceof sfValidatedFileFromUrl)
+        {
+            $info['url-list']=Array($file->getUrl());
+        }
+
+        $meta = $MakeTorrent->buildTorrent($info);
 
         if($meta && file_put_contents($torrent_file,$meta))
         {
