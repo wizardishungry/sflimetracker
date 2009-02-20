@@ -18,16 +18,7 @@
 <h3>Files</h3>
 <ul>
   <?php foreach($torrents as $torrent): ?>
-    <li>
-      <?php echo $torrent->getFileName(), '(', $torrent->getMimeType(), ') ', pretty_size($torrent->getSize()) ?>
-      <ul>
-        <li>Format: <?php echo $torrent->getFeed()->getTitle(); ?>
-        <li>Address: <?php echo link_to($torrent->getUrl(false),$torrent->getUrl(false)); ?>
-        <li>Torrent: <?php echo link_to($torrent->getUrl(),$torrent->getUrl()) ?>
-        <li>Hash: <?php echo '<a href="',$torrent->getMagnet(),'">',$torrent->getFileSha1(),'</a>'; ?> </li>
-        <li><?php echo delete_form_for_object($torrent); ?></li>
-      </ul>
-    </li>
+      <?php include_partial('torrent', Array('torrent'=>$torrent)); ?>
   <?php endforeach; ?>
 </ul>
 
