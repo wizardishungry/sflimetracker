@@ -78,14 +78,14 @@ class Torrent extends BaseTorrent
         }
     }
 
-    public function getUrl($torrent=true) // for convenience for now, fixme
+    public function getUrl($torrent=null) // for convenience for now, fixme
     {
         return $this->getUri($torrent);
     }
-    public function getUri($torrent=true)
+    public function getUri($torrent=null)
     {
         // todo this needs to be refactored to make Uri and enclosure methods less dependent on call order
-        if(isset($this->enclosure))
+        if($torrent==null && isset($this->enclosure))
             return $this->enclosure->getUrl();
         return $this->setFeedEnclosure($torrent?'torrent':'web')->getUrl();
     }
