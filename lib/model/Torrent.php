@@ -38,12 +38,14 @@ class Torrent extends BaseTorrent
         }
 
         if($store_original_file)
-            $file->save(sfConfig::get('sf_upload_dir').'/'.$filename,0644);
+            $file->save(sfConfig::get('sf_upload_dir').'/'.$this->formatFilename($filename).'.'.$file->getOriginalExtension(),0644);
+        // NB:  formatFilename should probably put the real filename on the file
+        //      but we've factored this out
 
         $MakeTorrent = new File_Bittorrent2_MakeTorrent($file->getSavedName());
         $MakeTorrent->setAnnounce(url_for('client/announce',true));
         $MakeTorrent->setComment('TODO');
-        $MakeTorrent->setPieceLength(256); // KiB
+        $MakeTorrent->setPieceLength(256); // KiBw
         
         $info=Array();
         if($file instanceof sfValidatedFileFromUrl)
@@ -238,5 +240,21 @@ class Torrent extends BaseTorrent
     public function getTitle() // convenience method for sfFeed2Plugin
     {
         return $this->getEpisode()->getTitle();
+    }
+
+    public function getPodcast()
+    {
+        return $this->getEpisode()->getPodcast();
+    }
+
+    public function formatFileName($filename,$fmt_string=null)
+    {
+        if($fmt_string!=null)
+        {
+            throw new sfException("Format strings are not implemented, thus overloading the format is neither");
+        }
+        return strtr(implode('-',
+            Array($this->getPodcast()->getTitle(),$this->getTitle(),$this->getFeed()->getTitle())),
+        ' /','__');
     }
 }
