@@ -53,6 +53,11 @@ class feedActions extends sfActions
     }
 
     $torrent_items = sfFeedPeer::convertObjectsToItems($result_set);
+    
+    foreach($torrent_items as $item)
+    {
+    }
+
     $feed->addItems($torrent_items);
 
     $this->feed = $feed;
