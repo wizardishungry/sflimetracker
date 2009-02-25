@@ -14,15 +14,18 @@ sfLoader::loadHelpers(Array('Asset','Url'));
 class Torrent extends BaseTorrent
 {
 
-    function __construct($file=null,$store_original_file=true) // todo -- abstract the validatedfile stuff out
+    function setFile($file,$store_original_file=true) // todo -- abstract the validatedfile stuff out
     {
-        if($file==null){return;}
+        if(! $file  instanceof sfValidatedFile)
+        {
+            if(is_string($file))
+                return parent::setFile($file);
+        }
 
-        if(! $file instanceof sfValidatedFile) throw new sfException('constructor takes instance of sfValidatedFile');
-
-        $filename = $file->getOriginalName();
+        $filename = $this->formatFilename($file->getOriginalName()).'.'.$file->getOriginalExtension();
         $extension = $file->getOriginalExtension();
-        $this->setFileName($filename);
+        $this->setFile($filename);
+        // fixme this isn't setting the whole path
 
         $this->setSize($file->getSize());
         $this->setMimeType($file->getType());
@@ -38,7 +41,7 @@ class Torrent extends BaseTorrent
         }
 
         if($store_original_file)
-            $file->save(sfConfig::get('sf_upload_dir').'/'.$this->formatFilename($filename).'.'.$file->getOriginalExtension(),0644);
+            $file->save(sfConfig::get('sf_upload_dir').'/'.$filename,0644);
         // NB:  formatFilename should probably put the real filename on the file
         //      but we've factored this out
 
@@ -96,7 +99,8 @@ class Torrent extends BaseTorrent
     {
       // TODO: add web sources to magnets
         return 'magnet:?xt=urn:sha1:'.$this->getFileSha1().
-        '&dn='.urlencode($this->getFileName());
+        '&dn='.urlencode($this->getFile());
+        // fixme this should return webloc not local path REGRESSION
     }
 
 
@@ -125,7 +129,8 @@ class Torrent extends BaseTorrent
         switch($type)
         {
             case 'web':
-                $params['url']=_compute_public_path($this->getFileName(),'uploads','',true);
+                $params['url']=_compute_public_path($this->getFile(),'uploads','',true);
+                // fixme this should return webloc not local path REGRESSION
                 $params['length']=$this->getSize();
                 $params['mimeType']=$this->getMimeType();
                 break;
@@ -135,7 +140,7 @@ class Torrent extends BaseTorrent
                 $params['mimeType']=$this->getMimeType();
                 break;
             case 'torrent':
-                $params['url']=_compute_public_path($this->getFileName().'.torrent','uploads','',true);
+                $params['url']=_compute_public_path($this->getFile().'.torrent','uploads','',true);
                 $params['length']=filesize($this->getTorrentPath());
                 $params['mimeType']='application/x-bittorrent';
                 break;
@@ -170,7 +175,8 @@ class Torrent extends BaseTorrent
 
     public function getOriginalFilePath()
     {
-      return sfConfig::get('sf_upload_dir').'/'.$this->getFileName();
+        // todo factor out?
+      return $this->getFile();
     }
 
     public function __destruct()
@@ -186,7 +192,7 @@ class Torrent extends BaseTorrent
     }
     protected function cleanupFiles()
     {
-      if($this->getFileName())
+      if($this->getFile())
       {
         @unlink($this->getTorrentPath());
         @unlink($this->getOriginalFilePath());
@@ -197,7 +203,7 @@ class Torrent extends BaseTorrent
       try {
         $ret=parent::delete($con);
         $this->cleanupFiles();
-        if($this->getFileName())
+        if($this->getFile())
         {
           @unlink($this->getOriginalFilePath());
         }
