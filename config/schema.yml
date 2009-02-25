@@ -139,3 +139,7 @@ propel:
     itunes_id:        longvarchar
 
     last_fetched:     timestamp
+
+  settings:
+    key:            varchar(255)
+    value:          varchar(255)
