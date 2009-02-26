@@ -11,4 +11,9 @@ class ProjectConfiguration extends sfProjectConfiguration
   // fix for dumb PEAR
     set_include_path(get_include_path().PATH_SEPARATOR.$this->getRootDir().DIRECTORY_SEPARATOR.'lib');
   }
+  public function setRootDir($rootDir)
+  {
+    parent::setRootDir($rootDir);
+    $this->setWebDir($rootDir);
+  }
 }
