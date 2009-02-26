@@ -8,7 +8,7 @@ Options +FollowSymLinks +ExecCGI
   #RewriteBase /
 
   # we skip all files with .something
-  RewriteCond %{REQUEST_URI} .*\..+$
+  RewriteCond %{REQUEST_URI} \..+$
   RewriteRule .* - [L]
 
   # no, so we redirect to our front web controller
