@@ -5,56 +5,77 @@
 	<td>
 	<?php echo $form['title']->renderError() ?>
 	<?php echo $form['title'] ?>
-	</td>
+	<p>
+        Podcast title, like: The Show	    
+	</p>
+</td>
 </tr>
 <tr>
 	<th><?php echo $form['slug']->renderLabel() ?>:</th>
 	<td>
 	<?php echo $form['slug']->renderError() ?>
 	<?php echo $form['slug'] ?>
-	</td>
+	<p>
+		Used in urls. example of url here todo
+	</p>
+</td>
 </tr>
 <tr>
 	<th><?php echo $form['author']->renderLabel() ?>:</th>
 	<td>
 	<?php echo $form['author']->renderError() ?>
 	<?php echo $form['author'] ?>
-	</td>
+	<p>
+        Public author credit, like: The Show Staff
+	</p>
+</td>
 </tr>
 <tr>
 	<th><?php echo $form['name']->renderLabel() ?>:</th>
 	<td>
 	<?php echo $form['name']->renderError() ?>
 	<?php echo $form['name'] ?>
-	</td>
+	<p>
+        Your real name, put in RSS feeds but not shown in iTunes
+	</p>
+</td>
 </tr>
 <tr>
 	<th><?php echo $form['email']->renderLabel() ?>:</th>
 	<td>
 	<?php echo $form['email']->renderError() ?>
 	<?php echo $form['email'] ?>
-	</td>
+	<p>
+        Podcast contact email address, put in RSS feeds but not shown in iTunes
+    </p>
+</td>
 </tr>
 <tr>
 	<th><?php echo $form['link']->renderLabel() ?>:</th>
 	<td>
 	<?php echo $form['link']->renderError() ?>
 	<?php echo $form['link'] ?>
-	</td>
+	<p>
+		This contains an optional url that your podcast will link back to.
+	</p>
+</td>
 </tr>
 <tr>
 	<th><?php echo $form['itunes_id']->renderLabel() ?>:</th>
 	<td>
 	<?php echo $form['itunes_id']->renderError() ?>
 	<?php echo $form['itunes_id'] ?>
-	</td>
+	<p>
+        Once your podcast is in iTunes, enter your ID number here, like: 123456789
+	</p>
+</td>
 </tr>
 <tr>
 	<th><?php echo $form['description']->renderLabel() ?>:</th>
 	<td>
 	<?php echo $form['description']->renderError() ?>
 	<?php echo $form['description'] ?>
-	</td>
+</td>
 </tr>
   <?php if ($form->hasGlobalErrors()): ?>
     <tr>
