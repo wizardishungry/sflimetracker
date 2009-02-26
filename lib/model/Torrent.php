@@ -232,7 +232,7 @@ class Torrent extends BaseTorrent
         if($this->getWebUrl()!='')
             return parent::getSize();
         else
-            return filesize($this->getOriginalFilePath());
+            return $this->getOriginalFilePath()?filesize($this->getOriginalFilePath()):0;
     }
 
     public function getTitle() // convenience method for sfFeed2Plugin
