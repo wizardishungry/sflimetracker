@@ -3,8 +3,7 @@ cache/*
 config/databases.yml
 config/propel.ini
 config/properties.ini
-web/uploads/*
-web/fixtures
+uploads/*
 plugins/.*
 # add2zip -- files below belong in the zip but not git
 data/sql/*
@@ -14,6 +13,5 @@ lib/model/map/*
 lib/form/base/*
 config/generated*
 VERSION
-web/sf
 .htpasswd
 lib/filter/base
