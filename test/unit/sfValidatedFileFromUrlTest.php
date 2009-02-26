@@ -5,7 +5,7 @@ include(dirname(__FILE__).'/../bootstrap/unit.php');
 
 $t = new lime_test(4, new lime_output_color());
 
-$web_fixtures=file_exists("$sf_root_dir/web/fixtures");
+$web_fixtures=file_exists("$sf_root_dir/fixtures");
 if($web_fixtures)
 {
   $t->diag('Trying to use web fixtures…');
@@ -22,7 +22,7 @@ if($web_fixtures)
 else
 {
   $t->diag("web/fixtures does not exist so we're going to use file:// fixtures");
-  $t->diag("ln -s ../test/fixtures web");
+  $t->diag("ln -s ../test/fixtures .");
 }
 
 $url=fixture_url('1upShow-rss2.xml',!$web_fixtures);
