@@ -54,9 +54,10 @@ class torrentActions extends sfActions
     {
         if($file)
             throw new sfException("Either add by file or by upload not both.");
-        @apache_setenv('no-gzip', 1);
-        @ini_set('zlib.output_compression', 0);
-        @ini_set('implicit_flush', 1);
+        if(function_exists("apache_setenv")) // could be running under fastcgi or in non-apache env
+            apache_setenv('no-gzip', 1);
+        ini_set('zlib.output_compression', 0);
+        ini_set('implicit_flush', 1);
         header('Content-type: multipart/x-mixed-replace;boundary="rn9012"');
         $file=new sfValidatedFileFromUrl($request->getParameter('web_url'),Array($this,'progress'));
         $is_replace=true;
