@@ -23,20 +23,9 @@ class TorrentForm extends BaseTorrentForm
         'episode_id' => new sfValidatorInteger(array('required' => true)),
         'feed_id' => new sfValidatorInteger(array('required' => true)),
 
-        // two oprions
+        // two options
         'web_url' => new sfValidatorUrl(Array('required' => false)),
         'file' => new sfValidatorFile(Array('required' => false)),
     ));
-
-    $options=Array('required' => false);
-    $messages=Array('required'=>'You must pick at least a file or a url');
-
-    $this->validatorSchema->setPostValidator(
-      new sfValidatorOr(array(
-        new sfValidatorSchemaFilter('web_url', new sfValidatorUrl($options,$messages)),
-        new sfValidatorSchemaFilter('file', new sfValidatorFile($options,$messages)),
-      )
-    ));
-    
   }
 }

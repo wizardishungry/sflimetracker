@@ -36,39 +36,30 @@ class torrentActions extends sfActions
     if(!$request->isMethod('post'))
     {
         // Should be a POST;
+        // fixme throw a proper error
         return;
     }
 
-    $this->form->bind($request->getPostParameters(),$request->getFiles());
-    if(!$this->form->isValid())
-    {
-        return sfView::ERROR;
-    }
-
-    // is there an upload
-    $file=$this->form->getValue('file');
-
+    $files=$request->getFiles();
+    $params=$request->getPostParameters();
     $is_replace=false;
-
-    if($request->getParameter('web_url')!='') // it is blank but exists
+    print_r($files);exit;
+    if(isset($params['web_url']))
     {
-        if($file)
-            throw new sfException("Either add by file or by upload not both.");
         if(function_exists("apache_setenv")) // could be running under fastcgi or in non-apache env
             apache_setenv('no-gzip', 1);
         ini_set('zlib.output_compression', 0);
         ini_set('implicit_flush', 1);
         header('Content-type: multipart/x-mixed-replace;boundary="rn9012"');
-        $file=new sfValidatedFileFromUrl($request->getParameter('web_url'),Array($this,'progress'));
+        $files['file']=new sfValidatedFileFromUrl($request->getParameter('web_url'),Array($this,'progress'));
         $is_replace=true;
     }
 
-    $torrent=new Torrent($file,$file instanceof sfValidatedFileFromUrl);
-    // ^ we should try using the sfForm object we used earlier todo
-    $torrent->setEpisodeId($request->getParameter('episode_id'));
-    $torrent->setFeedId($request->getParameter('feed_id'));
-    $torrent->save();
-
+    $this->form->bindAndSave($params,$files);
+    if(!$this->form->isValid())
+    {
+        return sfView::ERROR;
+    }
 
     if(!$is_replace)
         $this->redirect('episode/edit?id='.$torrent->getEpisodeId());
