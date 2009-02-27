@@ -88,7 +88,7 @@ class torrentActions extends sfActions
 
     $torrent=TorrentPeer::retrieveByPK($id);
     $this->forward404Unless($torrent); 
-    $this->getUser()->setFlash('notice','Deleted torrent '.$torrent->getFileName());
+    $this->getUser()->setFlash('notice','Deleted torrent '.$torrent->getFile());
     $torrent->delete();
     $this->redirect('episode/edit?id='.$torrent->getEpisodeId());
   }

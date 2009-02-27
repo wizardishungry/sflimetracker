@@ -1,5 +1,5 @@
 <li>
-    <?php echo $torrent->getFileName(), '(', $torrent->getMimeType(), ') ', pretty_size($torrent->getSize()) ?>
+    <?php echo $torrent->getFile(), '(', $torrent->getMimeType(), ') ', pretty_size($torrent->getSize()) ?>
     <ul>
     <li>Format: <?php echo $torrent->getFeed()->getTitle(); ?>
     <li>Address: <?php echo link_to($torrent->getUrl(false),$torrent->getUrl(false)); ?>
