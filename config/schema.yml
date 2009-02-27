@@ -63,7 +63,7 @@ propel:
     peers:          integer
 
     _uniques:
-      unique_file_name:    [file_name, episode_id]
+      unique_file_name:    [file, episode_id]
       unique_episode_feed: [episode_id,feed_id]
     
 
