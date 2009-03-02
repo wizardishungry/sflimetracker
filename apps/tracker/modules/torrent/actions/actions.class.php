@@ -80,6 +80,7 @@ class torrentActions extends sfActions
         $this->redirect('episode/edit?id='.$torrent->getEpisodeId());
     else
     {
+        exit;
         return sfView::NONE;
     }
 
