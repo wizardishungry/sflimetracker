@@ -21,15 +21,14 @@ class Torrent extends BaseTorrent
             if(is_string($file))
                 return parent::setFile($file);
         }
-
-        $filename = $this->formatFilename($file->getOriginalName()).'.'.$file->getOriginalExtension();
+        $filename = $this->formatFilename($file->getOriginalName()).$file->getOriginalExtension();
         $extension = $file->getOriginalExtension();
-        $this->setFile($filename);
+        parent::setFile($filename);
         // fixme this isn't setting the whole path
 
         $this->setSize($file->getSize());
         $this->setMimeType($file->getType());
-        $sha1=method_exists($file,'getFileSha1')?$file->getFileSha1():sha1_file($file->getSavedName());
+        $sha1=method_exists($file,'getFileSha1')?$file->getFileSha1():sha1_file($file->getTempName());
         $this->setFileSha1($sha1);       
 
         $torrent_file=$this->getTorrentPath();
@@ -38,14 +37,22 @@ class Torrent extends BaseTorrent
         {
             $this->cleanupFiles();
             throw new sfException("$torrent_file already exists");
+            parent::setFile(null);
         }
 
         if($store_original_file)
-            $file->save(sfConfig::get('sf_upload_dir').'/'.$filename,0644);
+        {
+            $file->save($this->getOriginalFilePath(),0644);
+        }
+        else
+        {
+            
+        }
         // NB:  formatFilename should probably put the real filename on the file
         //      but we've factored this out
 
-        $MakeTorrent = new File_Bittorrent2_MakeTorrent($file->getSavedName());
+        
+        $MakeTorrent = new File_Bittorrent2_MakeTorrent($file->isSaved()?$file->getSavedName():$file->getTempName());
         $MakeTorrent->setAnnounce(url_for('client/announce',true));
         $MakeTorrent->setComment('TODO');
         $MakeTorrent->setPieceLength(256); // KiBw
@@ -78,7 +85,6 @@ class Torrent extends BaseTorrent
 
         if($file instanceof sfValidatedFileFromUrl)
         {
-            @unlink($file->getSavedName());
             $this->setWebUrl($file->getUrl());
         }
     }
@@ -175,8 +181,7 @@ class Torrent extends BaseTorrent
 
     public function getOriginalFilePath()
     {
-        // todo factor out?
-      return $this->getFile();
+      return sfConfig::get('sf_upload_dir').'/'.$this->getFile();
     }
 
     public function __destruct()
