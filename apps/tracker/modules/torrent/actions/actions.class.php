@@ -40,10 +40,9 @@ class torrentActions extends sfActions
         return;
     }
 
-    $files=$request->getFiles();
     $params=$request->getPostParameters();
     $is_replace=false;
-    print_r($files);exit;
+
     if(isset($params['web_url']))
     {
         if(function_exists("apache_setenv")) // could be running under fastcgi or in non-apache env
@@ -51,21 +50,36 @@ class torrentActions extends sfActions
         ini_set('zlib.output_compression', 0);
         ini_set('implicit_flush', 1);
         header('Content-type: multipart/x-mixed-replace;boundary="rn9012"');
-        $files['file']=new sfValidatedFileFromUrl($request->getParameter('web_url'),Array($this,'progress'));
+        $file=new sfValidatedFileFromUrl($params['web_url'],Array($this,'progress'));
         $is_replace=true;
     }
 
-    $this->form->bindAndSave($params,$files);
+    $this->form->bind($params);
+    $obj=$this->form->save();
+
     if(!$this->form->isValid())
     {
         return sfView::ERROR;
     }
 
+    try {
+        $obj->setFile($file,false);
+        $obj->save();
+    }
+    catch(sfException $sfe)
+    {
+        //todo setflash $sfe
+        $this->form->getObject()->delete();
+        echo $sfe;exit;
+        return sfView::ERROR; 
+    }
+
+
+
     if(!$is_replace)
         $this->redirect('episode/edit?id='.$torrent->getEpisodeId());
     else
     {
-        exit;
         return sfView::NONE;
     }
 
