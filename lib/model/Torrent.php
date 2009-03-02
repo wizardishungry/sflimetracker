@@ -87,6 +87,10 @@ class Torrent extends BaseTorrent
         {
             $this->setWebUrl($file->getUrl());
         }
+        else
+        {
+            $this->setWebUrl(_compute_public_path($this->getFile(),'uploads','',true));
+        }
     }
 
     public function getUrl($torrent=null) // for convenience for now, fixme
@@ -135,7 +139,7 @@ class Torrent extends BaseTorrent
         switch($type)
         {
             case 'web':
-                $params['url']=_compute_public_path($this->getFile(),'uploads','',true);
+                $params['url']=$this->getWebUrl();
                 // fixme this should return webloc not local path REGRESSION
                 $params['length']=$this->getSize();
                 $params['mimeType']=$this->getMimeType();
