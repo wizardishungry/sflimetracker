@@ -250,7 +250,10 @@ class Torrent extends BaseTorrent
 
     public function getPodcast()
     {
-        return $this->getEpisode()->getPodcast();
+        if($this->getEpisodeId())
+            return $this->getEpisode()->getPodcast();
+        else
+            return null;
     }
 
     public function formatFileName($filename,$fmt_string=null)
