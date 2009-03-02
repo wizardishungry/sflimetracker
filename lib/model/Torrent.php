@@ -208,14 +208,9 @@ class Torrent extends BaseTorrent
       try {
         $ret=parent::delete($con);
         $this->cleanupFiles();
-        if($this->getFile())
-        {
-          @unlink($this->getOriginalFilePath());
-        }
       }
       catch(Exception $e)
       {
-        $this->cleanupFiles(); // make this always happen
         throw $e;
       }
       return $ret;
