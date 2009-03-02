@@ -14,19 +14,21 @@ sfLoader::loadHelpers(Array('Asset','Url'));
 class Torrent extends BaseTorrent
 {
 
-    function __construct($file=null,$store_original_file=true) // todo -- abstract the validatedfile stuff out
+    function setFile($file,$store_original_file=true) // todo -- abstract the validatedfile stuff out
     {
-        if($file==null){return;}
-
-        if(! $file instanceof sfValidatedFile) throw new sfException('constructor takes instance of sfValidatedFile');
-
-        $filename = $file->getOriginalName();
+        if(! $file  instanceof sfValidatedFile)
+        {
+            if(is_string($file))
+                return parent::setFile($file);
+        }
+        $filename = $this->formatFilename($file->getOriginalName()).$file->getOriginalExtension();
         $extension = $file->getOriginalExtension();
-        $this->setFileName($filename);
+        parent::setFile($filename);
+        // fixme this isn't setting the whole path
 
         $this->setSize($file->getSize());
         $this->setMimeType($file->getType());
-        $sha1=method_exists($file,'getFileSha1')?$file->getFileSha1():sha1_file($file->getSavedName());
+        $sha1=method_exists($file,'getFileSha1')?$file->getFileSha1():sha1_file($file->getTempName());
         $this->setFileSha1($sha1);       
 
         $torrent_file=$this->getTorrentPath();
@@ -35,15 +37,25 @@ class Torrent extends BaseTorrent
         {
             $this->cleanupFiles();
             throw new sfException("$torrent_file already exists");
+            parent::setFile(null);
         }
 
         if($store_original_file)
-            $file->save(sfConfig::get('sf_upload_dir').'/'.$filename,0644);
+        {
+            $file->save($this->getOriginalFilePath(),0644);
+        }
+        else
+        {
+            
+        }
+        // NB:  formatFilename should probably put the real filename on the file
+        //      but we've factored this out
 
-        $MakeTorrent = new File_Bittorrent2_MakeTorrent($file->getSavedName());
+        
+        $MakeTorrent = new File_Bittorrent2_MakeTorrent($file->isSaved()?$file->getSavedName():$file->getTempName());
         $MakeTorrent->setAnnounce(url_for('client/announce',true));
         $MakeTorrent->setComment('TODO');
-        $MakeTorrent->setPieceLength(256); // KiB
+        $MakeTorrent->setPieceLength(256); // KiBw
         
         $info=Array();
         if($file instanceof sfValidatedFileFromUrl)
@@ -73,8 +85,11 @@ class Torrent extends BaseTorrent
 
         if($file instanceof sfValidatedFileFromUrl)
         {
-            @unlink($file->getSavedName());
             $this->setWebUrl($file->getUrl());
+        }
+        else
+        {
+            $this->setWebUrl(_compute_public_path($this->getFile(),'uploads','',true));
         }
     }
 
@@ -94,7 +109,8 @@ class Torrent extends BaseTorrent
     {
       // TODO: add web sources to magnets
         return 'magnet:?xt=urn:sha1:'.$this->getFileSha1().
-        '&dn='.urlencode($this->getFileName());
+        '&dn='.urlencode($this->getFile());
+        // fixme this should return webloc not local path REGRESSION
     }
 
 
@@ -123,7 +139,8 @@ class Torrent extends BaseTorrent
         switch($type)
         {
             case 'web':
-                $params['url']=_compute_public_path($this->getFileName(),'uploads','',true);
+                $params['url']=$this->getWebUrl();
+                // fixme this should return webloc not local path REGRESSION
                 $params['length']=$this->getSize();
                 $params['mimeType']=$this->getMimeType();
                 break;
@@ -133,7 +150,7 @@ class Torrent extends BaseTorrent
                 $params['mimeType']=$this->getMimeType();
                 break;
             case 'torrent':
-                $params['url']=_compute_public_path($this->getFileName().'.torrent','uploads','',true);
+                $params['url']=_compute_public_path($this->getFile().'.torrent','uploads','',true);
                 $params['length']=filesize($this->getTorrentPath());
                 $params['mimeType']='application/x-bittorrent';
                 break;
@@ -168,7 +185,7 @@ class Torrent extends BaseTorrent
 
     public function getOriginalFilePath()
     {
-      return sfConfig::get('sf_upload_dir').'/'.$this->getFileName();
+      return sfConfig::get('sf_upload_dir').'/'.$this->getFile();
     }
 
     public function __destruct()
@@ -184,7 +201,7 @@ class Torrent extends BaseTorrent
     }
     protected function cleanupFiles()
     {
-      if($this->getFileName())
+      if($this->getFile())
       {
         @unlink($this->getTorrentPath());
         @unlink($this->getOriginalFilePath());
@@ -195,14 +212,9 @@ class Torrent extends BaseTorrent
       try {
         $ret=parent::delete($con);
         $this->cleanupFiles();
-        if($this->getFileName())
-        {
-          @unlink($this->getOriginalFilePath());
-        }
       }
       catch(Exception $e)
       {
-        $this->cleanupFiles(); // make this always happen
         throw $e;
       }
       return $ret;
@@ -238,5 +250,24 @@ class Torrent extends BaseTorrent
     public function getTitle() // convenience method for sfFeed2Plugin
     {
         return $this->getEpisode()->getTitle();
+    }
+
+    public function getPodcast()
+    {
+        if($this->getEpisodeId())
+            return $this->getEpisode()->getPodcast();
+        else
+            return null;
+    }
+
+    public function formatFileName($filename,$fmt_string=null)
+    {
+        if($fmt_string!=null)
+        {
+            throw new sfException("Format strings are not implemented, thus overloading the format is neither");
+        }
+        return strtr(implode('-',
+            Array($this->getPodcast()->getTitle(),$this->getTitle(),$this->getFeed()->getTitle())),
+        ' /','__');
     }
 }

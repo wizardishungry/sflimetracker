@@ -46,7 +46,7 @@ propel:
     created_at:
     updated_at:
 
-    file_name:      varchar(255)
+    file:           varchar(255)
     size:           integer            # file size
     mime_type:      varchar(40)
     web_url:        longvarchar        # for web backed torrents and non-torrent enclosure loving clients
@@ -63,7 +63,7 @@ propel:
     peers:          integer
 
     _uniques:
-      unique_file_name:    [file_name, episode_id]
+      unique_file_name:    [file, episode_id]
       unique_episode_feed: [episode_id,feed_id]
     
 

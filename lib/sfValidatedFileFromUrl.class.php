@@ -3,6 +3,7 @@
   sfValidatedFileFromURl
   -- constructs a new sfValidatedFile class via a url
 */
+require_once('lib/vendor/symfony/lib/validator/sfValidatorFile.class.php');
 class sfValidatedFileFromUrl extends sfValidatedFile
 {
   protected $original_url=null;
