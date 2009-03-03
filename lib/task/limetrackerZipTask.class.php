@@ -75,6 +75,13 @@ EOF;
         }
       }
 
+      // for files that need to avoid exclude patterns -- only one so far
+      if(!$is_ok) if(preg_match('#/.htaccess$#',$file))
+      {
+        $this->log("Butnot ". (is_dir($file)?'dir ':'file') ." $short");
+        $is_ok=true;
+      }
+
       if($is_ok)
       {
 
