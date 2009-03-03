@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Settings filter form.
+ * Setting filter form.
  *
  * @package    sflimetracker
  * @subpackage filter
  * @author     Your name here
  * @version    SVN: $Id$
  */
-class SettingsFormFilter extends BaseSettingsFormFilter
+class SettingFormFilter extends BaseSettingFormFilter
 {
   public function configure()
   {

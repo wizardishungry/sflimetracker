@@ -140,6 +140,9 @@ propel:
 
     last_fetched:     timestamp
 
-  settings:
-    key:            varchar(255)
+  setting:
+    key:
+        type:           varchar(255)
+        index:          unique
     value:          varchar(255)
+    vendor:         varchar(255)
