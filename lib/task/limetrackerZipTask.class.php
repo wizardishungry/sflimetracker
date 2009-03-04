@@ -38,38 +38,7 @@ EOF;
     $code=$this->zip->open($this->path,ZipArchive::CREATE); // this was having trouble accepting and &-ed mask
     if($code!==TRUE)
     {
-        switch($code)
-        {
-            case ZIPARCHIVE::ER_EXISTS:
-            $e="exists"; // should never happen since Overwrite is set
-            break;
-            case ZIPARCHIVE::ER_INCONS:
-            $e="incos";
-            break;
-            case ZIPARCHIVE::ER_INVAL:
-            $e="inval";
-            break;
-            case ZIPARCHIVE::ER_MEMORY:
-            $e="mem";
-            break;
-            case ZIPARCHIVE::ER_NOENT:
-            $e="noent";
-            break;
-            case ZIPARCHIVE::ER_NOZIP:
-            $e="nozip";
-            break;
-            case ZIPARCHIVE::ER_OPEN:
-            $e="open";
-            break;
-            case ZIPARCHIVE::ER_READ:
-            $e="read";
-            break;
-            case ZIPARCHIVE::ER_SEEK:
-            $e="seek";
-            break;
-            default:
-            $e="unknown";
-        }
+      $e=$this->error2string($code);
       throw new sfException("Can't make a zip -- $code $e");
     }
     $this->root=realpath(dirname(__FILE__).'/../..');
@@ -104,6 +73,13 @@ EOF;
           $is_ok=false;
           break;
         }
+      }
+
+      // for files that need to avoid exclude patterns -- only one so far
+      if(!$is_ok) if(preg_match('#/.htaccess$#',$file))
+      {
+        $this->log("Butnot ". (is_dir($file)?'dir ':'file') ." $short");
+        $is_ok=true;
       }
 
       if($is_ok)
@@ -210,7 +186,46 @@ EOF;
 
   protected function reopen()
   {
-    $this->zip->close();
-    $this->zip->open($this->path);
+    $this->log('Reopening…');
+    if($this->zip->close()!==TRUE)
+        throw new sfException('Closing zip for reopen failed');
+    if($code = $this->zip->open($this->path)!=TRUE)
+    throw new sfException('Reopening zip for failed -- '.$this->error2string($code));
+  }
+  protected function error2string($code)
+  {
+    switch($code)
+    {
+        case ZIPARCHIVE::ER_EXISTS:
+        $e="exists"; // should never happen since Overwrite is set
+        break;
+        case ZIPARCHIVE::ER_INCONS:
+        $e="incos";
+        break;
+        case ZIPARCHIVE::ER_INVAL:
+        $e="inval";
+        break;
+        case ZIPARCHIVE::ER_MEMORY:
+        $e="mem";
+        break;
+        case ZIPARCHIVE::ER_NOENT:
+        $e="noent";
+        break;
+        case ZIPARCHIVE::ER_NOZIP:
+        $e="nozip";
+        break;
+        case ZIPARCHIVE::ER_OPEN:
+        $e="open";
+        break;
+        case ZIPARCHIVE::ER_READ:
+        $e="read";
+        break;
+        case ZIPARCHIVE::ER_SEEK:
+        $e="seek";
+        break;
+        default:
+        $e="unknown";
+    }
+    return $e;
   }
 }
