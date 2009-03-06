@@ -27,12 +27,15 @@ $autoload->addDirectory($sf_root_dir.'/lib');
 $autoload->register();
 
 // Commenting this out because it seems to be breaking stuff right now
-$app_config=$configuration->getApplicationConfiguration('tracker','test',true/*,$sf_root_dir*/);
+$app_config=$configuration->getApplicationConfiguration('tracker','dev',true/*,$sf_root_dir*/);
 
 $databaseManager = new sfDatabaseManager($app_config);
 //$databaseManager->loadConfiguration();
 
 sfContext::createInstance($app_config,'tracker');
+
+$sessionPath = sfToolkit::getTmpDir().'/sessions_'.rand(11111, 99999);
+$storage= new sfSessionTestStorage(Array('session_path'=>$sessionPath));
 
 function fixture_url($name,$file_url=true)
 {
