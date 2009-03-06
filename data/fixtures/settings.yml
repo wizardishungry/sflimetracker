@@ -1,4 +1,4 @@
 Setting:
     password:
         key:        password
-        vendor:     limetracker
+        vendor:     <?php echo trackerUser::crypt('LimeTracker'),"\n"; ?>
