@@ -20,9 +20,9 @@ class SettingPeer extends BaseSettingPeer
         throw new sfException('key not found');
     }
 
-    public static function reset(Criteria $criteria =null,PropelPDO $con=null)
+    public static function reset(Criteria $criteria =null, PropelPDO $con=null)
     {
-        $os=self::doSelect($criteria $con);
+        $os=self::doSelect($criteria, $con);
         foreach($os as $o)
         {
             $o->reset();
