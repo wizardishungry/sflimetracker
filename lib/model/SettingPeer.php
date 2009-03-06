@@ -30,4 +30,12 @@ class SettingPeer extends BaseSettingPeer
         }
         return $os;
     }
+    public static function setByKey($key, $value, PropelPDO $con = null)
+    {
+        $c = new Criteria();
+        $c->add(SettingPeer::KEY,$key);
+        $s=SettingPeer::doSelectOne($c, $con);
+        $s->setValue($value);
+        return $s->save();
+    }
 }
