@@ -5,12 +5,11 @@ class trackerUser extends sfBasicSecurityUser
 
   protected $cookie_name='remember_me';
 
-  public function setPassword($password,$write=true)
+  public function setPassword($password)
   {
-    $payload.=self::crypt($password); // nb no salt!!!!
-    if($write)
-      if(false==file_put_contents($this->getPasswdPath(),$payload))
-        throw new sfException("Couldn't write password, check permissions");
+    $payload=self::crypt($password); // nb no salt!!!!
+      if(!SettingPeer::setByKey('password',$payload))
+        throw new sfException("Couldn't write password, check database permissions and connect info");
     return $payload;
   }
 
@@ -24,6 +23,11 @@ class trackerUser extends sfBasicSecurityUser
     {
       return false;
     }
+  }
+
+  public function getCryptedString()
+  {
+    return SettingPeer::retrieveByKey('password');
   }
 
   public static function crypt($str)
