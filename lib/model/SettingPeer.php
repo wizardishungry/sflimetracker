@@ -6,7 +6,10 @@ class SettingPeer extends BaseSettingPeer
     {
         $c = new Criteria();
         $c->add(SettingPeer::KEY,$key);
-        return SettingPeer::doSelectOne($c, $con);
+        $o = SettingPeer::doSelectOne($c, $con);
+        if($o)
+            return $o->getValue()?$o->getValue():$o->getVendor();
+        return null;
     }
 
     public static function resetByKey($key, PropelPDO $con = null)
