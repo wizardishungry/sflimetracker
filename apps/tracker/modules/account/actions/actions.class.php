@@ -65,26 +65,16 @@ class accountActions extends sfActions
   public function executePassword($request)
   {
     $user=$this->getUser();
-    $payload=null;
     $this->form = $form = new PasswordForm($user);
     if($request->getMethod () == sfRequest::POST)
     {
       $form->bind($request->getPostParameters());
       if($form->isValid())
       {
-
-        $can_write=$user->canWritePasswd();
-        $payload=$user->setPassword($form->getValue('password'),$can_write);
-        if($can_write)
-        {
-          $user->setAuthenticated(false);
-          $user->setFlash('notice','Password changed');
-          return $this->redirect('@homepage');
-        }
-
-        $this->payload=$payload;
-        if(isset($e))
-          $this->exception=$e;
+        $user->setPassword($form->getValue('password'));
+        $user->setAuthenticated(false);
+        $user->setFlash('notice','Password changed');
+        return $this->redirect('@homepage');
       }
     }
   }
