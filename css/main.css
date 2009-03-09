@@ -453,17 +453,24 @@ table input[type="submit"]
     width: auto !important;
 }
 
-
-/**
-* Podcast
-**/
-.podcasts h3 {
-  margin: 0;
-}
-body.module_account #header {
+body.action_add tr#slug_row
+{
     display: none;
 }
 
+/**
+ * Podcast
+ **/
+.podcasts h3 {
+  margin: 0;
+}
 iframe {
     border: 0;
+}
+
+/**
+ * Account
+ **/
+body.module_account #header {
+    display: none;
 }

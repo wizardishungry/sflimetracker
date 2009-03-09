@@ -20,7 +20,7 @@
 	<?php echo $form['title'] ?>
 	</td>
 </tr>
-<tr>
+<tr id="slug_row">
 	<th><?php echo $form['slug']->renderLabel() ?>:</th>
 	<td>
 	<?php echo $form['slug']->renderError() ?>
