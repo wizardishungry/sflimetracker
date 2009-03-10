@@ -41,6 +41,7 @@ EOF;
     {
       //$tasks[]=Array(new sfPropelBuildDbTask($this->dispatcher, $this->formatter),Array(),Array() );
       // todo ^ this doesn't work
+      // TODO insert DATA --  php symfony propel:data-load   --env=dev
       // todo copy tracker.db to tracker.db.dist
     }
 
