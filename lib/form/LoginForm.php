@@ -14,7 +14,7 @@ class LoginForm extends sfForm
     $this->setWidgets(array(
       'password'    => new sfWidgetFormInputPassword(),
       'remember_me' => new sfWidgetFormInputCheckbox(),
-      'i_will_not_use_LimeTracker_for_copyright_infringement' => new sfWidgetFormInputCheckbox(),
+      'legal_mumbo_jumbo' => new sfWidgetFormInputCheckbox(),
     ));
     $this->setValidators(array(
       'password'    =>   new sfValidatorCallback(array(
