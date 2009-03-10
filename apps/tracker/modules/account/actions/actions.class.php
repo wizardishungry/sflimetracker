@@ -54,12 +54,17 @@ class accountActions extends sfActions
   public function executeLogout($request)
   {
     $user=$this->getUser();
-    if($request->getMethod () == sfRequest::POST && $user->isAuthenticated())
+    $this->form = $form = new LogoutForm();
+    if($request->getMethod () == sfRequest::POST)
     {
-      $user->remember(true); // also known as "forget"
-      $user->setAuthenticated(false);
-      $this->redirect('@root');
-      // todo add flash
+        $form->bind($request->getPostParameters());
+        if($form->isValid() && $user->isAuthenticated())
+        {
+            $user->remember(true); // also known as "forget"
+            $user->setAuthenticated(false);
+            $this->redirect('@root');
+            // todo add flash
+        }
     }
   }
   public function executePassword($request)
