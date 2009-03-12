@@ -14,5 +14,5 @@ if (version_compare(PHP_VERSION, '5.1.0') === -1) {
 
 require_once(dirname(__FILE__).'/config/ProjectConfiguration.class.php');
 
-$configuration = ProjectConfiguration::getApplicationConfiguration('tracker', 'dev', true);
-sfContext::createInstance($configuration)->dispatch();
+$app="tracker"; $env="dev"; $debug=true;
+require_once(dirname(__FILE__).'/lib/initialize.php');
