@@ -8,10 +8,26 @@ class ProjectConfiguration extends sfProjectConfiguration
 
   public function setup()
   {
-
     if(!class_exists('PDO',false))
     {
-        $this->loadSharedObjects(Array('pdo','pdo_sqlite','sqlite')); // todo support mysql
+        $classes=Array('pdo');
+        $use_sqlite = is_writeable($this->getRootDir().DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'tracker.db');
+
+        if($use_sqlite)
+        {
+            $classes[]='pdo_sqlite';
+            $classes[]='sqlite';
+        }
+        else
+        {
+            $classes[]='pdo_mysql';
+            $classes[]='mysql';
+        }
+
+        $this->loadSharedObjects($classes);
+        // this could really use to be made more elegant but if you're
+        // installing on a webhost without PDO setup right, this
+        // is the least of your problems
     }
 
       $this->enableAllPluginsExcept(array('sfDoctrinePlugin'));
