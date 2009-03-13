@@ -3,28 +3,32 @@ class LoginForm extends sfForm
 {
 
   protected $user;
+  protected $intent;
 
-  public function __construct(sfUser $user)
+  public function __construct(sfUser $user,$intent=false)
   {
     $this->user=$user;
+    $this->intent=$intent;
     parent::__construct();
   }
   public function configure()
   {
-    $this->setWidgets(array(
+    $widgets=array(
       'password'    => new sfWidgetFormInputPassword(),
-      'remember_me' => new sfWidgetFormInputCheckbox(),
-      'legal_mumbo_jumbo' => new sfWidgetFormInputCheckbox(),
-    ));
-    $this->setValidators(array(
+      'remember_me' => new sfWidgetFormInputCheckbox());
+    if(!$this->intent) $widgets['intent'] = new sfWidgetFormInputCheckbox();
+    $this->setWidgets($widgets);
+
+    $validators=array(
       'password'    =>   new sfValidatorCallback(array(
         'required' => true,
         'callback' => Array($this,'passwordCallback'),
         'arguments' => Array($this->getValue('password'))
       )),
       'remember_me' =>  new sfValidatorPass(Array('required'=>false)),
-    ));
-    $this->validatorSchema->setOption('allow_extra_fields', true); // remove this eventually FIXME
+    );
+    if(!$this->intent) $validators['intent'] = new sfValidatorChoice(array('choices' =>Array('on')));
+    $this->setValidators($validators);
   }
 
   public function passwordCallback($validator,$password)

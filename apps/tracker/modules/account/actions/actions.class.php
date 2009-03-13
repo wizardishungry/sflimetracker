@@ -13,6 +13,8 @@ class accountActions extends sfActions
   {
     
     $user = $this->getUser();
+    $this->intent = $intent = SettingPeer::retrieveByKey('intent');
+    $form = $this->form = new LoginForm($user,$intent);
 
     if($user->isAuthenticated())
       $this->redirect('@homepage');
@@ -21,12 +23,13 @@ class accountActions extends sfActions
     {
       $params=$request->getPostParameters();
 
-      $form = $this->form = new LoginForm($this->getUser());
       $form->bind($params);
       
       if($form->isValid())
       {
         $this->getUser()->setAuthenticated(true);
+        if(!$intent)
+             SettingPeer::setByKey('intent',true);
 
         if($form->getValue('remember_me'))
         {
@@ -55,7 +58,7 @@ class accountActions extends sfActions
   {
     $user=$this->getUser();
     $this->form = $form = new LogoutForm();
-    if($request->getMethod () == sfRequest::POST)
+    if($request->getMethod() == sfRequest::POST)
     {
         $form->bind($request->getPostParameters());
         if($form->isValid() && $user->isAuthenticated())

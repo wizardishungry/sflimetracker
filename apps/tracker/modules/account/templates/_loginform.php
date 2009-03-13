@@ -1,7 +1,3 @@
-<?php
-    if(!isset($form))
-        $form=new LoginForm($sf_user);
-?>
 <div class="login">
   <form action="<?php echo url_for('account/login') ?>" method="POST">
     <?php echo $form['_csrf_token']; ?>
@@ -20,15 +16,18 @@
             </td>
             <td><?php echo $form['remember_me']->renderLabel() ?></td>
         </tr>
+
+        <?php if(!$intent): ?>
         <tr>
             <td>
-            <?php echo $form['legal_mumbo_jumbo']->renderError() ?>
-            <?php echo $form['legal_mumbo_jumbo'] ?>
+            <?php echo $form['intent']->renderError() ?>
+            <?php echo $form['intent'] ?>
             </td>
-            <td><label for="legal_mumbo_jumbo">
-                I will not use LimeTracker <!-- replace with constant todo --> for copyright infringement.
+            <td><label for="intent">
+                I will not use <?php echo sfConfig::get('app_version_name') ?> for copyright infringement.
             </label></td>
         </tr>
+        <?php endif; ?>
 
       <tr>
         <td>&nbsp;</td>
