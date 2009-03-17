@@ -22,7 +22,7 @@ test:
 all:
   .settings:
     # Form security secret (CSRF protection)
-    csrf_secret:        <?php echo uniqid() ?>  # This value is regenerated every time the cache is refreshed.
+    csrf_secret:        <?php echo uniqid(),"\n" ?> # This value is regenerated every time the cache is refreshed.
     #csrf_secret:       false                # Unique secret to enable CSRF protection or false to disable
 
     # Output escaping settings
