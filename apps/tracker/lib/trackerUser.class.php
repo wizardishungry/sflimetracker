@@ -42,12 +42,11 @@ class trackerUser extends sfBasicSecurityUser
 
     if(!$this->isAuthenticated())
     {
-      if($request->getPostParameter('password')!='' && $request->getCookie($this->cookie_name))
+      if($request->getPostParameter('password')=='' && $request->getCookie($this->cookie_name))
       {
         $params=Array();
         $params['password']=$request->getCookie($this->cookie_name);
-        sfForm::disableCSRFProtection();
-        $form = new LoginForm($this);
+        $form = new LoginForm($this,true,array(),array(),false); // no csrf
         $form->bind($params);
         if($form->isValid())
         {

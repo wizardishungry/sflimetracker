@@ -5,11 +5,11 @@ class LoginForm extends sfForm
   protected $user;
   protected $intent;
 
-  public function __construct(sfUser $user,$intent=false)
+  public function __construct(sfUser $user,$intent=false,$defaults = array(), $options = array(), $CSRFSecret = null)
   {
     $this->user=$user;
     $this->intent=$intent;
-    parent::__construct();
+    parent::__construct($defaults,$options,$CSRFSecret);
   }
   public function configure()
   {
