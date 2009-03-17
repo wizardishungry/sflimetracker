@@ -37,6 +37,10 @@ class trackerUser extends sfBasicSecurityUser
 
   public function initialize(sfEventDispatcher $dispatcher, sfStorage $storage, $options = array())
   {
+
+    $this->checkPermissions();
+
+
     parent::initialize($dispatcher,$storage, $options);
     $request=sfContext::getInstance()->getRequest();
 
@@ -77,5 +81,35 @@ class trackerUser extends sfBasicSecurityUser
       $expire=time()+sfConfig::get('app_admin_remember_me_time',3600);
     }
     $response->setCookie($this->cookie_name,$value,$expire,$path,'',false);
+  }
+
+  public function checkPermissions($storage)
+  {
+    // fixme array is hardcoded
+    $paths=Array(
+        'cache',
+        'data',
+        'data/tracker.db',
+        'log',
+        'uploads',
+    );
+
+
+    $root=sfContext::getInstance()->getConfiguration()->getRootDir();
+    $is_ok=true;
+    $bad=Array();
+    foreach($paths as $o_path)
+    {
+        $path=$root.'/'.$o_path;
+        if(!is_writable($path))
+        {
+            $bad[]=$o_path;
+            $is_ok=false;
+        }
+    }
+    if(!$is_ok)
+    {
+        throw new sfException('You have one or more unwritable paths that must be writable -- '. implode(' ',$bad));
+    }
   }
 }
