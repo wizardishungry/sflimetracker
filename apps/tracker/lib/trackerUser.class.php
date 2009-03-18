@@ -83,7 +83,7 @@ class trackerUser extends sfBasicSecurityUser
     $response->setCookie($this->cookie_name,$value,$expire,$path,'',false);
   }
 
-  public function checkPermissions($storage)
+  public function checkPermissions()
   {
     // fixme array is hardcoded
     $paths=Array(
