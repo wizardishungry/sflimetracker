@@ -1,9 +1,9 @@
 <form action="<?php echo url_for('account/password') ?>" method="POST">
-<?php echo $form['_csrf_token'] ?>
   <table>
     <tr>
         <th><?php echo $form['current_password']->renderLabel() ?>:</th>
         <td>
+        <?php echo $form['_csrf_token'] ?>
         <?php echo $form['current_password']->renderError() ?>
         <?php echo $form['current_password'] ?>
         </td>

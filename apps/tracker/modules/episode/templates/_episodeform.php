@@ -1,8 +1,8 @@
-<?php echo $form['podcast_id'] ?>
-<?php echo $form['id'] ?>
-<?php echo $form['_csrf_token'] ?>
 <tr>
     <td colspan="2">
+        <?php echo $form['podcast_id'] ?>
+        <?php echo $form['id'] ?>
+        <?php echo $form['_csrf_token'] ?>
         <iframe height="120" width="100%" name="<?php echo $iframe;?>"> </iframe>
     </td>
 </tr>

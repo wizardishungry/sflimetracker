@@ -1,10 +1,10 @@
 <div class="login">
   <form action="<?php echo url_for('account/login') ?>" method="POST">
-    <?php echo $form['_csrf_token']; ?>
     <table>
         <tr>
             <th><?php echo $form['password']->renderLabel() ?>:</th>
             <td>
+            <?php echo $form['_csrf_token']; ?>
             <?php echo $form['password']->renderError() ?>
             <?php echo $form['password'] ?>
             </td>

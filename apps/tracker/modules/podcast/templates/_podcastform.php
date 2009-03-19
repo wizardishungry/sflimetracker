@@ -1,8 +1,8 @@
-<?php echo $form['id'] ?>
-<?php echo $form['_csrf_token'] ?>
 <tr>
 	<th><?php echo $form['title']->renderLabel() ?>:</th>
 	<td>
+    <?php echo $form['id'] ?>
+    <?php echo $form['_csrf_token'] ?>  
 	<?php echo $form['title']->renderError() ?>
 	<?php echo $form['title'] ?>
 	<p>
