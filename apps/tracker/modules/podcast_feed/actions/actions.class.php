@@ -10,27 +10,34 @@ class podcast_feedActions extends sfActions
 {
   public function executeAdd($request)
   {
-    $this->form=new FeedForm();
+    return $this->executeEdit($request);
+  }
+  public function executeEdit($request)
+  {
+    $form=$this->form=new FeedForm(FeedPeer::retrieveByPk($request->getParameter('id')));
+    $podcast_feed=$this->podcast_feed=$form->getObject();
+    $podcast=$this->podcast=$podcast_feed->getPodcast();
     if ($request->isMethod('post'))
     {
-        $this->form->bind($request->getPostParameters(),$request->getFiles());
+        $form->bind($request->getPostParameters(),$request->getFiles());
         if($this->form->isValid())
         {
-            $feed=$this->form->save();
-            $this->redirect('podcast/edit?id='.$feed->getPodcastId());
+            $podcast_feed=$this->form->save();
+            $this->redirect('podcast/edit?id='.$podcast_feed->getPodcastId());
         }
     }
   }
+
 
   public function executeDelete($request)
   {
     $this->forward404Unless($request->getMethod () == sfRequest::POST);   
     $id=$request->getParameter('id');
 
-    $feed=FeedPeer::retrieveByPK($id);
-    $this->forward404Unless($feed); 
-    $this->getUser()->setFlash('notice','Deleted feed '.$feed->getTitle());
-    $feed->delete();
-    $this->redirect('podcast/edit?id='.$feed->getPodcastId());
+    $podcast_feed=FeedPeer::retrieveByPK($id);
+    $this->forward404Unless($podcast_feed); 
+    $this->getUser()->setFlash('notice','Deleted feed '.$podcast_feed->getTitle());
+    $podcast_feed->delete();
+    $this->redirect('podcast/edit?id='.$podcast_feed->getPodcastId());
   } 
 }

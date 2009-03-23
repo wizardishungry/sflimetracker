@@ -492,3 +492,8 @@ body.module_account.action_settings #header
 {
     display: block;
 }
+
+body.module_podcast.action_edit #content ul li form
+{
+    display: inline;
+}

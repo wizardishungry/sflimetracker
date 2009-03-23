@@ -16,39 +16,6 @@
 </form>
 <?php echo delete_form_for_object($podcast); ?>
 
-<h2>Formats</h2>
-<?php if($feeds): ?>
-<ul>
-  <?php foreach($feeds as $feed): ?>
-    <li>
-      <?php 
-        echo $feed->getTitle();
-      ?>
-    </li>
-  <?php endforeach; ?>
-</ul>
-<?php else: ?>
-  <p><i>No feeds yet.</i></p>
-<?php endif; ?>
-
-
-<h3>Add a new format for feeds</h3>
-
-<p>These feeds generally correspond to a media format like "mp3 high quality".</p>
-<form action="<?php echo url_for('podcast_feed/add') ?>" method="POST">
-    <table>
-    <?php echo $podcast_feed_form; ?>
-    <tr>
-        <td>&nbsp;</td>
-        <td>
-        <input type="submit" value="Add"/>
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    </table>
-</form>
 
 <h2>Episodes</h2>
 <ul>
@@ -69,3 +36,20 @@
     }
   ?>
 </ul>
+
+<h2>Formats</h2>
+<?php if($feeds): ?>
+<ul>
+  <?php foreach($feeds as $feed): ?>
+    <li>
+      <?php 
+        echo $feed->getTitle(),
+        button_to('Edit','podcast_feed/edit?id='.$feed->getID()),
+        count($feeds)>1?delete_form_for_object($feed,'podcast_feed/delete'):'';
+      ?>
+    </li>
+  <?php endforeach; ?>
+</ul>
+<?php else: ?>
+  <p><i>No feeds yet.</i></p>
+<?php endif; ?>
