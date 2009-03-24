@@ -154,7 +154,6 @@ EOF;
       'plugins/.*',
       'plugins/File_Bittorrent2', // added via symlinks in lib
       'test',       // tests don't bleong in an end user release
-      'sf/sf_*', // no debugging
       'tracker_dev.php*', // no debugging
       '*.swp', '*/*.swp', // no vim swapfiles
     );
