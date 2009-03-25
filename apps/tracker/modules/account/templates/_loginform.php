@@ -20,10 +20,11 @@
         <?php if(!$intent): ?>
         <tr>
             <td>
-            <?php echo $form['intent']->renderError() ?>
             <?php echo $form['intent'] ?>
             </td>
-            <td><label for="intent">
+            <td>
+            <?php echo $form['intent']->renderError() ?>
+            <label for="intent">
                 I will not use <?php echo sfConfig::get('app_version_name') ?> for copyright infringement.
             </label></td>
         </tr>
