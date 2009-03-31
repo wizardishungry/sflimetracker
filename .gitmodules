@@ -10,7 +10,8 @@
 	url = git://github.com/WIZARDISHUNGRY/file_bittorrent2.git
 # private
 #	url = git@github.com:WIZARDISHUNGRY/file_bittorrent2.git
-[submodule "plugins/sfPropelActAsSluggableBehaviorPlugin"]
+
+[submodule "sfPropelActAsSluggableBehaviorPlugin"]
     path = plugins/sfPropelActAsSluggableBehaviorPlugin
 # public 
 	url = git://github.com/WIZARDISHUNGRY/sfpropelactassluggablebehaviorplugin.git
