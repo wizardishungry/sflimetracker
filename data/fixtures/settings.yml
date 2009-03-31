@@ -1,7 +1,7 @@
 Setting:
     password:
-        name:       password
+        key:       password
         vendor:     <?php echo trackerUser::crypt('LimeTracker'),"\n"; ?>
     intent:
-        name:       intent
+        key:       intent
         vendor:     false
