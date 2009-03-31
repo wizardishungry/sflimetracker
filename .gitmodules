@@ -17,3 +17,6 @@
 	url = git://github.com/WIZARDISHUNGRY/sfpropelactassluggablebehaviorplugin.git
 # private
 #	url = git@github.com:WIZARDISHUNGRY/sfpropelactassluggablebehaviorplugin.git
+[submodule "host-assert"]
+	path = test/host-assert
+	url = git://gist.github.com/78145.git
