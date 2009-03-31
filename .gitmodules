@@ -17,3 +17,6 @@
 	url = git://github.com/WIZARDISHUNGRY/sfpropelactassluggablebehaviorplugin.git
 # private
 #	url = git@github.com:WIZARDISHUNGRY/sfpropelactassluggablebehaviorplugin.git
+[submodule "lib/vendor/symfony"]
+	path = lib/vendor/symfony
+	url = git://github.com/WIZARDISHUNGRY/symfony.git
