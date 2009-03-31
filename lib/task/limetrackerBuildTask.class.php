@@ -43,6 +43,8 @@ EOF;
       // todo ^ this doesn't work
       // TODO insert DATA --  php symfony propel:data-load   --env=dev
       // todo copy tracker.db to tracker.db.dist
+      // todo permissions
+      // todo overwrite checks
     }
 
     if(@$arguments['file'])
