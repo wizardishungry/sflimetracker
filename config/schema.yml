@@ -141,7 +141,7 @@ propel:
     last_fetched:     timestamp
 
   setting:
-    key:
+    name:
         type:           varchar(255)
         index:          unique
     value:          varchar(255)
