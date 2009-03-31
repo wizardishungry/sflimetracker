@@ -149,7 +149,7 @@ class sfFileCache extends sfCache
     {
       if (sfCache::ALL == $mode || !$this->isValid($file))
       {
-        $result = $result && @unlink($file);
+        $result = @unlink($file) && $result;
       }
     }
 
@@ -278,21 +278,21 @@ class sfFileCache extends sfCache
       mkdir(dirname($path), 0777, true);
     }
 
-    if (!$fp = @fopen($path, 'wb'))
+    $tmpFile = $path . '.' . getmypid();
+
+    if (!$fp = @fopen($tmpFile, 'wb'))
     {
-      throw new sfCacheException(sprintf('Unable to write cache file "%s".', $path));
+       throw new sfCacheException(sprintf('Unable to write cache file "%s".', $tmpFile));
     }
 
-    @flock($fp, LOCK_EX);
     @fwrite($fp, str_pad($timeout, 12, 0, STR_PAD_LEFT));
     @fwrite($fp, str_pad(time(), 12, 0, STR_PAD_LEFT));
     @fwrite($fp, $data);
-    @flock($fp, LOCK_UN);
     @fclose($fp);
 
-    // change file mode
-    chmod($path, 0666);
-
+    chmod($tmpFile, 0666);
+    @unlink($path);
+    rename($tmpFile, $path);
     umask($current_umask);
 
     return true;

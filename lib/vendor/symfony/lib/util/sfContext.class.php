@@ -234,6 +234,11 @@ class sfContext
      return isset($this->factories['controller']) ? $this->factories['controller'] : null;
    }
 
+   /**
+    * Retrieve the logger.
+    *
+    * @return sfLogger The current sfLogger implementation instance.
+    */
    public function getLogger()
    {
      if (!isset($this->factories['logger']))

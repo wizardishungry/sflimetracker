@@ -10,7 +10,7 @@
 
 require_once(dirname(__FILE__).'/../../bootstrap/unit.php');
 
-$t = new lime_test(137, new lime_output_color());
+$t = new lime_test(140, new lime_output_color());
 
 class FormTest extends sfForm
 {
@@ -728,6 +728,11 @@ class TestForm1 extends FormTest
       'b' => '1_b',
       'c' => '1_c',
     ));
+    $this->getWidgetSchema()->setHelps(array(
+      'a' => '1_a',
+      'b' => '1_b',
+      'c' => '1_c',
+    ));
   }
 }
 
@@ -748,6 +753,10 @@ class TestForm2 extends FormTest
       'c' => '2_c',
       'd' => '2_d',
     ));
+    $this->getWidgetSchema()->setHelps(array(
+      'c' => '2_c',
+      'd' => '2_d',
+    ));
     $this->validatorSchema->setPreValidator(new sfValidatorPass());
     $this->validatorSchema->setPostValidator(new sfValidatorPass());
   }
@@ -764,6 +773,7 @@ $t->is(count($validatorSchema->getFields()), 4, 'mergeForm() merges a validator 
 $t->is(array_keys($widgetSchema->getFields()), array('a', 'b', 'c', 'd'), 'mergeForms() merges the correct widgets');
 $t->is(array_keys($validatorSchema->getFields()), array('a', 'b', 'c', 'd'), 'mergeForms() merges the correct validators');
 $t->is($widgetSchema->getLabels(), array('a' => '1_a', 'b' => '1_b', 'c' => '2_c', 'd' => '2_d'), 'mergeForm() merges labels correctly');
+$t->is($widgetSchema->getHelps(), array('a' => '1_a', 'b' => '1_b', 'c' => '2_c', 'd' => '2_d'), 'mergeForm() merges helps correctly');
 $t->isa_ok($widgetSchema['c'], 'sfWidgetFormTextarea', 'mergeForm() overrides original form widget');
 $t->isa_ok($validatorSchema['c'], 'sfValidatorPass', 'mergeForm() overrides original form validator');
 $t->isa_ok($validatorSchema->getPreValidator(), 'sfValidatorPass', 'mergeForm() merges pre validator');
@@ -782,6 +792,24 @@ catch (LogicException $e)
 
 $errorSchema = $f1->getErrorSchema();
 $t->ok(array_key_exists('d', $errorSchema->getErrors()), 'mergeForm() merges errors after having been bound');
+
+$f1 = new TestForm1();
+$f1->getWidgetSchema()->moveField('a', 'last');
+
+// is moved field well positioned when accessed with iterator interface? (#5551)
+foreach($f1 as $f1name => $f1field)
+{
+  $t->is ($f1name, 'b', 'iterating on form takes in account ->moveField() operations.');
+  break;
+}
+
+$f2 = new TestForm2();
+$f2->mergeForm($f1);
+
+$t->is_deeply(array_keys($f2->getWidgetSchema()->getFields()), array('c', 'd', 'b', 'a'), 'mergeForm() merges fields in the correct order');
+
+// ->getJavaScripts() ->getStylesheets()
+$t->diag('->getJavaScripts() ->getStylesheets()');
 
 class MyWidget extends sfWidgetForm
 {
@@ -806,8 +834,6 @@ class MyWidget extends sfWidgetForm
   }
 }
 
-// ->getJavaScripts() ->getStylesheets()
-$t->diag('->getJavaScripts() ->getStylesheets()');
 $f = new FormTest();
 $f->setWidgets(array(
   'foo' => new MyWidget(array('name' => 'foo')),

@@ -26,7 +26,8 @@ abstract class sfBaseTask extends sfCommandApplicationTask
    */
   protected function doRun(sfCommandManager $commandManager, $options)
   {
-    $this->dispatcher->filter(new sfEvent($this, 'command.filter_options', array('command_manager' => $commandManager)), $options);
+    $event = $this->dispatcher->filter(new sfEvent($this, 'command.filter_options', array('command_manager' => $commandManager)), $options);
+    $options = $event->getReturnValue();
 
     $this->process($commandManager, $options);
 
@@ -182,7 +183,7 @@ abstract class sfBaseTask extends sfCommandApplicationTask
    */
   protected function getFirstApplication()
   {
-    if (count($dirs = sfFinder::type('dir')->maxdepth(0)->follow_link()->relative()->in(sfConfig::get('sf_apps_dir'))))
+    if (count($dirs = sfFinder::type('dir')->ignore_version_control()->maxdepth(0)->follow_link()->relative()->in(sfConfig::get('sf_apps_dir'))))
     {
       return $dirs[0];
     }

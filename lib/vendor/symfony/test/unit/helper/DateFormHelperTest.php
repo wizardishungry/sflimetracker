@@ -35,7 +35,7 @@ class myRequest
   }
 }
 
-$t = new lime_test(87, new lime_output_color());
+$t = new lime_test(94, new lime_output_color());
 
 $context = sfContext::getInstance(array('user' => 'myUser', 'request' => 'myRequest', 'controller' => 'myController'));
 
@@ -142,8 +142,8 @@ $t->like(select_ampm_tag('ampm'), '/<option value="'.date('A').'" selected="sele
 $t->like(select_ampm_tag('ampm', 'AM'), '/<option value="AM" selected="selected">/', 'select_ampm_tag() takes a ampm as its second argument');
 
 // options
-$t->like(select_ampm_tag('ampm', null, array('include_custom' => 'test')), "/<option value=\"\">test<\/option>/", 'select_ampm_tag() can take an "include_custom" option');
-$t->like(select_ampm_tag('ampm', null, array('include_blank' => true)), "/<option value=\"\"><\/option>/", 'select_ampm_tag() can take an "include_blank" option');
+$t->like(select_ampm_tag('ampm', null, array('include_custom' => 'test')), '/<option value="">test<\/option>/', 'select_ampm_tag() can take an "include_custom" option');
+$t->like(select_ampm_tag('ampm', null, array('include_blank' => true)), '/<option value=""><\/option>/', 'select_ampm_tag() can take an "include_blank" option');
 $t->like(select_ampm_tag('ampm', null, array(), array('class' => 'foo')), '<select name="ampm" id="ampm" class="foo">', 'select_ampm_tag() takes an array of attribute options as its fourth argument');
 $t->like(select_ampm_tag('ampm', null, array(), array('id' => 'foo')), '<select name="ampm" id="foo">', 'select_ampm_tag() takes an array of attribute options as its fourth argument');
 
@@ -157,6 +157,16 @@ $t->like(select_time_tag('time','09:01:05'), '/<option value="9" selected="selec
 $t->like(select_time_tag('time','09:01:05'), '/<option value="1" selected="selected">/', 'select_time_tag() selects minutes for one digit correctly');
 $t->like(select_time_tag('time','09:01:05', array('include_second' => true)), '/<option value="5" selected="selected">/', 'select_time_tag() selects seconds for one digit correctly');
 $t->todo('select_time_tag()');
+
+// select_timezone_tag()
+$t->diag('select_timezone_tag()');
+$t->like(select_timezone_tag('timezone'), '/<select name="timezone" id="timezone">/', 'select_timezone_tag() outputs a select tag for timezones');
+$t->like(select_timezone_tag('timezone'), '/<option value="America\/Los_Angeles">America\/Los_Angeles<\/option>/', 'select_timezone_tag() outputs a select tag for timezones');
+$t->like(select_timezone_tag('timezone', null, array('display' => 'city')), '/<option value="America\/Los_Angeles">Los Angeles<\/option>/', 'select_timezone_tag() respects the display option');
+$t->like(select_timezone_tag('timezone', null, array('display' => 'timezone')), '/<option value="America\/Los_Angeles">Pacific Standard Time<\/option>/', 'select_timezone_tag() respects the display option');
+$t->like(select_timezone_tag('timezone', null, array('display' => 'timezone_abbr')), '/<option value="America\/Los_Angeles">PST<\/option>/', 'select_timezone_tag() respects the display option');
+$t->like(select_timezone_tag('timezone', null, array('display' => 'timezone_dst')), '/<option value="America\/Los_Angeles">Pacific Daylight Time<\/option>/', 'select_timezone_tag() respects the display option');
+$t->like(select_timezone_tag('timezone', null, array('display' => 'timezone_dst_abbr')), '/<option value="America\/Los_Angeles">PDT<\/option>/', 'select_timezone_tag() respects the display option');
 
 // select_datetime_tag()
 $t->diag('select_datetime_tag()');

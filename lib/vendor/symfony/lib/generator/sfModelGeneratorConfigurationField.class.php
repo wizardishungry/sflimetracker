@@ -17,13 +17,19 @@ class sfModelGeneratorConfigurationField
   /**
    * Constructor.
    *
-   * @param string $config The configuration for this field
-   * @param array  $flags  The column flags
+   * @param string $name   The field name
+   * @param array  $config The configuration for this field
    */
   public function __construct($name, $config)
   {
     $this->name = $name;
     $this->config = $config;
+
+    if (isset($this->config['flag']))
+    {
+      $this->setFlag($this->config['flag']);
+      unset($this->config['flag']);
+    }
   }
 
   /**

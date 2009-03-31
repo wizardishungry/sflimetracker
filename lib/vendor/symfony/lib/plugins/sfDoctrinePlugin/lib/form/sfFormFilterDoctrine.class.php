@@ -20,6 +20,9 @@
  */
 abstract class sfFormFilterDoctrine extends sfFormFilter
 {
+  protected
+    $tableMethodName       = null;
+
   /**
    * Returns the current model name.
    *
@@ -33,6 +36,27 @@ abstract class sfFormFilterDoctrine extends sfFormFilter
    * @return array An array of fields with their filter type
    */
   abstract public function getFields();
+
+  /**
+   * Get the name of the table method used to retrieve the query object for the filter
+   *
+   * @return string $tableMethodName
+   */
+  public function getTableMethod()
+  {
+    return $this->tableMethodName;
+  }
+
+  /**
+   * Set the name of the table method used to retrieve the query object for the filter
+   *
+   * @param string $tableMethodName 
+   * @return void
+   */
+  public function setTableMethod($tableMethodName)
+  {
+    $this->tableMethodName = $tableMethodName;
+  }
 
   /**
    * Returns a Doctrine Query based on the current values form the form.
@@ -106,8 +130,13 @@ abstract class sfFormFilterDoctrine extends sfFormFilter
   {
     $values = $this->processValues($values);
 
-    $query = Doctrine_Query::create()
-      ->from($this->getModelName() . ' r');
+    $query = Doctrine::getTable($this->getModelName())->createQuery('r');
+
+    if ($this->tableMethodName)
+    {
+      $method = $this->tableMethodName;
+      $query = Doctrine::getTable($this->getModelName())->$method($query);
+    }
 
     foreach ($this->getFields() as $field => $type)
     {

@@ -112,7 +112,7 @@ abstract class sfLogger
    */
   public function log($message, $priority = self::INFO)
   {
-    if ($this->level < $priority)
+    if ($this->getLogLevel() < $priority)
     {
       return false;
     }
@@ -216,11 +216,16 @@ abstract class sfLogger
   public function listenToLogEvent(sfEvent $event)
   {
     $priority = isset($event['priority']) ? $event['priority'] : self::INFO;
-    unset($event['priority']);
+
     $subject  = $event->getSubject();
     $subject  = is_object($subject) ? get_class($subject) : (is_string($subject) ? $subject : 'main');
-    foreach ($event->getParameters() as $message)
+    foreach ($event->getParameters() as $key => $message)
     {
+      if ('priority' === $key)
+      {
+        continue;
+      }
+
       $this->log(sprintf('{%s} %s', $subject, $message), $priority);
     }
   }

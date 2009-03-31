@@ -99,6 +99,7 @@ EOF;
     // create a route
     $model = $arguments['route_or_model'];
     $name = strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), '\\1_\\2', $model));
+    $name = $options['module'] ? $name . '_' . $options['module'] : $name;
 
     $routing = sfConfig::get('sf_app_config_dir').'/routing.yml';
     $content = file_get_contents($routing);
@@ -113,10 +114,10 @@ EOF;
 %s:
   class: sfDoctrineRouteCollection
   options:
-    model:               %s
-    module:              %s
-    prefix_path:         %s
-    column:              %s
+    model:                %s
+    module:               %s
+    prefix_path:          %s
+    column:               %s
     with_wildcard_routes: true
 
 
