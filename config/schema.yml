@@ -102,6 +102,7 @@ propel:
 
     created_at:
     updated_at:
+    last_fetched:     timestamp
 
     title:           longvarchar
     slug:           varchar(255)
@@ -138,7 +139,6 @@ propel:
     link:             longvarchar
     itunes_id:        longvarchar
 
-    last_fetched:     timestamp
 
   setting:
     key:
