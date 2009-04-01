@@ -136,7 +136,11 @@ class Feed extends BaseFeed
             'timeout'    => 15
         )); // refactor this into our own browser wrapper class todo
 
-        $b->get($this->getRssUrl()); 
+        
+        if(preg_match('#^file://#',$this->getRssUrl())) // suppress spurious errors for file urls (unit test)
+            @$b->get($this->getRssUrl()); 
+        else
+            $b->get($this->getRssUrl()); 
 
         if($b->responseIsError()||!$xml=$this->browser2feed($b))
         {
