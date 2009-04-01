@@ -249,7 +249,7 @@ class Torrent extends BaseTorrent
 
     public function getTitle() // convenience method for sfFeed2Plugin
     {
-        return $this->getEpisode()->getTitle();
+        return $this->getEpisode()?$this->getEpisode()->getTitle():'';
     }
 
     public function getPodcast()
@@ -266,8 +266,21 @@ class Torrent extends BaseTorrent
         {
             throw new sfException("Format strings are not implemented, thus overloading the format is neither");
         }
-        return strtr(implode('-',
-            Array($this->getPodcast()->getTitle(),$this->getTitle(),$this->getFeed()->getTitle())),
-        ' /','__');
+
+        $parts=Array();
+
+        if($podcast=$this->getPodcast())
+            $parts[]=$podcast->getTitle();
+
+        if($episode=$this->getEpisode())
+            $parts[]=$episode->getTitle();
+
+        if($feed=$this->getFeed())
+            $parts[]=$feed->getTitle();
+
+        if(!count($parts))
+            $parts[] = $filename;
+
+        return strtr(implode('-',$parts),' /','__');
     }
 }
