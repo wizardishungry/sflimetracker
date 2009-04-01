@@ -83,12 +83,12 @@ class Feed extends BaseFeed
 
     public function getLastFetched($format = 'Y-m-d H:i:s')
     {
+      $epoch="January 1 1970 00:00:00 UTC"; // todo replace with a symbolic constant
       if($this->getRssUrl())
       {
-        $this->last_fetched=0+@$this->last_fetched;
         if($file=$this->getStore())
         {
-          $this->last_fetched=max($this->last_fetched, @filemtime($file));
+          $this->last_fetched=@filemtime($file)>strtotime($epoch)?date('c',filemtime($file)):$epoch;
         }
       }
       else
