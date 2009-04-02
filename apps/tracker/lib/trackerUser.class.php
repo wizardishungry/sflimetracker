@@ -39,7 +39,7 @@ class trackerUser extends sfBasicSecurityUser
   {
 
     $this->checkPermissions();
-
+    $this->checkDatabase();
 
     parent::initialize($dispatcher,$storage, $options);
     $request=sfContext::getInstance()->getRequest();
@@ -110,6 +110,17 @@ class trackerUser extends sfBasicSecurityUser
     if(!$is_ok)
     {
         throw new sfException('You have one or more unwritable paths that must be writable -- '. implode(' ',$bad));
+    }
+  }
+  public function checkDatabase()
+  {
+    $keys=Array('password','intent');
+    // todo cache these in the trackerUser class
+    $config=SettingPeer::retrieveByKeys($keys);
+    foreach($keys as $key)
+    {
+        if(!isset($config[$key]))
+            throw new sfException("Required setting '$key' not found in database");
     }
   }
 }
