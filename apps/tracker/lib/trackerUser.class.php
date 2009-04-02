@@ -4,12 +4,17 @@ class trackerUser extends sfBasicSecurityUser
 {
 
   protected $cookie_name='remember_me';
+  protected $settings;
 
   public function setPassword($password)
   {
     $payload=self::crypt($password); // nb no salt!!!!
       if(!SettingPeer::setByKey('password',$payload))
         throw new sfException("Couldn't write password, check database permissions and connect info");
+    
+    $this->getSettings(); // make sure this is initialized
+    $this->settings['password']=$payload;
+
     return $payload;
   }
 
@@ -27,7 +32,8 @@ class trackerUser extends sfBasicSecurityUser
 
   public function getCryptedString()
   {
-    return SettingPeer::retrieveByKey('password');
+    $settings=$this->getSettings();
+    return $settings['password'];
   }
 
   public static function crypt($str)
@@ -112,15 +118,31 @@ class trackerUser extends sfBasicSecurityUser
         throw new sfException('You have one or more unwritable paths that must be writable -- '. implode(' ',$bad));
     }
   }
+
   public function checkDatabase()
   {
-    $keys=Array('password','intent');
-    // todo cache these in the trackerUser class
-    $config=SettingPeer::retrieveByKeys($keys);
-    foreach($keys as $key)
+    $settings=$this->getSettings();
+    foreach($this->getSettingsKeys() as $key)
     {
-        if(!isset($config[$key]))
+        if(!isset($settings[$key]))
             throw new sfException("Required setting '$key' not found in database");
     }
+  }
+  
+  public function getSettings()
+  {
+    if(!isset($this->settings))
+        $this->settings=SettingPeer::retrieveByKeys($this->getSettingsKeys());
+    return $this->settings;
+  }
+
+  public function getSettingsKeys()
+  {
+    return Array('password','intent');
+  }
+
+  protected function flushSettingsCache()
+  {
+    unset($this->settings);
   }
 }
