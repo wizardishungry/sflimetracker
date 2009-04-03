@@ -1,7 +1,10 @@
 Setting:
     password:
-        key:       password
-        vendor:     <?php echo trackerUser::crypt('LimeTracker'),"\n"; ?>
+        key:            password
+        vendor:         <?php echo trackerUser::crypt('LimeTracker'),"\n"; ?>
     intent:
-        key:       intent
-        vendor:     false
+        key:            intent
+        vendor:         false
+    test_sideload:
+        key:            test_sideload
+        vendor:         null

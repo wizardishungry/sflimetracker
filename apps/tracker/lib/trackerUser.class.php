@@ -46,6 +46,7 @@ class trackerUser extends sfBasicSecurityUser
 
     $this->checkPermissions();
     $this->checkDatabase();
+    $this->performTests();
 
     parent::initialize($dispatcher,$storage, $options);
     $request=sfContext::getInstance()->getRequest();
@@ -138,11 +139,23 @@ class trackerUser extends sfBasicSecurityUser
 
   public function getSettingsKeys()
   {
-    return Array('password','intent');
+    return Array('password','intent','test_sideload');
   }
 
   protected function flushSettingsCache()
   {
     unset($this->settings);
+  }
+
+  public function performTests()
+  {
+    $settings=$this->getSettings();
+
+    if($settings['test_sideload']==null)
+        $settings['test_sideload']=$this->testSideload(); 
+  }
+  public function testSideload()
+  {
+    // todo implement
   }
 }
