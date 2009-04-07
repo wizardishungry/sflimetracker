@@ -426,9 +426,6 @@ text-align: right;
 vertical-align: top;
 padding-right: 10px;
 }
-.content table {
-margin-left: -130px;
-}
 .content table tr td {
 padding: 0 0 14px 0;
 }
@@ -440,6 +437,21 @@ padding: 0 0 14px 0;
 #body table
 {
     width: 100%;
+}
+
+.content div.form-wrapper {
+margin-left: -130px;
+margin-bottom: 10px;
+}
+.content div.open-form table {
+margin-bottom: -38px;
+}
+
+div.form-wrapper.open-form {
+    border-top: 5px solid #222222;
+    border-bottom: 5px solid #222222;
+    padding: 10px 0px;
+    margin-bottom: 20px;
 }
 
 table textarea,

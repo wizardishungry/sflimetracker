@@ -13,7 +13,7 @@ default:
 
   stylesheets:    [main]
 
-  javascripts:    []
+  javascripts:    [prototype,forms]
 
   has_layout:     on
   layout:         layout

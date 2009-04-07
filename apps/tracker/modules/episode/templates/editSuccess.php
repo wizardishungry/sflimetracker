@@ -1,19 +1,21 @@
 <?php use_helper('ApacheConfig'); ?>
 <h2><?php echo 'Episode "', $episode->getTitle(),'" - ',
     link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId()) ?></h2>
-
-<form action="<?php echo url_for('episode/edit') ?>" method="POST" enctype="multipart/form-data">
+<div class="form-wrapper">
+  <form action="<?php echo url_for('episode/edit') ?>" method="POST" enctype="multipart/form-data">
     <table>
       <?php include_partial('episode/episodeform', Array('form'=>$form)); ?>
       <tr>
         <td>&nbsp;</td>
         <td>
           <input type="submit" value="Save"/>
+          <input type="submit" class="close-form" value="Cancel"/>
+          <?php echo delete_form_for_object($episode); ?>
         </td>
       </tr>
     </table>
   </form>
-  <?php echo delete_form_for_object($episode); ?>
+</div>
 
 <h3>Files</h3>
 <ul>
