@@ -16,7 +16,7 @@ class sfValidatedFileFromUrl extends sfValidatedFile
     $options=Array(
         CURLOPT_USERAGENT => sfConfig::get('app_version_name').' ('. sfConfig::get('app_version_rev'). ' '
           .sfConfig::get('app_version_comment'). ') '. sfConfig::get('app_version_url') , 
-    );
+    ); // todo abstact this out
 
 
     $this->original_url=$url;
