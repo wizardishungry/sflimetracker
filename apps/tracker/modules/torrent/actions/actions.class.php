@@ -106,7 +106,7 @@ class torrentActions extends sfActions
         static $skipped;
         $now = microtime(true);
         @$calls++;
-        if(!$done && isset($time) && $now-$time<.500)
+        if(!$done && @$time && $now-$time<.500)
         {
             @$skipped++;
             return;
