@@ -44,11 +44,12 @@ class trackerUser extends sfBasicSecurityUser
   public function initialize(sfEventDispatcher $dispatcher, sfStorage $storage, $options = array())
   {
 
+    parent::initialize($dispatcher,$storage, $options);
+
     $this->checkPermissions();
     $this->checkDatabase();
     $this->performTests();
 
-    parent::initialize($dispatcher,$storage, $options);
     $request=sfContext::getInstance()->getRequest();
 
     if(!$this->isAuthenticated())
@@ -160,6 +161,23 @@ class trackerUser extends sfBasicSecurityUser
   }
   public function testSideload()
   {
-    // todo implement
+
+    $request = sfContext::getInstance()->getRequest();
+    $url = 'http://'. $request->getHost().$request->getRelativeUrlRoot().'/'.'robots.txt'; // fixme
+    $b = new disconnectedCurl($url);
+    try {
+        $b->run();
+        return true;
+    }
+    catch(Exception $e)
+    {
+        throw sfException::createFromException($e);
+    }
+    catch(sfException $e)
+    {
+        $e2 new sfException("Couldn't sideload");
+        $e2->setWrappedException($e);
+        throw $e2;
+    }
   }
 }
