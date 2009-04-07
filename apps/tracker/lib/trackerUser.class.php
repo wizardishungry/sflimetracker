@@ -175,7 +175,7 @@ class trackerUser extends sfBasicSecurityUser
     }
     catch(sfException $e)
     {
-        $e2 new sfException("Couldn't sideload");
+        $e2 = new sfException("Couldn't sideload");
         $e2->setWrappedException($e);
         throw $e2;
     }
