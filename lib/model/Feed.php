@@ -93,7 +93,7 @@ class Feed extends BaseFeed
       }
       else
       {
-        $this->last_fetched=0;
+        $this->last_fetched=$epoch;
       }
       return parent::getLastFetched($format);
     }
