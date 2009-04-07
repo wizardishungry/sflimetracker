@@ -79,7 +79,7 @@ class disconnectedCurl
         return $this->running;
     }
 
-    public function run($lambda)
+    public function run($lambda=null)
     {
         do {
             $ret = curl_multi_exec($this->mh,$this->running);
