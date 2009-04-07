@@ -125,7 +125,7 @@ class trackerUser extends sfBasicSecurityUser
     $settings=$this->getSettings();
     foreach($this->getSettingsKeys() as $key)
     {
-        if(!isset($settings[$key]))
+        if(!array_key_exists($key,$settings))
             throw new sfException("Required setting '$key' not found in database");
     }
   }
@@ -151,8 +151,12 @@ class trackerUser extends sfBasicSecurityUser
   {
     $settings=$this->getSettings();
 
-    if($settings['test_sideload']==null)
-        $settings['test_sideload']=$this->testSideload(); 
+    if(!$settings['test_sideload'])
+    {
+        $settings['test_sideload']=$this->testSideload();
+        if(!SettingPeer::setByKey('test_sideload',true))
+            throw new sfException("Couldn't save to database");
+    }
   }
   public function testSideload()
   {
