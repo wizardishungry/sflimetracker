@@ -13,7 +13,7 @@ class EpisodeForm extends BaseEpisodeForm
     $this->setWidgets(Array(
         'id' => new sfWidgetFormInputHidden(),
         'created_at'=> new sfWidgetFormDateTime(),
-        'length'=> new sfWidgetFormTime(Array('with_seconds'=>true,'hours'=>range(0,100))),
+        'length'=> new sfWidgetFormInput(),
         'podcast_id' => new sfWidgetFormInputHidden(),
         'title'=> new sfWidgetFormInput(),
         'slug'=> new sfWidgetFormInput(),
@@ -26,7 +26,7 @@ class EpisodeForm extends BaseEpisodeForm
         'podcast_id' => new sfValidatorInteger(array('required' => true)),
         'title' => new sfValidatorString(array('required' => true)),
         'slug' => new sfValidatorString(array('required' => false)),
-        'length' => new sfValidatorTime(array('required' => false)),
+        'length' => new sfValidatorString(array('required' => false)),
         'description' => new sfValidatorString(array('required' => false)),
     ));
     

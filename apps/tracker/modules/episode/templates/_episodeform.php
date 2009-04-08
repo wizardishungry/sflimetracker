@@ -2,45 +2,76 @@
     <td colspan="2">
         <?php echo $form['podcast_id'] ?>
         <?php echo $form['id'] ?>
-        <?php echo $form['_csrf_token'] ?>
-        <iframe height="120" width="100%" name="<?php echo $iframe;?>"> </iframe>
+   <?php // echo $form['_csrf_token'] ?>
+        <iframe height="120" width="100%" style="display:none;" name="<?php echo $iframe;?>"> </iframe>
     </td>
 </tr>
 <tr>
 	<th><?php echo $form['created_at']->renderLabel() ?>:</th>
 	<td>
-	<?php echo $form['created_at']->renderError() ?>
-	<?php echo $form['created_at'] ?>
+		<div class="form-field">
+			<?php echo $form['created_at']->renderError() ?>
+			<?php echo $form['created_at'] ?>
+		</div>
+		<div class="value">
+			<?php echo $form['created_at']->getValue(); ?>
+			<a href="#" class="edit-button">edit</a>
+		</div>
 	</td>
 </tr>
 <tr>
 	<th><?php echo $form['title']->renderLabel() ?>:</th>
 	<td>
-	<?php echo $form['title']->renderError() ?>
-	<?php echo $form['title'] ?>
+		<div class="form-field">
+			<?php echo $form['title']->renderError() ?>
+			<?php echo $form['title'] ?>
+		</div>
+		<div class="value">
+			<?php echo $form['title']->getValue(); ?>
+			<a href="#" class="edit-button">edit</a>
+		</div>
 	</td>
 </tr>
-<tr id="slug_row">
+<tr>
 	<th><?php echo $form['slug']->renderLabel() ?>:</th>
 	<td>
-	<?php echo $form['slug']->renderError() ?>
-	<?php echo $form['slug'] ?>
+		<div class="form-field">
+			<?php echo $form['slug']->renderError() ?>
+			<?php echo $form['slug'] ?>
+		</div>
+		<div class="value">
+			<?php echo $form['slug']->getValue(); ?>
+			<a href="#" class="edit-button">edit</a>
+		</div>
 	</td>
 </tr>
 <tr>
 	<th><?php echo $form['length']->renderLabel() ?>:</th>
 	<td>
-	<?php echo $form['length']->renderError() ?>
-	<?php echo $form['length'] ?>
+		<div class="form-field">
+			<?php echo $form['length']->renderError() ?>
+			<?php echo $form['length'] ?>
+		</div>
+		<div class="value">
+			<?php echo $form->getObject()->getFormattedLength(); ?>
+			<a href="#" class="edit-button">edit</a>
+		</div>
 	</td>
 </tr>
 <tr>
 	<th><?php echo $form['description']->renderLabel() ?>:</th>
 	<td>
-	<?php echo $form['description']->renderError() ?>
-	<?php echo $form['description'] ?>
+		<div class="form-field">
+			<?php echo $form['description']->renderError() ?>
+			<?php echo $form['description'] ?>
+		</div>
+		<div class="value">
+			<?php echo $form['description']->getValue(); ?>
+			<a href="#" class="edit-button">edit</a>
+		</div>
 	</td>
 </tr>
+
   <?php if ($form->hasGlobalErrors()): ?>
     <tr>
       <td colspan="">

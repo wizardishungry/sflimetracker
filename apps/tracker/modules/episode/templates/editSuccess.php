@@ -5,7 +5,7 @@
   <form action="<?php echo url_for('episode/edit') ?>" method="POST" enctype="multipart/form-data">
     <table>
       <?php include_partial('episode/episodeform', Array('form'=>$form)); ?>
-      <tr>
+      <tr class="form-field">
         <td>&nbsp;</td>
         <td>
           <input type="submit" value="Save"/>
