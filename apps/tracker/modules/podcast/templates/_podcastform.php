@@ -3,7 +3,7 @@
 	<td>
 		<div class="form-field">
 			<?php echo $form['id'] ?>
-			<?php // echo $form['_csrf_token'] ?>
+			<?php echo $form['_csrf_token'] ?>
 			<?php echo $form['title']->renderError() ?>
 			<?php echo $form['title'] ?>
 			<p>Podcast title, like: The Show</p>

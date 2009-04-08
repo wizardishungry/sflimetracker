@@ -3,7 +3,7 @@
         <?php echo $form['episode_id'] ?>
         <?php echo $form['feed_id'] ?>
         <?php echo $form['id'] ?>
-   <?php // echo $form['_csrf_token'] ?>
+        <?php echo $form['_csrf_token'] ?>
         <iframe height="120" width="100%" name="<?php echo $iframe;?>"> </iframe>
     </td>
 </tr>
