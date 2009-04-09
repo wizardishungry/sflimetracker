@@ -466,7 +466,8 @@ table input[type="submit"]
     width: auto !important;
 }
 
-body.action_add tr#slug_row
+body.action_add tr#slug_row,
+body.action_add .edit-button
 {
     display: none;
 }
