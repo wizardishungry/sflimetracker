@@ -102,11 +102,20 @@ class torrentActions extends sfActions
     public function progress($o,$done)
     {
         static $time;
+        static $start_time;
         static $calls;
         static $skipped;
+        static $last_partial;
+
         $now = microtime(true);
         @$calls++;
-        if(!$done && @$time && $now-$time<.500)
+
+        if(!@$start_time)
+            $start_time=$now;
+
+        $interval = $start_time-$now>60?3.0:.5; // slower updates after 60 seconds
+
+        if(!$done && @$time && $now-$time<$interval)
         {
             @$skipped++;
             return;
@@ -114,11 +123,18 @@ class torrentActions extends sfActions
 
         $info=$o->getInfo();
 
-        echo "--rn9012\n";
-        echo "Content-Type: text/html\n\n";
-        echo $this->getPartial('torrent/progress',Array('info'=>$info,'done'=>$done,'skipped'=>$skipped,'calls'=>$calls));
-        flush();
-        ob_flush();
+        $partial = $this->getPartial('torrent/progress',Array('info'=>$info,'done'=>$done,'skipped'=>$skipped,'calls'=>$calls));
+
+        if(!@$last_partial || $partial!=$last_partial) // only send the partial if something has happened
+        {
+            echo "--rn9012\n";
+            echo "Content-Type: text/html\n\n";
+            echo $partial;
+            flush();
+            ob_flush();
+            $last_partial=$partial;
+        }
+
         $time=$now;
     }
 }
