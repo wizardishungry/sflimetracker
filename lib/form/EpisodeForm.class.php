@@ -12,7 +12,7 @@ class EpisodeForm extends BaseEpisodeForm
   {
     $this->setWidgets(Array(
         'id' => new sfWidgetFormInputHidden(),
-        'created_at'=> new sfWidgetFormDateTime(),
+        'created_at'=> new sfWidgetFormInput(),
         'length'=> new sfWidgetFormInput(),
         'podcast_id' => new sfWidgetFormInputHidden(),
         'title'=> new sfWidgetFormInput(),
@@ -42,6 +42,15 @@ class EpisodeForm extends BaseEpisodeForm
       if(sizeof($length_array) > 2)
         $length += (int) $length_array[2] * 3600;
       return $length;
+    } else {
+      return $v;
+    }
+  }
+
+  public function updateCreatedAtColumn($v)
+  {
+    if(is_string($v)) {
+      return date('Y-m-d H:i:s', strtotime($v));
     } else {
       return $v;
     }
