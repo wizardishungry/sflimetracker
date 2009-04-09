@@ -1,3 +1,5 @@
+<h2>Add Episode</h2>
+
 <div class="form-wrapper add">
   <form action="<?php echo url_for('episode/add') ?>" method="POST" enctype="multipart/form-data">
     <table>

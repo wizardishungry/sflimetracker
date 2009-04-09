@@ -33,17 +33,6 @@ class episodeActions extends sfActions
   {
     $this->form=new EpisodeForm(EpisodePeer::retrieveByPk($request->getParameter('id')));
     $episode=$this->episode=$this->form->getObject();
-    if ($request->isMethod('post'))
-    {
-        $this->form->bind($request->getPostParameters());
-        if($this->form->isValid())
-        {
-            $this->form->save();
-            $this->redirect($request->getUri().'?id='.$episode->getId()); // GET to current uri
-        } 
-        else
-          return sfView::ERROR;
-    }
 
     $podcast=$this->podcast=$episode->getPodcast();
     $this->feeds=$feeds=$podcast->getFeeds();
@@ -55,7 +44,17 @@ class episodeActions extends sfActions
     }
     $this->missing_feeds=array_diff($feeds,$has_feeds);
 
-
+    if ($request->isMethod('post'))
+    {
+        $this->form->bind($request->getPostParameters());
+        if($this->form->isValid())
+        {
+            $this->form->save();
+            $this->redirect($request->getUri().'?id='.$episode->getId()); // GET to current uri
+        } 
+        else
+          return sfView::SUCCESS;
+    }
   }
 
   public function executeView($request)

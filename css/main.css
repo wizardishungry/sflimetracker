@@ -454,6 +454,23 @@ div.form-wrapper.open-form {
     margin-bottom: 20px;
 }
 
+/* Expand/contract behavior */
+div.form-wrapper div.value {
+  display: block;
+}
+div.form-wrapper .form-field {
+  display: none;
+}
+div.form-wrapper.open-form div.value {
+  display: none;
+}
+div.form-wrapper.open-form div.form-field {
+  display: block;
+}
+div.form-wrapper.open-form tr.form-field {
+  display: table-row;
+}
+
 div.delete-form-wrapper {
     margin-bottom: 1em;
 }
