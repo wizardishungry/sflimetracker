@@ -25,6 +25,8 @@
         $percent=$info['size_download']/$info['download_content_length'] *100.0;
     else
        $percent=0;
+
+    $percent=round($percent,2); // 2 significant digits -- ie "31.33%"
 ?>
 <html>
 <?php if($percent=='100'): ?>
@@ -39,11 +41,13 @@
             echo "width: $percent%; ";
         ?>">&nbsp;
         </div>
-        <!--
-        <pre>
-            <?php print_r($info); ?>
-            <?php echo "calls $calls ; skipped $skipped"; ?>
-        </pre> -->
+        <?php if(sfConfig::get('sf_debug')): // don't echo this stuff to non debug clients ?>
+            <!--
+            <pre>
+                <?php print_r($info); ?>
+                <?php echo "calls $calls ; skipped $skipped"; ?>
+            </pre> -->
+        <?php endif; ?>
         <?php echo '<!--',str_repeat(' ',1024),'-->'; ?>
     </body>
 <?php endif; ?>
