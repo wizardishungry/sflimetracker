@@ -2,29 +2,21 @@ document.observe("dom:loaded", function() {
   if($$('div.form-wrapper').size() > 0) {
     // If we're dealing with an add form
     if($$('div.form-wrapper').first().hasClassName('add')) {
-      $$('div.value').invoke('hide');
       return;
     }
-
-    // Initially hide all containers for tab content
-    $$('.form-field').invoke('hide');
 
     // Make the edit buttons 'open' the form
     $$('a.edit-button').each(function(button) {
       button.observe('click', function(event) {
         Event.stop(event);
-        $$('.form-field').invoke('show');
-        $$('div.value').invoke('hide');
         $$('div.form-wrapper').first().addClassName('open-form');
       });
     });
 
     // Close button closes the form
-    if($$('input.close-form').size > 0) {
+    if($$('input.close-form').size() > 0) {
       $$('input.close-form').first().observe('click', function(event) {
         Event.stop(event);
-        $$('.form-field').invoke('hide');
-        $$('div.value').invoke('show');
         $$('div.form-wrapper').first().removeClassName('open-form');
       });
     }
