@@ -1,6 +1,10 @@
 <?php use_helper('ApacheConfig'); ?>
 <h2><?php echo 'Episode "', $episode->getTitle(),'" - ',
     link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId()) ?></h2>
+
+<div class="delete-form-wrapper">
+  <?php echo delete_form_for_object($episode); ?>
+</div>
 <div class="form-wrapper">
   <form action="<?php echo url_for('episode/edit') ?>" method="POST" enctype="multipart/form-data">
     <table>
@@ -8,12 +12,16 @@
       <tr class="form-field">
         <td>&nbsp;</td>
         <td>
-          <input type="submit" value="Save"/>
-          <input type="submit" class="close-form" value="Cancel"/>
-          <?php echo delete_form_for_object($episode); ?>
+          <input type="submit" value="Save" class="save-button" />
+          <input type="submit" class="close-form" value="Cancel" />
         </td>
       </tr>
     </table>
+
+    <?php echo $form['podcast_id'] ?>
+    <?php echo $form['id'] ?>
+    <?php echo $form['_csrf_token'] ?>
+
   </form>
 </div>
 

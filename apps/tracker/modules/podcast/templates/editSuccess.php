@@ -1,25 +1,32 @@
 <h1><?php echo link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId()) ?></h1>
 
-<form action="<?php echo url_for('podcast/edit') ?>" method="POST" enctype="multipart/form-data">
-<div class="form-wrapper">
-<table>
-    <?php include_partial('podcast/podcastform', Array('form'=>$form)); ?>
-    <tr class="form-field">
-    <td>&nbsp;</td>
-    <td>
-        <div>
-          <input type="submit" value="Save"/>
-          <input type="submit" class="close-form" value="Cancel"/>
-          <?php echo delete_form_for_object($podcast); ?>
-        </div>
-    </td>
-    <td>
-
-    </td>
-    </tr>
-</table>
+<div class="delete-form-wrapper">
+  <?php echo delete_form_for_object($podcast); ?>
 </div>
-</form>
+<div class="form-wrapper">
+  <form action="<?php echo url_for('podcast/edit') ?>" method="POST" enctype="multipart/form-data">
+    <table>
+      <?php include_partial('podcast/podcastform', Array('form'=>$form)); ?>
+      <tr class="form-field">
+      <td>&nbsp;</td>
+      <td>
+          <div>
+            <input type="submit" value="Save"/>
+            <input type="submit" class="close-form" value="Cancel"/>
+          </div>
+      </td>
+      <td>
+
+      </td>
+      </tr>
+    </table>
+
+    <?php echo $form['id'] ?>
+    <?php echo $form['_csrf_token'] ?>
+
+  </form>
+</div>
+
 
 
 <h2>Episodes</h2>
