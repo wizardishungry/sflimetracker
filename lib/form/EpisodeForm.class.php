@@ -31,4 +31,19 @@ class EpisodeForm extends BaseEpisodeForm
     ));
     
   }
+
+  public function updateLengthColumn($v)
+  {
+    if(!is_numeric($v)) {
+      $length_array = array_reverse(explode(":", $v));
+      $length = (int) $length_array[0];
+      if(sizeof($length_array) > 1)
+        $length += (int) $length_array[1] * 60;
+      if(sizeof($length_array) > 2)
+        $length += (int) $length_array[2] * 3600;
+      return $length;
+    } else {
+      return $v;
+    }
+  }
 }
