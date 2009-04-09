@@ -471,7 +471,7 @@ table input[type="submit"]
 }
 
 body.action_add tr#slug_row,
-body.action_add .edit-button
+body.action_add form .value 
 {
     display: none;
 }
