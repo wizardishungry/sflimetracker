@@ -1,6 +1,6 @@
 <h2>Add Episode</h2>
 
-<div class="form-wrapper add">
+<div class="form-wrapper open-form">
   <form action="<?php echo url_for('episode/add') ?>" method="POST" enctype="multipart/form-data">
     <table>
       <?php include_partial('episode/episodeform', Array('form'=>$form)); ?>

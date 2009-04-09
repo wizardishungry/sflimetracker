@@ -5,7 +5,7 @@
 <div class="delete-form-wrapper">
   <?php echo delete_form_for_object($episode); ?>
 </div>
-<div class="form-wrapper">
+<div class="form-wrapper <?php if($form->hasErrors()) { echo "open-form"; } ?>">
   <form action="<?php echo url_for('episode/edit') ?>" method="POST" enctype="multipart/form-data">
     <table>
       <?php include_partial('episode/episodeform', Array('form'=>$form)); ?>
