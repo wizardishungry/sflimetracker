@@ -4,7 +4,7 @@
     </td>
 </tr>
 <tr>
-	<th><?php echo $form['created_at']->renderLabel() ?>:</th>
+	<th><?php echo $form['created_at']->renderLabel() ?></th>
 	<td>
 		<div class="form-field">
 			<?php echo $form['created_at']->renderError() ?>
@@ -18,7 +18,7 @@
 	</td>
 </tr>
 <tr>
-	<th><?php echo $form['title']->renderLabel() ?>:</th>
+	<th><?php echo $form['title']->renderLabel() ?></th>
 	<td>
 		<div class="form-field">
 			<?php echo $form['title']->renderError() ?>
@@ -32,7 +32,7 @@
 	</td>
 </tr>
 <tr>
-	<th><?php echo $form['slug']->renderLabel() ?>:</th>
+	<th><?php echo $form['slug']->renderLabel() ?></th>
 	<td>
 		<div class="form-field">
 			<?php echo $form['slug']->renderError() ?>
@@ -46,7 +46,7 @@
 	</td>
 </tr>
 <tr>
-	<th><?php echo $form['length']->renderLabel() ?>:</th>
+	<th><?php echo $form['length']->renderLabel() ?></th>
 	<td>
 		<div class="form-field">
 			<?php echo $form['length']->renderError() ?>
@@ -60,7 +60,7 @@
 	</td>
 </tr>
 <tr>
-	<th><?php echo $form['description']->renderLabel() ?>:</th>
+	<th><?php echo $form['description']->renderLabel() ?></th>
 	<td>
 		<div class="form-field">
 			<?php echo $form['description']->renderError() ?>
