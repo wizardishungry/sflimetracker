@@ -17,4 +17,6 @@
   </form>
 </div>
 
-<?php echo delete_form_for_object($podcast_feed,'podcast_feed/delete'); ?>
+<div class="delete-form-wrapper">
+  <?php echo delete_form_for_object($podcast_feed,'podcast_feed/delete'); ?>
+</div>

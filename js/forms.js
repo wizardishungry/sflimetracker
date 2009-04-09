@@ -20,12 +20,14 @@ document.observe("dom:loaded", function() {
     });
 
     // Close button closes the form
-    $$('input.close-form').first().observe('click', function(event) {
-      Event.stop(event);
-      $$('.form-field').invoke('hide');
-      $$('div.value').invoke('show');
-      $$('div.form-wrapper').first().removeClassName('open-form');
-    });
+    if($$('input.close-form').size > 0) {
+      $$('input.close-form').first().observe('click', function(event) {
+        Event.stop(event);
+        $$('.form-field').invoke('hide');
+        $$('div.value').invoke('show');
+        $$('div.form-wrapper').first().removeClassName('open-form');
+      });
+    }
 
     // Add confirm message to a form
     $$('form.delete-form a.delete-button').each(function(button) {
