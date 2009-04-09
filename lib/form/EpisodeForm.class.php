@@ -26,7 +26,7 @@ class EpisodeForm extends BaseEpisodeForm
         'podcast_id' => new sfValidatorInteger(array('required' => true)),
         'title' => new sfValidatorString(array('required' => true)),
         'slug' => new sfValidatorString(array('required' => false)),
-        'length' => new sfValidatorString(array('required' => false)),
+        'length' => new sfValidatorRegex(array('pattern' => '/^\d+(:\d+)?(:\d+)?$/')),
         'description' => new sfValidatorString(array('required' => false)),
     ));
     
