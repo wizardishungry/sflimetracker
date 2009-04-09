@@ -34,14 +34,9 @@ class EpisodeForm extends BaseEpisodeForm
 
   public function updateLengthColumn($v)
   {
-    if(!is_numeric($v)) {
-      $length_array = array_reverse(explode(":", $v));
-      $length = (int) $length_array[0];
-      if(sizeof($length_array) > 1)
-        $length += (int) $length_array[1] * 60;
-      if(sizeof($length_array) > 2)
-        $length += (int) $length_array[2] * 3600;
-      return $length;
+    if(is_string($v)) {
+      @List($s,$m,$h)= array_reverse(explode(":", $v));
+      return @$s+60*(@$m+60*@$h);
     } else {
       return $v;
     }
