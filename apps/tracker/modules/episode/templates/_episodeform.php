@@ -1,9 +1,6 @@
-<tr>
+<tr class="progress-iframe" style="display: none;">
     <td colspan="2">
-        <?php echo $form['podcast_id'] ?>
-        <?php echo $form['id'] ?>
-   <?php  echo $form['_csrf_token'] ?>
-        <iframe height="120" width="100%" style="display:none;" name="<?php echo $iframe;?>"> </iframe>
+        <iframe height="120" width="100%" name="<?php echo $iframe;?>"> </iframe>
     </td>
 </tr>
 <tr>

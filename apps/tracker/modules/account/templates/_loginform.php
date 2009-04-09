@@ -1,4 +1,4 @@
-<div class="login">
+<div class="form-wrapper login">
   <form action="<?php echo url_for('account/login') ?>" method="POST">
     <table>
         <tr>

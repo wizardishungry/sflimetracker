@@ -448,10 +448,14 @@ margin-bottom: -38px;
 }
 
 div.form-wrapper.open-form {
-    border-top: 5px solid #222222;
-    border-bottom: 5px solid #222222;
+    border-top: 5px solid #AAA;
+    border-bottom: 5px solid #AAA;
     padding: 10px 0px;
     margin-bottom: 20px;
+}
+
+div.delete-form-wrapper {
+    margin-bottom: 1em;
 }
 
 table textarea,
