@@ -46,6 +46,7 @@ document.observe("dom:loaded", function() {
     // Deny deletion
     $$('a.confirm-no').each(function(link) {
       link.observe('click', function(click) {
+	Event.stop(click);
 	click.element().up().hide();
       });
     });
