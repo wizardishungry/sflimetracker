@@ -47,6 +47,7 @@ class trackerUser extends sfBasicSecurityUser
     parent::initialize($dispatcher,$storage, $options);
 
     $this->checkPermissions();
+    $this->resetPasswordCheck(); // here?
     $this->checkDatabase();
     $this->performTests();
 
@@ -98,6 +99,7 @@ class trackerUser extends sfBasicSecurityUser
         'cache',
         'data',
         'data/tracker.db',
+        //'data/resetpassword.txt', //implict from" data"
         'log',
         'uploads',
     );
@@ -178,6 +180,19 @@ class trackerUser extends sfBasicSecurityUser
         $e2 = new sfException("Couldn't sideload");
         $e2->setWrappedException($e);
         throw $e2;
+    }
+  }
+  public function resetPasswordCheck()
+  {
+    $root=sfContext::getInstance()->getConfiguration()->getRootDir();
+    $path="$root/data/resetpassword.txt";
+
+    if(!file_exists($path))
+    {
+        $this->setPassword('LimeTracker'); // todo should use constant
+        if(!touch($path))
+            throw new sfException("$path isn't writable!");
+        $this->setFlash('notice', 'Password reset…'); // todo make sure this displays
     }
   }
 }
