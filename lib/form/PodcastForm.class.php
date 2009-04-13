@@ -21,6 +21,7 @@ class PodcastForm extends BasePodcastForm
         'link'        => new sfWidgetFormInput(),
         'description' => new sfWidgetFormTextarea(),
         'itunes_id'   => new sfWidgetFormInput(),
+        'image_url'   => new sfWidgetFormInput(),
     ));
    $this->setValidators(array(
         'id'          => new sfValidatorInteger(array('required' => false)),
@@ -32,6 +33,7 @@ class PodcastForm extends BasePodcastForm
         'link'        => new sfValidatorString(array('required' => false)),
         'description' => new sfValidatorString(array('required' => false)),
         'itunes_id'   => new sfValidatorString(array('required' => false)),
+        'image_url'   => new sfValidatorString(array('required' => false)),
     ));
   }
 }

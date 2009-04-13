@@ -138,6 +138,7 @@ propel:
     email:            longvarchar
     link:             longvarchar
     itunes_id:        longvarchar
+    image_url:        longvarchar
 
 
   setting:
