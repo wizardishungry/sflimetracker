@@ -97,7 +97,7 @@ propel:
       foreignTable:     podcast
       foreignReference: id
       onDelete:         cascade
-      required:         false
+      required:         false # should this be false todo
       default:          null
 
     created_at:
