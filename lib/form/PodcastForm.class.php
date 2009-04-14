@@ -12,7 +12,6 @@ class PodcastForm extends BasePodcastForm
   {
     $this->setWidgets(Array(
         'id' => new sfWidgetFormInputHidden(),
-        'cover'       => new sfWidgetFormInputFile(), // dummy FIXME
         'title'       => new sfWidgetFormInput(),
         'slug'        => new sfWidgetFormInput(),
         'author'      => new sfWidgetFormInput(),
