@@ -26,6 +26,22 @@
 		</div>
 	</td>
 </tr>
+<tr id="image_row">
+	<th><?php echo $form['image_url']->renderLabel() ?></th>
+	<td>
+		<div class="form-field">
+			<?php echo $form['image_url']->renderError() ?>
+			<?php echo $form['image_url'] ?>
+			<p>Url to an image </p>
+		</div>
+		<div class="value">
+			<?php if($form['image_url']->getValue())
+                echo image_tag($form['image_url']->getValue()),'<br>' ?>
+			<?php $form['image_url']->getValue() ?>
+			<a href="#" class="edit-button">edit</a>
+		</div>
+	</td>
+</tr>
 <tr id="author_row">
 	<th><?php echo $form['author']->renderLabel() ?></th>
 	<td>

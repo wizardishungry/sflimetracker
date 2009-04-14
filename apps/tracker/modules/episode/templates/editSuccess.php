@@ -32,6 +32,30 @@
   <?php endforeach; ?>
 </ul>
 
+<h3>Add new format</h4>
+<div class="form-wrapper">
+  <form action="<?php echo url_for('podcast_feed/add') ?>" method="POST" enctype="multipart/form-data">
+  <table>
+    <?php
+        // todo move to action
+        $fform =new FeedForm();
+        $fform->setDefault('podcast_id',$episode->getPodcastId());
+        echo $fform;
+    ?>
+    <tr>
+    <td>&nbsp;</td>
+    <td>
+        <input type="submit" value="Add"/>
+    </td>
+    <td>
+
+    </td>
+    </tr>
+ 
+ </table>
+  </form>
+</div>
+
 <?php if($missing_feeds): ?>
   We do not have files for the following formats:
 <?php endif; ?>

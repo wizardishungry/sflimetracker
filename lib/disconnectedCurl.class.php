@@ -36,7 +36,7 @@ class disconnectedCurl
         register_shutdown_function(array(&$this, "__destruct"));
         $ch=curl_init($url);
 
-        $this->temp_name=$this->generateTempName();
+        $this->temp_name=$this->generateUsefulTempName($url);
         $this->temp_name_h=$this->generateTempName();
 
         $options=$this->curl_options + $options;
@@ -67,6 +67,13 @@ class disconnectedCurl
         curl_multi_add_handle($mh,$ch);
         $this->ch=$ch;
         $this->mh=$mh;
+    }
+
+    protected function generateUsefulTempName($url)
+    {
+        // FIXME this is being overrided temporarily to make sure MakeTorrent gets a good filename
+        $name=preg_replace('#^.*/#','',$url);
+        return sys_get_temp_dir().DIRECTORY_SEPARATOR.$name;
     }
 
     protected function generateTempName()

@@ -72,7 +72,6 @@ class sfPropelActAsSluggableBehavior
     {
         $getter='get'.call_user_func(array($peer_name,'translateFieldName'),
             $column,BasePeer::TYPE_COLNAME,BasePeer::TYPE_PHPNAME);
-            echo "getter $getter ".$node->$getter();
         $scope_criteria->add($column,$node->$getter());
     }
     

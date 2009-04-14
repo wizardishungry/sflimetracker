@@ -60,6 +60,10 @@
     </div>
     <div id="body_wrapper">
 
+        <?php if ($sf_user->hasFlash('notice')): ?>
+        <div id="notice"><?php echo $sf_user->getFlash('notice'); ?></div>
+        <?php endif; ?>
+
       <div id="body">
         <div id="full_width">
           
