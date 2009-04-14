@@ -89,11 +89,12 @@ class accountActions extends sfActions
 
   public function executeSettings($request)
   {
-    // todo require post and csrf token
     $response=$this->getResponse();
   }
+
   public function executeDump($request)
   {
+    // todo require post and csrf token
     $root=sfContext::getInstance()->getConfiguration()->getRootDir();
     $path=$this->path="$root/data/dumpdata.txt"; // left forever here as a convenience; change this?
     $data=$this->data=new sfPropelData();
