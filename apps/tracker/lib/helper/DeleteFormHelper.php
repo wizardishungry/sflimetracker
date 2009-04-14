@@ -9,7 +9,7 @@ function delete_form_for_object($object, $internal_uri = null) {
   }
 
   return '<form class="delete-form" action="'. url_for($internal_uri).'" method="POST">'.
-    $form->__toString().
+    $form.
     '<a class="delete-button" href="#">Remove '.strtolower(get_class($object)).'</a>'.
   ' <span class="confirm" style="display: none;">'.
     'Are you sure you want to remove this '.strtolower(get_class($object)).'? '.
