@@ -13,7 +13,7 @@ class FeedForm extends BaseFeedForm
     $this->setWidgets(Array(
         'id' => new sfWidgetFormInputHidden(),
         'podcast_id' => new sfWidgetFormInputHidden(),
-        'title' => new sfWidgetFormTextarea(),
+        'title' => new sfWidgetFormInput(),
         'slug'=> new sfWidgetFormInput(),
         'rss_url'=> new sfWidgetFormInput(),
     ));
