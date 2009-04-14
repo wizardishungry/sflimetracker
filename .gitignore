@@ -5,6 +5,8 @@ config/propel.ini
 config/properties.ini
 uploads/*
 plugins/.*
+data/dumpdata.txt
+data/resetpassword.txt
 # add2zip -- files below belong in the zip but not git
 data/sql/*
 data/tracker.db*
