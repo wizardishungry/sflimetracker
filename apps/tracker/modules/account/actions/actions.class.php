@@ -89,11 +89,19 @@ class accountActions extends sfActions
 
   public function executeSettings($request)
   {
-    // todo require post and csrf token
     $response=$this->getResponse();
   }
+
   public function executeDump($request)
   {
+    if($request->getMethod () != sfRequest::POST)
+        return sfView::ERROR;
+
+    $form = new sfForm();
+    $form->bind($request->getPostParameters());
+    if(!$form->isValid())
+        return sfView::ERROR;
+
     $root=sfContext::getInstance()->getConfiguration()->getRootDir();
     $path=$this->path="$root/data/dumpdata.txt"; // left forever here as a convenience; change this?
     $data=$this->data=new sfPropelData();
@@ -108,5 +116,6 @@ class accountActions extends sfActions
     $response=$this->getResponse();
     $response->setContentType('text/yaml');
     $this->setLayout(false);
+    return;
   }
 }
