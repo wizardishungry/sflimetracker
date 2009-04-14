@@ -111,7 +111,7 @@ class trackerUser extends sfBasicSecurityUser
     foreach($paths as $o_path)
     {
         $path=$root.'/'.$o_path;
-        if(!is_writable($path))
+        if(!is_writable($path) || !is_readable($path) )
         {
             $bad[]=$o_path;
             $is_ok=false;
