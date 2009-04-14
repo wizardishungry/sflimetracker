@@ -3,7 +3,7 @@
 <div class="delete-form-wrapper">
   <?php echo delete_form_for_object($podcast); ?>
 </div>
-<div class="form-wrapper">
+<div class="form-wrapper <?php if($form->hasErrors()) { echo "open-form"; } ?>">
   <form action="<?php echo url_for('podcast/edit') ?>" method="POST" enctype="multipart/form-data">
     <table>
       <?php include_partial('podcast/podcastform', Array('form'=>$form)); ?>
