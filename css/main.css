@@ -519,6 +519,9 @@ form table tr td:first-child
     text-align: right;
     padding-right: 4px;
 }
+form .perm-preview {
+    font-weight: bold;
+}
 
 /**
  * Podcast

@@ -22,16 +22,19 @@
 	<td>
 		<div class="form-field">
 			<?php echo $form['title'] ?>
-			<p>Title of the episode</p>
+			<p>Becomes <span class="perm-preview">(empty)</span> in torrent filenames</p>
 			<?php echo $form['title']->renderError() ?>
 		</div>
+		<script type="text/javascript">
+		  watchForSlug($$('input#title').first(), $$('.perm-preview').first());
+		</script>
 		<div class="value">
 			<?php echo $form['title']->getValue(); ?>
 			<a href="#" class="edit-button">edit</a>
 		</div>
 	</td>
 </tr>
-<tr>
+<tr id="slug_row">
 	<th><?php echo $form['slug']->renderLabel() ?></th>
 	<td>
 		<div class="form-field">

@@ -3,9 +3,12 @@
 	<td>
 		<div class="form-field">
 			<?php echo $form['title'] ?>
-			<p>Podcast title, like: The Show</p>
+			Becomes <span class="perm-preview">(empty)</span> in RSS feed URLs</p>
 			<?php echo $form['title']->renderError() ?>
 		</div>
+		<script type="text/javascript">
+		  watchForSlug($$('input#title').first(), $$('.perm-preview').first());
+		</script>
 		<div class="value">
 			<?php echo $form['title']->getValue() ?>
 			<a href="#" class="edit-button">edit</a>
