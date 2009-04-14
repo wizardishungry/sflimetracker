@@ -89,5 +89,24 @@ class accountActions extends sfActions
 
   public function executeSettings($request)
   {
+    // todo require post and csrf token
+    $response=$this->getResponse();
+  }
+  public function executeDump($request)
+  {
+    $root=sfContext::getInstance()->getConfiguration()->getRootDir();
+    $path=$this->path="$root/data/dumpdata.txt"; // left forever here as a convenience; change this?
+    $data=$this->data=new sfPropelData();
+
+    try {
+        $data->dumpData($path,Array('setting','podcast','episode','feed','torrent'));
+    }
+    catch(Exception $e)
+    {
+        return sfView::ERROR;
+    }
+    $response=$this->getResponse();
+    $response->setContentType('text/yaml');
+    $this->setLayout(false);
   }
 }
