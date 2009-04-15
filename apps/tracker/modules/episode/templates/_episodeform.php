@@ -4,20 +4,6 @@
     </td>
 </tr>
 <tr>
-	<th><?php echo $form['created_at']->renderLabel() ?></th>
-	<td>
-		<div class="form-field">
-			<?php echo $form['created_at'] ?>
-			<p>Creation date, like: 2008-12-25 13:34:00</p>
-			<?php echo $form['created_at']->renderError() ?>
-		</div>
-		<div class="value">
-			<?php echo $form['created_at']->getValue(); ?>
-			<a href="#" class="edit-button">edit</a>
-		</div>
-	</td>
-</tr>
-<tr>
 	<th><?php echo $form['title']->renderLabel() ?></th>
 	<td>
 		<div class="form-field">
@@ -58,6 +44,20 @@
 		</div>
 		<div class="value">
 			<?php echo $form->getObject()->getFormattedLength(); ?>
+			<a href="#" class="edit-button">edit</a>
+		</div>
+	</td>
+</tr>
+<tr>
+	<th><?php echo $form['created_at']->renderLabel() ?></th>
+	<td>
+		<div class="form-field">
+			<?php echo $form['created_at'] ?>
+			<p>Creation date, like: 2008-12-25 13:34:00</p>
+			<?php echo $form['created_at']->renderError() ?>
+		</div>
+		<div class="value">
+			<?php echo $form['created_at']->getValue(); ?>
 			<a href="#" class="edit-button">edit</a>
 		</div>
 	</td>
