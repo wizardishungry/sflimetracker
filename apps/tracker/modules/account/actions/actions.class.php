@@ -118,4 +118,25 @@ class accountActions extends sfActions
     $this->setLayout(false);
     return;
   }
+  public function executeRestore($request)
+  {
+    if($request->getMethod () != sfRequest::POST)
+        return sfView::ERROR;
+
+    $form = $this->form = new RestoreForm();
+    $form->bind($request->getPostParameters(),$request->getFiles());
+
+    if(!$form->isValid())
+        return sfView::ERROR;
+
+    $data=$this->data=new sfPropelData();
+    try {
+        $data->dumpData($form->getValue('file'));
+    }
+    catch(sfException $e)
+    {
+        return sfView::ERROR;
+    }
+    $user->setFlash('notice','Database restored from disk');
+  }
 }

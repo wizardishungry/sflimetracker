@@ -14,4 +14,10 @@
         <input type='submit' value='Dump'>
     </form>
     </li>
+    <li>
+    <form  action='<?php echo url_for('account/restore') ?>' method="POST" enctype="multipart/form-data">
+        <?php echo new RestoreForm(); ?>
+        <input type='submit' value='Restore'>
+    </form>
+    </li>
 </ul>
