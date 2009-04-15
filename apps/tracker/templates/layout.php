@@ -15,7 +15,6 @@
   echo "module_",$sf_context->getModuleName();
   echo " action_",$sf_context->getActionName();
 ?>">
-
 <div id="document">
   <div id="layout">
 
@@ -31,21 +30,36 @@
         
         <div id="account_bar">      
           <ul>
+          <?php if($sf_user->isAuthenticated()) { ?>
             <li class="">
               <?php echo link_to_with_icon('Home', 'house', '@homepage'); ?>
             </li>
             <li class="">
               <?php echo link_to_with_icon('Settings', 'cog', '@settings'); ?>
             </li>
+	  <?php } ?>
             <li class="">
               <?php echo link_to_with_icon('Help', 'help', 'http://limecast.com/tracker'); ?>
             </li>
             <li class="signup">
               <?php
-                if($sf_user->isAuthenticated())
+	        if($sf_user->isAuthenticated()) {
                   echo link_to_with_icon('Logout', 'user', 'account/logout');
-                else
+		  $logout_form = new LogoutForm();
+		  ?>
+		  <form style="display:none;" id="logout_form" action="<?php echo url_for('account/logout') ?>" method="POST">
+  		    <?php echo $logout_form['_csrf_token']; ?>
+		  </form>
+		  <script type="text/javascript">
+		    $$('.signup a').first().observe('click', function(event) {
+   		      event.stop();
+		      $('logout_form').submit();
+		    });
+		  </script>
+		  <?php
+                } else {
                   echo link_to_with_icon('Login', 'user', 'account/login');
+		}
               ?>
             </li>
           </ul>

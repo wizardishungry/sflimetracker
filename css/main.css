@@ -536,10 +536,6 @@ iframe {
 /**
  * Account
  **/
-body.module_account #header
-{
-    display: none;
-}
 
 body.module_account.action_settings #header
 {
