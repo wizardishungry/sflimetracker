@@ -14,7 +14,7 @@ class sfWidgetFormDuration extends sfWidgetFormInput
   /**
    * Configures the current widget
    */
-  protected function configure()
+  protected function configure($options=array(), $attributes=array())
   {
     parent::configure($options, $attributes);
   }
