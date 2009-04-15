@@ -13,7 +13,7 @@ class EpisodeForm extends BaseEpisodeForm
     $this->setWidgets(Array(
         'id' => new sfWidgetFormInputHidden(),
         'created_at'=> new sfWidgetFormInput(),
-        'length'=> new sfWidgetFormInput(),
+        'length'=> new sfWidgetFormDuration(),
         'podcast_id' => new sfWidgetFormInputHidden(),
         'title'=> new sfWidgetFormInput(),
         'slug'=> new sfWidgetFormInput(),
