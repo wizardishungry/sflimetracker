@@ -3,7 +3,7 @@
 	<td>
 		<div class="form-field">
 			<?php echo $form['title'] ?>
-			Becomes <span class="perm-preview">(empty)</span> in RSS feed URLs</p>
+			<p>Becomes <span class="perm-preview">(empty)</span> in RSS feed URLs</p>
 			<?php echo $form['title']->renderError() ?>
 		</div>
 		<script type="text/javascript">
@@ -35,7 +35,7 @@
 		<div class="form-field">
 			<?php echo $form['image_url']->renderError() ?>
 			<?php echo $form['image_url'] ?>
-			<p>Url to an image </p>
+			<p>Podcast cover art.  Recommended size is at least 300x300.</p>
 		</div>
 		<div class="value">
 			<?php if($form['image_url']->getValue())
