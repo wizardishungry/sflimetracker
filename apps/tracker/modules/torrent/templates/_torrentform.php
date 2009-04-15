@@ -4,7 +4,7 @@
         <?php echo $form['feed_id'] ?>
         <?php echo $form['id'] ?>
         <?php echo $form['_csrf_token'] ?>
-        <iframe height="120" width="100%" name="<?php echo $iframe;?>"> </iframe>
+        <iframe style="display: none;" height="120" width="100%" name="<?php echo $iframe;?>" id="<?php echo $iframe;?>"> </iframe>
     </td>
 </tr>
 <tr>

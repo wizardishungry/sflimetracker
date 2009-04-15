@@ -9,7 +9,7 @@
     <tr>
         <td>&nbsp;</td>
         <td colspan="2">
-        <input type="submit" value="add"/>
+        <input type="submit" onclick="$('<?php echo $iframe; ?>').show();" value="add"/>
         </td>
     </tr>
     </table>

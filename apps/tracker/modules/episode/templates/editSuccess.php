@@ -69,7 +69,7 @@
       ),Array());
   ?>
     <li>
-      <?php echo $feed ?>
+      <h3><?php echo $feed ?></h3>
       <?php include_partial('torrent/add',Array('form'=>$form)); ?>
     </li>
   <?php endforeach; ?>
