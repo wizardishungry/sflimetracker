@@ -17,15 +17,18 @@
   </form>
   <script type="text/javascript">
     $('torrent_<?php echo $form->getDefault('feed_id'); ?>').observe('submit', function(submit) {
+        Event.stop(submit);
 	var form = $(Event.element(submit));
 	var progress = $(form.getElementsByClassName('progress')[0]);
 	var indicator = progress.childElements().first();
         var percentage = $(form.getElementsByClassName('percentage')[0]);
 
-        progress.style.visibility = "";	
+  	new Ajax.Request('<?php echo url_for('torrent/add'); ?>', { method: 'post', postBody: Form.serializeElements(form.getInputs()) });
+
+        progress.style.visibility = "";
 
 	new PeriodicalExecuter(function(pe) {
-	    new Ajax.Request('/cache/progress.json', {
+	    new Ajax.Request('<?php echo url_for('/json-cache/progress.json'); ?>', {
 	      method: 'get',
 	      onSuccess: function(transport) {
 		  var data = transport.responseText.evalJSON();
