@@ -4,7 +4,11 @@
         <?php echo $form['feed_id'] ?>
         <?php echo $form['id'] ?>
         <?php echo $form['_csrf_token'] ?>
-        <iframe style="display: none;" height="120" width="100%" name="<?php echo $iframe;?>" id="<?php echo $iframe;?>"> </iframe>
+	<iframe style="display: none;" height="1" width="1" name="<?php echo $iframe;?>" id="<?php echo $iframe;?>"> </iframe>
+	<div style="visibility: hidden;" class="progress">
+          <div class="indicator">&nbsp;</div>
+	</div>
+        <div class="percentage">&nbsp;</div>
     </td>
 </tr>
 <tr>
