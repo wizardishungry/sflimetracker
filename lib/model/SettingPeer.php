@@ -53,6 +53,11 @@ class SettingPeer extends BaseSettingPeer
         $c = new Criteria();
         $c->add(SettingPeer::KEY,$key);
         $s=SettingPeer::doSelectOne($c, $con);
+        if(!$s)
+        {
+            $s=new Setting();
+            $setting->setKey($key);
+        }
         $s->setValue($value);
         return $s->save();
     }

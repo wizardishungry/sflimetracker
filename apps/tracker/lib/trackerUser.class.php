@@ -9,8 +9,7 @@ class trackerUser extends sfBasicSecurityUser
   public function setPassword($password)
   {
     $payload=self::crypt($password); // nb no salt!!!!
-      if(!SettingPeer::setByKey('password',$payload))
-        throw new sfException("Couldn't write password, check database permissions and connect info");
+    SettingPeer::setByKey('password',$payload);
     
     $this->getSettings(); // make sure this is initialized
     $this->settings['password']=$payload;
@@ -157,8 +156,7 @@ class trackerUser extends sfBasicSecurityUser
     if(!$settings['test_sideload'])
     {
         $settings['test_sideload']=$this->testSideload();
-        if(!SettingPeer::setByKey('test_sideload',true))
-            throw new sfException("Couldn't save to database");
+        SettingPeer::setByKey('test_sideload',true);
     }
   }
   public function testSideload()
