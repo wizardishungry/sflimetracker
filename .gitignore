@@ -1,5 +1,6 @@
 log/*
 cache/*
+json-cache/*
 config/databases.yml
 config/propel.ini
 config/properties.ini

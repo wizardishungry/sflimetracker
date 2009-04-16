@@ -101,6 +101,7 @@ class trackerUser extends sfBasicSecurityUser
         'data/tracker.db',
         //'data/resetpassword.txt', //implict from" data"
         'log',
+				'json-cache',
         'uploads',
     );
 
