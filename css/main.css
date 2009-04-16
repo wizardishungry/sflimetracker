@@ -524,6 +524,20 @@ form .perm-preview {
 }
 
 /**
+ * Side-load
+ **/
+div.progress {
+  width: 100%; 
+  background:#DDD; 
+  height: 1em; 
+}
+div.progress div.indicator {
+  width: 0; 
+  height: 1em; 
+  background-color: #222;
+}
+
+/**
  * Podcast
  **/
 .podcasts h3 {
