@@ -48,8 +48,6 @@ class torrentActions extends sfActions
         if(function_exists("apache_setenv")) // could be running under fastcgi or in non-apache env
             apache_setenv('no-gzip', 1);
         ini_set('zlib.output_compression', 0);
-        ini_set('implicit_flush', 1);
-        header('Content-type: multipart/x-mixed-replace;boundary="rn9012"');
         $file=new sfValidatedFileFromUrl($params['web_url'],Array($this,'progress'));
         $is_replace=true;
     }
@@ -123,17 +121,19 @@ class torrentActions extends sfActions
 
         $info=$o->getInfo();
 
-        $partial = $this->getPartial('torrent/progress',Array('info'=>$info,'done'=>$done,'skipped'=>$skipped,'calls'=>$calls));
+	if($info['download_content_length'])
+          $percent=$info['size_download']/$info['download_content_length'] *100.0;
+    	else
+          $percent=0;
+	$percent=round($percent,2); // 2 significant digits -- ie "31.33%"
 
-        if(!@$last_partial || $partial!=$last_partial) // only send the partial if something has happened
-        {
-            echo "--rn9012\n";
-            echo "Content-Type: text/html\n\n";
-            echo $partial;
-            flush();
-            ob_flush();
-            $last_partial=$partial;
-        }
+	$data = "{percent: '".$percent."', finished: '".$info['size_download']."', total: '".$info['download_content_length']."'}";
+
+	$root=sfContext::getInstance()->getConfiguration()->getRootDir();
+	$path="$root/json-cache/progress.json";
+	$fp = fopen($path, "w");
+	fwrite($fp, $data);
+        fclose($fp);
 
         $time=$now;
     }
