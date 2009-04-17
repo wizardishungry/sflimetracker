@@ -27,7 +27,30 @@
   </form>
 </div>
 
-
+<h2>Feeds</h2>
+<ul>
+  <li><?php echo link_to_with_icon($podcast->getTitle(),'web',$podcast->getUri()); ?></li>
+  <?php foreach($feeds as $feed): ?>
+    <li>
+      <?php 
+        echo $feed->getTitle(), ' ',
+        link_to('Edit','podcast_feed/edit?id='.$feed->getID()),
+        count($feeds)>1?delete_form_for_object($feed,'podcast_feed/delete'):'';
+        ?>
+        <ul>
+        <?php
+        foreach($feed->getUris() as $uri): ?>
+            <li>
+            <?php 
+                $url = url_for($uri,true);
+                echo link_to_with_icon($url, 'rss', $url);
+            ?>
+            </li>
+        <?php endforeach; ?>
+        </ul>
+    </li>
+  <?php endforeach; ?>
+</ul>
 
 <h2>Episodes</h2>
 <ul>
@@ -48,20 +71,3 @@
     }
   ?>
 </ul>
-
-<h2>Formats</h2>
-<?php if($feeds): ?>
-<ul>
-  <?php foreach($feeds as $feed): ?>
-    <li>
-      <?php 
-        echo $feed->getTitle(),
-        button_to('Edit','podcast_feed/edit?id='.$feed->getID()),
-        count($feeds)>1?delete_form_for_object($feed,'podcast_feed/delete'):'';
-      ?>
-    </li>
-  <?php endforeach; ?>
-</ul>
-<?php else: ?>
-  <p><i>No feeds yet.</i></p>
-<?php endif; ?>
