@@ -28,7 +28,7 @@
         progress.style.visibility = "";
 
 	new PeriodicalExecuter(function(pe) {
-	    new Ajax.Request('<?php echo url_for('/json-cache/progress.json'); ?>', {
+	    new Ajax.Request('<?php echo _compute_public_path('progress','json-cache','json'); ?>', {
 	      method: 'get',
 	      onSuccess: function(transport) {
 		  var data = transport.responseText.evalJSON();
