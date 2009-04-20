@@ -7,19 +7,14 @@
     $dsn=$db_params['dsn'];
     unset($db_params['dsn']);
 ?>
-<p>
-    You should edit <code>config/databases.yml</code> to change the database connection. The active connection is:
-    <blockquote>
-        <code><?php echo $dsn; ?></code>
-    </blockquote>
-</p>
-
-<h4>More info</h4>
+<h1>Database Diagnostics</h1>
 <ul>
 <?php
 try {
     foreach($db_params as $k=>$v)
     {
+        if(is_array($v))
+            $v=print_r($v,true);
         echo "<li>$k: $v</li>\n";
     }
     $con = Propel::getConnection(); // this is a PDO class

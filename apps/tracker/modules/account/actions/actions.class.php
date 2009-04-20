@@ -9,6 +9,11 @@
 class accountActions extends sfActions
 {
 
+
+  public function executeDbinfo($request)
+  {
+  }
+
   public function executeLogin($request)
   {
     
