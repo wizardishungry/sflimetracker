@@ -35,12 +35,17 @@ class torrentActions extends sfActions
 
     if(!$request->isMethod('post'))
     {
-        // Should be a POST;
-        // fixme throw a proper error
-        return;
+        return sfView::ERROR;
     }
 
     $params=$request->getPostParameters();
+    $this->form->bind($params);
+
+    if(!$this->form->isValid())
+    {
+        return sfView::ERROR;
+    }
+
     $is_replace=false;
 
     if(isset($params['web_url']))
@@ -52,14 +57,7 @@ class torrentActions extends sfActions
         $is_replace=true;
     }
 
-    $this->form->bind($params);
     $obj=$this->form->save();
-
-    if(!$this->form->isValid())
-    {
-        return sfView::ERROR;
-    }
-
     try {
         $obj->setFile($file,false);
         $obj->save();
@@ -68,7 +66,6 @@ class torrentActions extends sfActions
     {
         //todo setflash $sfe
         $this->form->getObject()->delete();
-        echo $sfe;exit;
         return sfView::ERROR; 
     }
 
@@ -121,20 +118,29 @@ class torrentActions extends sfActions
 
         $info=$o->getInfo();
 
-	if($info['download_content_length'])
-          $percent=$info['size_download']/$info['download_content_length'] *100.0;
-    	else
-          $percent=0;
-	$percent=round($percent,2); // 2 significant digits -- ie "31.33%"
+        if($info['download_content_length'])
+            $percent=$info['size_download']/$info['download_content_length'] *100.0;
+            else
+            $percent=0;
+        $percent=round($percent,2); // 2 significant digits -- ie "31.33%"
 
-	$data = "{percent: '".$percent."', finished: '".$info['size_download']."', total: '".$info['download_content_length']."'}";
+        $data = "{percent: '".$percent."', finished: '".$info['size_download']."', total: '".$info['download_content_length']."'}";
 
-	$root=sfContext::getInstance()->getConfiguration()->getRootDir();
-	$path="$root/json-cache/progress.json";
-	$fp = fopen($path, "w");
-	fwrite($fp, $data);
+        $root=sfContext::getInstance()->getConfiguration()->getRootDir();
+        $path="$root/json-cache/".$this->form->getDefault('_csrf_token').".json";
+        $fp = fopen($path, "w");
+        fwrite($fp, $data);
         fclose($fp);
 
         $time=$now;
+
+        if($done) // give it a few seconds to manage to hit a poll correctly
+        {
+            $fxn=create_function('',"
+                sleep(15);
+                unlink('$path');
+            ");
+            register_shutdown_function($fxn);
+        }
     }
 }
