@@ -167,7 +167,9 @@ class accountActions extends sfActions
     {
         return sfView::ERROR;
     }
-    $this->getUser()->setFlash('notice','Database has been wiped.'); // todo destroy session
+    $this->getUser()->setFlash('notice','Database has been wiped.');
+    $this->remember(true); // nom nom nom cookies all gone
+    $this->setAuthenticated(false);
     $this->redirect('@root');
   }
 }
