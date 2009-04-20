@@ -123,6 +123,7 @@ class accountActions extends sfActions
     $this->setLayout(false);
     return;
   }
+
   public function executeRestore($request)
   {
     if($request->getMethod () != sfRequest::POST)
@@ -143,5 +144,30 @@ class accountActions extends sfActions
         return sfView::ERROR;
     }
     $user->setFlash('notice','Database restored from disk');
+  }
+
+  public function executeBlam($request)
+  {
+    if($request->getMethod () != sfRequest::POST)
+        return;
+
+    $form = $this->form = new sfForm();
+    $form->bind($request->getPostParameters());
+
+    if(!$form->isValid())
+        return sfView::ERROR;
+
+
+    $data=$this->data=new sfPropelData();
+    try {
+        $data->setDeleteCurrentData(true);
+        $data->loadData(sfContext::getInstance()->getConfiguration()->getRootDir().'/data/fixtures'); // delete all data from tables mentioned in the yamls
+    }
+    catch(sfException $e)
+    {
+        return sfView::ERROR;
+    }
+    $this->getUser()->setFlash('notice','Database has been wiped.'); // todo destroy session
+    $this->redirect('@root');
   }
 }
