@@ -1,16 +1,12 @@
-<?php
-    $iframe="torrent_iframe_".$form->getDefault('feed_id');
-?>
 <div class="form-wrapper open-form">
-  <form id="torrent_<?php echo $form->getDefault('feed_id'); ?>" target="<?php echo $iframe;
-  ?>" action="<?php echo url_for('torrent/add') ?>" method="POST" enctype="multipart/form-data">
+  <form id="torrent_<?php echo $form->getDefault('feed_id'); ?>" action="<?php echo url_for('torrent/add') ?>" method="POST" enctype="multipart/form-data">
       <table>
 
-      <?php include_partial('torrent/torrentform', Array('form'=>$form,'iframe'=>$iframe)) ?>
+      <?php include_partial('torrent/torrentform', Array('form'=>$form)) ?>
       <tr>
           <td>&nbsp;</td>
           <td colspan="2">
-          <input type="submit" onclick="$('<?php echo $iframe; ?>').show();" value="add"/>
+          <input type="submit" value="add"/>
           </td>
       </tr>
       </table>

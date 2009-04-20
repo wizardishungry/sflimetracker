@@ -1,8 +1,3 @@
-<tr class="progress-iframe" style="display: none;">
-    <td colspan="2">
-        <iframe height="120" width="100%" name="<?php echo $iframe;?>"> </iframe>
-    </td>
-</tr>
 <tr>
 	<th><?php echo $form['title']->renderLabel() ?></th>
 	<td>
