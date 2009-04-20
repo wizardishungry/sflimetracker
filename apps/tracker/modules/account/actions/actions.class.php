@@ -160,16 +160,19 @@ class accountActions extends sfActions
 
     $data=$this->data=new sfPropelData();
     try {
+        $root=sfContext::getInstance()->getConfiguration()->getRootDir();
         $data->setDeleteCurrentData(true);
-        $data->loadData(sfContext::getInstance()->getConfiguration()->getRootDir().'/data/fixtures'); // delete all data from tables mentioned in the yamls
+        $data->loadData($root.'/data/fixtures'); // delete all data from tables mentioned in the yamls
+        sfUtil::clearDirectory($root.'uploads');
     }
     catch(sfException $e)
     {
         return sfView::ERROR;
     }
-    $this->getUser()->setFlash('notice','Database has been wiped.');
-    $this->remember(true); // nom nom nom cookies all gone
-    $this->setAuthenticated(false);
+    $user=$this->getUser();
+    $user->setFlash('notice','Database has been wiped and torrents deleted.');
+    $user->remember(true); // nom nom nom cookies all gone
+    $user->setAuthenticated(false);
     $this->redirect('@root');
   }
 }
