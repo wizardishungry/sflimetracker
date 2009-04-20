@@ -101,12 +101,24 @@ class torrentActions extends sfActions
         static $calls;
         static $skipped;
         static $last_partial;
+        static $path;
+        static $route;
 
         $now = microtime(true);
         @$calls++;
 
         if(!@$start_time)
+        {
             $start_time=$now;
+            $root=sfContext::getInstance()->getConfiguration()->getRootDir();
+            $path="$root/json-cache/".$this->form->getDefault('_csrf_token').".json";
+
+            $fxn=create_function('',"
+                sleep(15); // a few seconds for ajax requests
+                unlink('$path');
+            ");
+            register_shutdown_function($fxn);
+        }
 
         $interval = $start_time-$now>60?3.0:.5; // slower updates after 60 seconds
 
@@ -126,21 +138,10 @@ class torrentActions extends sfActions
 
         $data = "{percent: '".$percent."', finished: '".$info['size_download']."', total: '".$info['download_content_length']."'}";
 
-        $root=sfContext::getInstance()->getConfiguration()->getRootDir();
-        $path="$root/json-cache/".$this->form->getDefault('_csrf_token').".json";
         $fp = fopen($path, "w");
         fwrite($fp, $data);
         fclose($fp);
 
         $time=$now;
-
-        if($done) // give it a few seconds to manage to hit a poll correctly
-        {
-            $fxn=create_function('',"
-                sleep(15);
-                unlink('$path');
-            ");
-            register_shutdown_function($fxn);
-        }
     }
 }
