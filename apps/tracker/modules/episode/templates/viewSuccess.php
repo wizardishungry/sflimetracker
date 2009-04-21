@@ -1,5 +1,5 @@
 <?php use_helper('ApacheConfig'); ?>
-<h2><?php echo 'Episode "', $episode->getTitle(),'" - ',link_to($podcast->getTitle(),$podcast->getUri()) ?></h2>
+<?php page_title('Episode "'. $episode->getTitle().'" - '.link_to($podcast->getTitle(),$podcast->getUri())) ?>
 <h3>Files</h3>
 <ul>
   <?php foreach($torrents as $torrent): ?>

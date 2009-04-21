@@ -1,4 +1,4 @@
-<h2>Podcasts</h2>
+<?php page_title('Podcasts') ?>
   <div class="podcasts">
   <?php foreach($podcasts as $podcast): ?>
     <h3>

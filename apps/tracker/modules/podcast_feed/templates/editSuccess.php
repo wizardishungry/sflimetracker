@@ -1,4 +1,4 @@
-<h1>Editing format for podcast <?php echo link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId()) ?></h1>
+<?php page_title('Editing format for podcast'. link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId())) ?>
 
 <div class="form-wrapper open-form">
   <form action="<?php echo url_for('podcast_feed/edit') ?>" method="POST" enctype="multipart/form-data">

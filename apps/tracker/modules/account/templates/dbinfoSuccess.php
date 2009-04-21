@@ -7,7 +7,7 @@
     $dsn=$db_params['dsn'];
     unset($db_params['dsn']);
 ?>
-<h1>Database Diagnostics</h1>
+<?php page_title('Database Diagnostics') ?>
 <ul>
 <?php
 try {

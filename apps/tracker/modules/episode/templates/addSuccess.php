@@ -1,4 +1,4 @@
-<h2>Add Episode</h2>
+<?php page_title('Add Episode') ?>
 
 <div class="form-wrapper open-form">
   <form action="<?php echo url_for('episode/add') ?>" method="POST" enctype="multipart/form-data">

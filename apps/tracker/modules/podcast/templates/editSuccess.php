@@ -1,4 +1,4 @@
-<h1><?php echo link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId()) ?></h1>
+<?php page_title(link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId())) ?>
 
 <div class="delete-form-wrapper">
   <?php echo delete_form_for_object($podcast); ?>

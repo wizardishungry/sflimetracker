@@ -1,4 +1,4 @@
-<h1><?php echo $podcast->getTitle() ?></h1>
+<?php page_title($podcast->getTitle()); ?>
 
 <h2>Feeds</h2>
 <?php if($feeds): ?>

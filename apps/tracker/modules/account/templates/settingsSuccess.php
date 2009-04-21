@@ -1,4 +1,4 @@
-<h1>Settings</h1>
+<?php page_title('Settings') ?>
 
 <h3>Database</h3>
 
