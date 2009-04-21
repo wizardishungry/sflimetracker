@@ -40,8 +40,8 @@ all:
 #        rdf:  application/rdf+xml
 #        atom: application/atom+xml
 #
-#  response:
-#    class: sfWebResponse
+  response:
+    class: myWebResponse
 #    param:
 #      logging: %SF_LOGGING_ENABLED%
 #      charset: %SF_CHARSET%
