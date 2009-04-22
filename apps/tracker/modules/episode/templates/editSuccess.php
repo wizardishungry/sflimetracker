@@ -35,14 +35,14 @@
 
 <h3>Add new format</h3>
 <div class="form-wrapper">
-  <form action="<?php echo url_for('podcast_feed/add') ?>" method="POST" enctype="multipart/form-data">
+  <form action="<?php echo url_for('podcast_feed/add') ?>" method="POST" enctype="multipart/form-data" class=".form_feed">
   <table>
     <?php
         // todo move to action
         $fform =new FeedForm();
         $fform->setDefault('podcast_id',$episode->getPodcastId());
-        echo $fform;
     ?>
+    <?php include_partial('podcast_feed/feedform', Array('form'=>$fform)); ?>
     <tr>
     <td>&nbsp;</td>
     <td>
