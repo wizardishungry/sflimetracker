@@ -163,7 +163,7 @@ class accountActions extends sfActions
         $root=sfContext::getInstance()->getConfiguration()->getRootDir();
         $data->setDeleteCurrentData(true);
         $data->loadData($root.'/data/fixtures'); // delete all data from tables mentioned in the yamls
-        sfUtil::clearDirectory($root.'uploads');
+        sfToolkit::clearDirectory($root.'uploads');
     }
     catch(sfException $e)
     {
