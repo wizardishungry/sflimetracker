@@ -24,7 +24,7 @@ class feedActions extends sfActions
       if(!$podcast)
         $this->forward404();
 
-      $link=$podcast->getLink()?$this->getLink():$this->getUri();
+      $link=$podcast->getLink()?$podcast->getLink():$podcast->getUri();
 
       $podcast_feed=CommonBehavior::retrieveBySlug('FeedPeer',$request->getParameter('slug'),$c);
 
