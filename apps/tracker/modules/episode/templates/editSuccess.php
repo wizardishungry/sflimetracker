@@ -1,7 +1,5 @@
-<?php use_helper('ApacheConfig'); ?>
-<?php page_title(   'Episode "'. $episode->getTitle().'" - '.
-                    link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId())
-                )?>
+<h2><?php echo link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId()) ?></h2>
+<?php page_title($episode->getTitle()); ?>
 
 <div class="delete-form-wrapper">
   <?php echo delete_form_for_object($episode); ?>
