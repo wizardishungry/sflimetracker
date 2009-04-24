@@ -30,7 +30,7 @@
 	</td>
 </tr>
 <tr>
-	<th><?php echo $form['length']->renderLabel() ?></th>
+	<th>Duration</th>
 	<td>
 		<div class="form-field">
 			<?php echo $form['length'] ?>
@@ -44,7 +44,7 @@
 	</td>
 </tr>
 <tr>
-	<th><?php echo $form['created_at']->renderLabel() ?></th>
+	<th>Date</th>
 	<td>
 		<div class="form-field">
 			<?php echo $form['created_at'] ?>
