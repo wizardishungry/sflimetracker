@@ -536,6 +536,10 @@ div.progress div.indicator {
   height: 1em; 
   background-color: #222;
 }
+div.progress .spinner {
+    position: relative;
+    right: -20px;
+}
 
 /**
  * Podcast

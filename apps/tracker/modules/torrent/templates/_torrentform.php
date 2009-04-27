@@ -6,6 +6,7 @@
         <?php echo $form['_csrf_token'] ?>
 	<div style="visibility: hidden;" class="progress">
           <div class="indicator">&nbsp;</div>
+          <?php echo image_tag('icons/spinner.gif','class=spinner'); ?>
 	</div>
         <div class="percentage">&nbsp;</div>
     </td>
