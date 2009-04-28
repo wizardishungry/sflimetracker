@@ -175,4 +175,24 @@ class accountActions extends sfActions
     $user->setAuthenticated(false);
     $this->redirect('@root');
   }
+
+  public function executeTracker($request)
+  {
+    if($request->getMethod () != sfRequest::POST)
+        return;
+
+    $form = $this->form = new TrackerForm();
+    $form->bind($request->getPostParameters());
+    $user=$this->getUser();
+
+    if(!$form->isValid())
+        return sfView::ERROR;
+
+
+    $active=$form->getValue('active');
+    SettingPeer::setByKey('tracker_active',$active);
+
+    $user->setFlash('notice','BitTorrent tracker '.($active?'on':'off'));
+    $this->redirect('@settings');
+  }
 }

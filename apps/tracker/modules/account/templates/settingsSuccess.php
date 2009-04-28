@@ -1,5 +1,12 @@
 <?php page_title('Settings') ?>
 
+<h3>BitTorrent Tracker</h3>
+
+<form action='<?php echo url_for('account/tracker') ?>' method="POST" enctype="multipart/form-data">
+    <?php echo new TrackerForm(); ?>
+    <input type='submit' value='Save'>
+</form>
+
 <h3>Database</h3>
 
 <?php
