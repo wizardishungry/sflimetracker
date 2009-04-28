@@ -9,5 +9,5 @@ Setting:
         key:            test_sideload
         vendor:         null
     tracker_active:
-        key:            
+        key:            tracker_active
         vendor:         true
