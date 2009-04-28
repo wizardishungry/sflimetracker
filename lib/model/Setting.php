@@ -8,6 +8,6 @@ class Setting extends BaseSetting
     }
     public function getValue()
     {
-        return parent::getValue()?parent::getValue():$this->getVendor();
+        return parent::getValue()!==null?parent::getValue():$this->getVendor();
     }
 }
