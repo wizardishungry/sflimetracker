@@ -42,10 +42,16 @@ class clientActions extends sfActions
 
   public function executeAnnounce($request)
   {
+
     register_shutdown_function(array($this, "timeout"),$request);
 
     $this->encoder= new File_Bittorrent2_Encode();
     try{
+
+      $settings=$this->getUser()->getSettings();
+      if(!$settings['tracker_active'])
+        throw new sfException('Tracker not active');
+
       $response=$this->response_ok;
 
       $this->form=new ClientForm();

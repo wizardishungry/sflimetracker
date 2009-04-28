@@ -8,3 +8,6 @@ Setting:
     test_sideload:
         key:            test_sideload
         vendor:         null
+    tracker_active:
+        key:            
+        vendor:         true
