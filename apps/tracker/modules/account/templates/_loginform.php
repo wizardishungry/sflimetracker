@@ -17,17 +17,6 @@
             <td><?php echo $form['remember_me']->renderLabel() ?></td>
         </tr>
 
-        <tr>
-            <td>
-            <?php echo $form['intent'] ?>
-            </td>
-            <td>
-            <?php echo $form['intent']->renderError() ?>
-            <label for="intent">
-                I will not use <?php echo sfConfig::get('app_version_name') ?> for copyright infringement.
-            </label></td>
-        </tr>
-
       <tr>
         <td>&nbsp;</td>
         <td><?php
