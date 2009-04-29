@@ -142,7 +142,7 @@ class trackerUser extends sfBasicSecurityUser
 
   public function getSettingsKeys()
   {
-    return Array('password','intent','test_sideload');
+    return Array('password','test_sideload');
   }
 
   protected function flushSettingsCache()
