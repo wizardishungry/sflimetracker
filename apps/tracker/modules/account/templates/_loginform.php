@@ -17,7 +17,6 @@
             <td><?php echo $form['remember_me']->renderLabel() ?></td>
         </tr>
 
-        <?php if(!$intent): ?>
         <tr>
             <td>
             <?php echo $form['intent'] ?>
@@ -28,7 +27,6 @@
                 I will not use <?php echo sfConfig::get('app_version_name') ?> for copyright infringement.
             </label></td>
         </tr>
-        <?php endif; ?>
 
       <tr>
         <td>&nbsp;</td>
