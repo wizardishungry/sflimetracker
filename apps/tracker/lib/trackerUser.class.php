@@ -185,13 +185,15 @@ class trackerUser extends sfBasicSecurityUser
   {
     $root=sfContext::getInstance()->getConfiguration()->getRootDir();
     $path="$root/data/resetpassword.txt";
+    $do_flash=$this->getCryptedString()!=null;
 
     if(!file_exists($path))
     {
-        $this->setPassword('LimeTracker'); // todo should use constant
+        $this->setPassword(null);
         if(!touch($path))
             throw new sfException("$path isn't writable!");
-        $this->setFlash('notice', 'Password reset…'); // todo make sure this displays
+        if($do_flash) // the tracker doesn't ship with the resetpassword.txt
+            $this->setFlash('notice', 'Password reset…'); // todo make sure this displays
     }
   }
 }
