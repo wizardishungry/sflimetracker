@@ -4,3 +4,5 @@ password:
   is_secure: off
 login:
   is_secure: off
+firstrun:
+  is_secure: off

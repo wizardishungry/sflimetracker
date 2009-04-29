@@ -14,12 +14,35 @@ class accountActions extends sfActions
   {
   }
 
+  public function executeFirstrun($request)
+  {
+    if($this->getUser()->isAuthenticated())
+      $this->redirect('@homepage');
+
+    $form = $this->form = new FirstRunForm();
+    if($request->getMethod () == sfRequest::POST)
+    {
+        $params=$request->getPostParameters();
+
+        $form->bind($params);
+        
+        if($form->isValid())
+        {
+            $this->getUser()->setPassword($form->getValue('password'));
+            return $this->performLogin($request,false);
+        }
+        else
+        {
+            return sfView::ERROR;
+        }
+    }
+  }
+
   public function executeLogin($request)
   {
     
     $user = $this->getUser();
-    $this->intent = $intent = SettingPeer::retrieveByKey('intent');
-    $form = $this->form = new LoginForm($user,$intent);
+    $form = $this->form = new LoginForm($user);
 
     if($user->isAuthenticated())
       $this->redirect('@homepage');
@@ -32,28 +55,10 @@ class accountActions extends sfActions
       
       if($form->isValid())
       {
-        $this->getUser()->setAuthenticated(true);
-        if(!$intent)
-             SettingPeer::setByKey('intent',true);
-
-        if($form->getValue('remember_me'))
-        {
-          $user->remember();
-        }
-
-        if($request->getReferer())
-        {
-          $this->redirect($request->getReferer());
-        }
-        else
-        {
-          $this->redirect('@homepage');
-        }
-
+        return $this->performLogin($request);
       }
       else
       {
-        $user->setFlash('notice','Oops, you probably entered your password wrong!');
         return sfView::ERROR;
       }
     }
@@ -195,4 +200,25 @@ class accountActions extends sfActions
     $user->setFlash('notice','BitTorrent tracker '.($active?'on':'off'));
     $this->redirect('@settings');
   }
+
+    public function performLogin($request,$allow_ref_redir=true)
+    {
+        $form=$this->form;
+        $user=$this->getUser();
+        $user->setAuthenticated(true);
+
+        if($form->getValue('remember_me'))
+        {
+            $user->remember();
+        }
+
+        if($request->getReferer() && $allow_ref_redir)
+        {
+            $this->redirect($request->getReferer());
+        }
+        else
+        {
+            $this->redirect('@homepage');
+        }
+    }
 }
