@@ -3,6 +3,10 @@ root:
   url:   /
   param: { module: account, action: login }
 
+first_run:
+  url:   /install
+  param: { module: account, action: firstrun }
+
 homepage:
   url:   /admin
   param: { module: podcast, action: list }
