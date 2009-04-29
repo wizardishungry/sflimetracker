@@ -17,7 +17,12 @@ class accountActions extends sfActions
   public function executeFirstrun($request)
   {
     if($this->getUser()->isAuthenticated())
-      $this->redirect('@homepage');
+      $this->getUser()->setAuthenticated(false);
+
+    
+    if($this->getUser()->getCryptedString())
+        $this->redirect('@homepage');
+    
 
     $form = $this->form = new FirstRunForm();
     if($request->getMethod () == sfRequest::POST)
@@ -43,6 +48,9 @@ class accountActions extends sfActions
     
     $user = $this->getUser();
     $form = $this->form = new LoginForm($user);
+
+    if($user->getCryptedString()==null)
+        $this->redirect('@first_run');
 
     if($user->isAuthenticated())
       $this->redirect('@homepage');
