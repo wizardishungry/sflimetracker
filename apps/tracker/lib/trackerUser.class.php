@@ -8,7 +8,8 @@ class trackerUser extends sfBasicSecurityUser
 
   public function setPassword($password)
   {
-    $payload=self::crypt($password); // nb no salt!!!!
+    if($password!==null)
+        $payload=self::crypt($password); // nb no salt!!!!
     SettingPeer::setByKey('password',$payload);
     
     $this->getSettings(); // make sure this is initialized
