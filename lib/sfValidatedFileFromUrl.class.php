@@ -35,7 +35,7 @@ class sfValidatedFileFromUrl extends sfValidatedFile
     
     if($b->isRunning()) throw new sfException('still running');
 
-    $mime_type=$b->getHeader('Content-Type'); // of course we shouldn't trust people to have their servers configured right…sigh todo
+    $mime_type=$b->getHeader('Content-Type'); // of course we shouldn't trust people to have their servers configured right; sigh todo
     $mime_type=preg_replace('/;.*$/','',$mime_type); // remove stuff after the semicolon delimiter "charset=UTF-8" etc
 
     parent::__construct($original_name,$mime_type,$b->getFile(),filesize($b->getFile()));

@@ -30,7 +30,7 @@ EOF;
     $this->path=$arguments['file'];
     $this->verbose=$options['verbose'];
 
-    $this->log("Saving zip to $this->path, please wait…",true);
+    $this->log("Saving zip to $this->path, please wait",true);
 
     if(file_exists($this->path))
         throw new sfException("Zip exists. Won't overwrite.");

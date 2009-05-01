@@ -194,7 +194,7 @@ class trackerUser extends sfBasicSecurityUser
         if(!touch($path))
             throw new sfException("$path isn't writable!");
         if($do_flash) // the tracker doesn't ship with the resetpassword.txt
-            $this->setFlash('notice', 'Password reset…'); // todo make sure this displays
+            $this->setFlash('notice', 'Password reset');
     }
   }
 }

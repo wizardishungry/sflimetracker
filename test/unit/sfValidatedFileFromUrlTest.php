@@ -8,7 +8,7 @@ $t = new lime_test(4, new lime_output_color());
 $web_fixtures=file_exists("$sf_root_dir/fixtures");
 if($web_fixtures)
 {
-  $t->diag('Trying to use web fixtures…');
+  $t->diag('Trying to use web fixtures');
   $url=fixture_url('1upShow-rss2.xml',false);
   if(!file_get_contents($url))
   {

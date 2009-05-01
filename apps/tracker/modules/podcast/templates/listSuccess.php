@@ -11,4 +11,4 @@
         </li>
     </ul>
   <?php endforeach; ?>
-<p><?php echo link_to_with_icon('New podcast…', "add", 'podcast/add'); ?></p>
+<p><?php echo link_to_with_icon('New podcast', "add", 'podcast/add'); ?></p>
