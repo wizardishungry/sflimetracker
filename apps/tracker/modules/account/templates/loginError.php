@@ -1,2 +1,2 @@
-<?php include_partial('heading') ?>
+<?php page_title('Login') ?>
 <?php include_partial('account/loginform', Array('form'=>$form)) ?>
