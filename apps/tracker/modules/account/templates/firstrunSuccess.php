@@ -3,7 +3,7 @@
   <form action="<?php echo url_for('@first_run') ?>" method="POST">
     <table>
         <tr>
-            <th><?php echo $form['password']->renderLabel() ?>:</th>
+            <th><?php echo $form['password']->renderLabel() ?></th>
             <td>
             <?php echo $form['_csrf_token']; ?>
             <?php echo $form['password']->renderError() ?>
@@ -11,7 +11,7 @@
             </td>
         </tr>
         <tr>
-            <th><?php echo $form['password_again']->renderLabel() ?>:</th>
+            <th><?php echo $form['password_again']->renderLabel() ?></th>
             <td>
             <?php echo $form['password_again']->renderError() ?>
             <?php echo $form['password_again'] ?>
