@@ -1,3 +1,5 @@
+<?php if($form['image_url']->getValue())
+    echo image_tag($form['image_url']->getValue()),'<br>' ?>
 <?php page_title(link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId())) ?>
 
 <div class="delete-form-wrapper">

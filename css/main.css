@@ -504,9 +504,15 @@ table input[type="submit"]
 }
 
 body.action_add tr#slug_row,
+body.action_edit tr#slug_row,
 body.action_add form .value 
 {
     display: none;
+}
+
+.open-form tr#slug_row
+{
+    display: table-row !important;
 }
 
 form label

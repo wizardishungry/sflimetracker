@@ -30,7 +30,7 @@
 	</td>
 </tr>
 <tr id="image_row">
-	<th><?php echo $form['image_url']->renderLabel() ?></th>
+	<th>Cover</th>
 	<td>
 		<div class="form-field">
 			<?php echo $form['image_url']->renderError() ?>
@@ -38,8 +38,6 @@
 			<p>Podcast cover art.  Recommended size is at least 300x300.</p>
 		</div>
 		<div class="value">
-			<?php if($form['image_url']->getValue())
-                echo image_tag($form['image_url']->getValue()),'<br>' ?>
 			<?php $form['image_url']->getValue() ?>
 			<a href="#" class="edit-button">edit</a>
 		</div>
@@ -103,7 +101,7 @@
 	</td>
 </tr>
 <tr id="itunes_id_row">
-	<th><?php echo $form['itunes_id']->renderLabel() ?></th>
+	<th>iTunes ID</th>
 	<td>
 		<div class="form-field">
 			<?php echo $form['itunes_id'] ?>
