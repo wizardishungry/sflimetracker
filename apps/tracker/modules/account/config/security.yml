@@ -6,3 +6,5 @@ login:
   is_secure: off
 firstrun:
   is_secure: off
+error404:
+  is_secure: off

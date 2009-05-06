@@ -10,6 +10,11 @@ class accountActions extends sfActions
 {
 
 
+  public function executeError404($request)
+  {
+  }
+
+
   public function executeDbinfo($request)
   {
   }
