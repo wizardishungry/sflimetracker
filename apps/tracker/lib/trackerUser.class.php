@@ -120,7 +120,7 @@ class trackerUser extends sfBasicSecurityUser
     }
     if(!$is_ok)
     {
-        throw new sfException('You have one or more unwritable paths that must be writable -- '. implode(' ',$bad));
+        throw new limeException('permissions', 'You have one or more unwritable paths that must be writable -- '. implode(' ',$bad));
     }
   }
 
