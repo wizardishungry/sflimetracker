@@ -4,6 +4,8 @@
 */
 class limeException extends sfException
 {
+    const HELP_BASE="http://wiki.github.com/WIZARDISHUNGRY/sflimetracker/exception-"; // should this be in GH pages?
+    const HELP_HOME="http://limecast.com/tracker";
     protected $token;
     static public function createFromException($token,Exception $e)
     {
@@ -15,7 +17,17 @@ class limeException extends sfException
     
     function __construct(string $token,string $message)
     {
-        parent::__construct($message);
-        $this->token=$token;
+        $this->token=@$token;
+        parent::__construct($message. (@$token?" - [$token]\n":''));
+    }
+
+    public function getUrl()
+    {
+        if(@$this->token)
+            $url=self::HELP_BASE.$this->token;
+        else
+            $url=self::HELP_HOME;
+
+        return $url;
     }
 }
