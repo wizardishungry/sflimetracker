@@ -100,6 +100,19 @@
 		</div>
 	</td>
 </tr>
+<tr id="description_row">
+	<th><?php echo $form['description']->renderLabel() ?></th>
+	<td>
+		<div class="form-field">
+			<?php echo $form['description'] ?>
+			<?php echo $form['description']->renderError() ?>
+		</div>
+		<div class="value">
+			<?php echo $form['description']->getValue() ?>
+			<a href="#" class="edit-button">edit</a>
+		</div>
+	</td>
+</tr>
 <tr id="itunes_id_row">
 	<th>iTunes ID</th>
 	<td>
@@ -114,20 +127,6 @@
 		</div>
 	</td>
 </tr>
-<tr id="description_row">
-	<th><?php echo $form['description']->renderLabel() ?></th>
-	<td>
-		<div class="form-field">
-			<?php echo $form['description'] ?>
-			<?php echo $form['description']->renderError() ?>
-		</div>
-		<div class="value">
-			<?php echo $form['description']->getValue() ?>
-			<a href="#" class="edit-button">edit</a>
-		</div>
-	</td>
-</tr>
-
   <?php if ($form->hasGlobalErrors()): ?>
     <tr>
       <td colspan="">
