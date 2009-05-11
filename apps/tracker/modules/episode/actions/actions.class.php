@@ -50,10 +50,8 @@ class episodeActions extends sfActions
         if($this->form->isValid())
         {
             $this->form->save();
-            $this->redirect($request->getUri().'?id='.$episode->getId()); // GET to current uri
+            return $this->redirect($request->getUri().'?id='.$episode->getId()); // GET to current uri
         } 
-        else
-          return sfView::SUCCESS;
     }
   }
 
