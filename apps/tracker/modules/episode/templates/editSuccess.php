@@ -26,8 +26,23 @@
 
 <h3>Files</h3>
 <ul>
-  <?php foreach($torrents as $torrent): ?>
-      <?php include_partial('torrent', Array('torrent'=>$torrent,'delete'=>true)); ?>
+  <?php foreach($feeds as $feed): ?>
+    <?php if(isset($files[$feed->getId()])):
+        $torrent=$files[$feed->getId()];
+        ?>
+      <?php include_partial('torrent', Array('feed'=>$feed,'torrent'=>$torrent,'delete'=>true)); ?>
+    <?php else: ?>
+        <?php 
+            $form=new TorrentForm();
+            $form->setDefaults(Array(
+            'episode_id'=>$episode->getId(),
+            'feed_id'=>$feed->getId(),
+            ),Array());
+        ?>
+            <li>
+                <?php include_partial('torrent/add',Array('feed'=>$feed,'form'=>$form)); ?>
+            </li>
+    <?php endif; ?>
   <?php endforeach; ?>
 </ul>
 
@@ -54,23 +69,3 @@
  </table>
   </form>
 </div>
-
-<?php if($missing_feeds): ?>
-  We do not have files for the following formats:
-<?php endif; ?>
-<ul>
-<?php if($missing_feeds): ?>
-  <?php foreach($missing_feeds as $feed):
-    $form=new TorrentForm();
-    $form->setDefaults(Array(
-      'episode_id'=>$episode->getId(),
-      'feed_id'=>$feed->getId(),
-      ),Array());
-  ?>
-    <li>
-      <h3><?php echo $feed ?></h3>
-      <?php include_partial('torrent/add',Array('form'=>$form)); ?>
-    </li>
-  <?php endforeach; ?>
-<?php endif; ?>
-</ul>

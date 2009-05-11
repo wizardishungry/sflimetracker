@@ -52,6 +52,7 @@ class episodeActions extends sfActions
     {
       $files[$torrent->getFeedId()]=$torrent;
     }
+    $this->files=$files;
   }
 
   public function executeView($request)

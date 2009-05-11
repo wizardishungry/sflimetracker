@@ -1,6 +1,16 @@
 <div class="form-wrapper open-form">
+
   <form id="torrent_<?php echo $form->getDefault('feed_id'); ?>" action="<?php echo url_for('torrent/add') ?>" method="POST" enctype="multipart/form-data">
       <table>
+
+      <?php if(isset($feed)): ?>
+      <tr>
+          <td>&nbsp;</td>
+          <td colspan="2">
+            <h4><?php echo $feed ?></h4>
+          </td>
+      </tr>
+      <?php endif; ?>
 
       <?php include_partial('torrent/torrentform', Array('form'=>$form)) ?>
       <tr>
