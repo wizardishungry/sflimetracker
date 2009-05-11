@@ -38,7 +38,7 @@
 			<p>Podcast cover art.  Recommended size is at least 300x300.</p>
 		</div>
 		<div class="value">
-			<?php $form['image_url']->getValue() ?>
+			<?php echo $form['image_url']->getValue() ?>
 			<a href="#" class="edit-button">edit</a>
 		</div>
 	</td>
