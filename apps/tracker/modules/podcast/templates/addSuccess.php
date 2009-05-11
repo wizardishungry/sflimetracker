@@ -1,4 +1,4 @@
-<?php page_title('Add Podcast') ?>
+<?php page_title('New Podcast') ?>
 <div class="form-wrapper open-form">
   <form action="<?php echo url_for('podcast/add') ?>" method="POST" enctype="multipart/form-data">
     <table>
