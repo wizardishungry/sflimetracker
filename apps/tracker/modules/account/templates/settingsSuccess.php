@@ -2,6 +2,11 @@
 
 <h3>BitTorrent Tracker</h3>
 
+<ul>
+    <li>Announce URL <tt><?php echo url_for('client/announce',true); ?></tt></li>
+    <li>Scrape URL <tt><?php echo url_for('client/scrape',true); ?></tt></li>
+</ul>
+
 <form action='<?php echo url_for('account/tracker') ?>' method="POST" enctype="multipart/form-data">
     <?php echo new TrackerForm(); ?>
     <input type='submit' value='Save'>
