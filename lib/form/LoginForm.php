@@ -22,6 +22,8 @@ class LoginForm extends sfForm
         'required' => true,
         'callback' => Array($this,'passwordCallback'),
         'arguments' => Array($this->getValue('password'))
+      ),Array(
+        'invalid' => 'Incorrect password'
       )),
       'remember_me' =>  new sfValidatorPass(Array('required'=>false)),
     );

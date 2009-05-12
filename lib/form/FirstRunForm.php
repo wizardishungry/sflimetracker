@@ -14,15 +14,23 @@ class FirstRunForm extends sfForm
     $vals=array(
       'password' => new sfValidatorRegex(array(
         'pattern' => '/^.+$/'
+      ),
+      Array(
+         'invalid'=>'Please choose a password',
+         'required'=>'Please choose a password',
       )),
-      'password_again' => new sfValidatorString(Array('required'=>true)),
-      'intent' => new sfValidatorChoice(array('choices' =>Array('on'))),
+      'password_again' => new sfValidatorString(Array('required'=>true),Array('required'=>' ')),
+      'intent' => new sfValidatorChoice(array('choices' =>Array('on')),array('invalid'=>'Please state your intent')),
       'remember_me' =>  new sfValidatorPass(Array('required'=>false)),
     );
 
     $this->setWidgets($widgets);
     $this->setValidators($vals);
 
-    $this->validatorSchema->setPostValidator(new sfValidatorSchemaCompare('password', sfValidatorSchemaCompare::EQUAL, 'password_again'));
+    $this->validatorSchema->setPostValidator(new sfValidatorSchemaCompare(
+        'password', sfValidatorSchemaCompare::EQUAL, 'password_again',
+        Array(),
+        Array('invalid'=>"Passwords don't match")
+    ));
   }
 }
