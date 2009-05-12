@@ -36,7 +36,7 @@ class Torrent extends BaseTorrent
         if(file_exists($torrent_file))
         {
             $this->cleanupFiles();
-            throw new sfException("$torrent_file already exists");
+            throw new limeException('torrent',"$torrent_file already exists");
             parent::setFile(null);
         }
 
@@ -74,13 +74,13 @@ class Torrent extends BaseTorrent
             if(!file_exists($torrent_file))
             {
                 $this->cleanupFiles();
-                throw new sfException("$torrent_file not written");
+                throw new limeException('torrent',"$torrent_file not written");
             }
         }
         else
         {
             $this->cleanupFiles();
-            throw new sfException('Unable to generate torrent');
+            throw new limeException('torrent','Unable to generate torrent');
         }
 
         if($file instanceof sfValidatedFileFromUrl)
@@ -155,7 +155,7 @@ class Torrent extends BaseTorrent
                 $params['mimeType']='application/x-bittorrent';
                 break;
             default:
-                throw new sfException("Unsupported enclosure type $type");
+                throw new limeException('enclosure',"Unsupported enclosure type $type");
         }
 
         $this->enclosure =new sfFeedEnclosure();
@@ -264,7 +264,7 @@ class Torrent extends BaseTorrent
     {
         if($fmt_string!=null)
         {
-            throw new sfException("Format strings are not implemented, thus overloading the format is neither");
+            throw new limeException('not-implemented',"Format strings are not implemented, thus overloading the format is neither");
         }
 
         $parts=Array();

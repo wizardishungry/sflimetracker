@@ -103,7 +103,7 @@ class ClientPeer extends BaseClientPeer
       $criteria->add(TorrentPeer::INFO_HASH,$params['info_hash']);
       $torrent = TorrentPeer::doSelectOne($criteria);
       if($torrent==null)
-        throw new sfException('Torrent not found');
+        throw new limeException('missing-torrent','Torrent not found');
 
       $client = new Client();
       $client->setTorrent($torrent);

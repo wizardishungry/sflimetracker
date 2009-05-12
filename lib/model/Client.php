@@ -60,7 +60,7 @@ class Client extends BaseClient
             $torrent->setDownloads($torrent->getDownloads()+1);
           break;
         default:
-          throw new sfException('Unknown event, '.$params['event']);
+          throw new limeException('torrent-protocol','Unknown event, '.$params['event']);
       }
     }
   }

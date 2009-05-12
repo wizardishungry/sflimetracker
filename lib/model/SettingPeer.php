@@ -35,7 +35,7 @@ class SettingPeer extends BaseSettingPeer
             $o->reset();
             return $o->save($con);
         }
-        throw new sfException('key not found');
+        throw new limeException('missing-setting','key not found');
     }
 
     public static function reset(Criteria $criteria =null, PropelPDO $con=null)

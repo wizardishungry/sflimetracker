@@ -44,15 +44,15 @@ class ProjectConfiguration extends sfProjectConfiguration
   public function loadSharedObjects($objects)
   {
     if(!function_exists('dl'))
-        throw new sfException("Couldn't dl(); dl not defined");
+        throw new limeException('load-shared-objects',"Couldn't dl(); dl not defined");
 
     if(!ini_get('enable_dl'))
-        throw new sfException("Couldn't dl(); ini_get reports enable_dl disabled in php.ini");
+        throw new limeException('load-shared-objects',"Couldn't dl(); ini_get reports enable_dl disabled in php.ini");
 
     foreach($objects as $o)
     {
         if(!dl($o.'.so'))
-            throw new sfException("Couldn't dl(\"$o.so\")");
+            throw new limeException('load-shared-objects',"Couldn't dl(\"$o.so\")");
     }
   }
 }

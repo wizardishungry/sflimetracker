@@ -49,7 +49,7 @@ class clientActions extends sfActions
     try{
 
       if(!SettingPeer::retrieveByKey'tracker_active']))
-        throw new sfException('Tracker not active');
+        throw new limeException('turn-on-tracker','Tracker not active');
 
       $response=$this->response_ok;
 

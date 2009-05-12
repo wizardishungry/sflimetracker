@@ -30,10 +30,10 @@ class sfValidatedFileFromUrl extends sfValidatedFile
     }
     catch(Exception $e)
     {
-        throw sfException::createFromException($e);
+        throw limeException::createFromException('curl',$e);
     }
     
-    if($b->isRunning()) throw new sfException('still running');
+    if($b->isRunning()) throw new limeException('curl','still running');
 
     $mime_type=$b->getHeader('Content-Type'); // of course we shouldn't trust people to have their servers configured right; sigh todo
     $mime_type=preg_replace('/;.*$/','',$mime_type); // remove stuff after the semicolon delimiter "charset=UTF-8" etc
@@ -51,7 +51,7 @@ class sfValidatedFileFromUrl extends sfValidatedFile
   {
     $v =$this->b->getSha1();
     if(!$v)
-        throw new sfException('Unable to retrieve Sha1 from disconnectedCurl instance');
+        throw new limeException('hashing','Unable to retrieve Sha1 from disconnectedCurl instance');
     return $v;
   }
 

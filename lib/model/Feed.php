@@ -76,7 +76,7 @@ class Feed extends BaseFeed
     public function save(PropelPDO $con=null)
     {
         if($this->getRssUrl() && !$this->has_validation_run)
-            throw new sfException('Cannot save podcast with unvalidated feed');
+            throw new limeException('not-implemented','Cannot save podcast with unvalidated feed');
 
         return parent::save($con);
     }
@@ -112,7 +112,7 @@ class Feed extends BaseFeed
         // stale means the cache is stale
 
         if(!$this->getRssUrl())
-          throw new sfException("Can't fetch() on a local podcast");
+          throw new limeException('not-implemented',"Can't fetch() on a local podcast");
 
         $lifetime = sfConfig::get('app_feed_interval',300);
         $stale=time()-$this->getLastFetched()>$lifetime;
@@ -149,7 +149,7 @@ class Feed extends BaseFeed
             if(!$fallback)
             {
                 if($b->responseIsError)
-                    throw new sfException('request for url returned an error -- '.
+                    throw new limeException('not-implemented','request for url returned an error -- '.
                         $b->getResponseCode(). ' - '.$b->getResponseMessage()
                     );
                 else
@@ -170,7 +170,7 @@ class Feed extends BaseFeed
     protected function browser2feed(sfWebBrowser $b)
     {
         if($b==null)
-            throw new sfException("Can't make feed from nothing");
+            throw new limeException('curl',"Can't make feed from nothing");
         try {
             return sfFeedPeer::createFromXml($b->getResponseText(),$this->getRssUrl());
         }
@@ -230,7 +230,7 @@ class Feed extends BaseFeed
     protected function getStore()
     {
         if(!$this->getRssUrl())
-            throw new sfException('non externally-backed feed cannot have an store');
+            throw new limeException('not-implemented','non externally-backed feed cannot have an store');
         if(!$cache_dir=$this->getStorePath())
             return null;
         return $cache_dir.DIRECTORY_SEPARATOR.$this->getRssUrlHash();

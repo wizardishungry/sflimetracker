@@ -130,7 +130,7 @@ class trackerUser extends sfBasicSecurityUser
     foreach($this->getSettingsKeys() as $key)
     {
         if(!array_key_exists($key,$settings))
-            throw new sfException("Required setting '$key' not found in database");
+            throw new limeException('missing-setting',"Required setting '$key' not found in database");
     }
   }
   
@@ -173,13 +173,7 @@ class trackerUser extends sfBasicSecurityUser
     }
     catch(Exception $e)
     {
-        throw sfException::createFromException($e);
-    }
-    catch(sfException $e)
-    {
-        $e2 = new sfException("Couldn't sideload");
-        $e2->setWrappedException($e);
-        throw $e2;
+        throw limeException::createFromException('sideload',$e);
     }
   }
   public function resetPasswordCheck()
@@ -192,7 +186,7 @@ class trackerUser extends sfBasicSecurityUser
     {
         $this->setPassword(null);
         if(!touch($path))
-            throw new sfException("$path isn't writable!");
+            throw new limeException('permissions',"$path isn't writable!");
         if($do_flash) // the tracker doesn't ship with the resetpassword.txt
             $this->setFlash('notice', 'Password reset');
     }
