@@ -144,6 +144,7 @@ EOF;
       'lib/vendor/symfony/lib/task/generator/skeleton',
       'lib/vendor/symfony/lib/task/project/upgrade*',
       'lib/vendor/symfony/lib/plugins/sfCompat10Plugin',
+      'lib/vendor/symfony/lib/plugins/sfDoctrinePlugin',
       'lib/vendor/symfony/lib/plugins/sfPropelPlugin/data',
       'lib/vendor/symfony/lib/plugins/sfPropelPlugin/lib/task',
       'lib/vendor/symfony/lib/plugins/sfPropelPlugin/lib/vendor/phing',
