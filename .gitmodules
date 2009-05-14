@@ -14,3 +14,6 @@
 [submodule "test/host-assert"]
 	path = test/host-assert
 	url = git://gist.github.com/78145.git
+[submodule "plugins/sfFeed2Plugin"]
+	path = plugins/sfFeed2Plugin
+	url = git://github.com/WIZARDISHUNGRY/sfFeed2Plugin.git
