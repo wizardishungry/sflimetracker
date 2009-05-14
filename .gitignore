@@ -18,3 +18,4 @@ config/generated*
 VERSION
 .htpasswd
 lib/filter/base
+lib/vendor/symfony

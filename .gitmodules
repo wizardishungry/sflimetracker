@@ -1,9 +1,3 @@
-[submodule "lib/vendor/symfony"]
-	path = lib/vendor/symfony
-	url = git://github.com/WIZARDISHUNGRY/symfony.git
-[submodule "lib/vendor/symfony/lib/vendor/lime"]
-	path = lib/vendor/symfony/lib/vendor/lime
-	url = git://github.com/WIZARDISHUNGRY/lime_test.git
 [submodule "plugins/File_Bittorrent2"]
 	path = plugins/File_Bittorrent2
 # public 
