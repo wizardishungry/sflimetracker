@@ -30,9 +30,20 @@ class ProjectConfiguration extends sfProjectConfiguration
         // is the least of your problems
     }
 
-    $this->enableAllPluginsExcept(file_exists(dirname(__FILE__).'/../lib/vendor/symfony/lib/plugins/sfDoctrinePlugin')?
-        array('sfDoctrinePlugin'):array());
-  // fix for dumb PEAR
+
+    // exclude plugins if they actually exist
+    $plugin_path=realpath(dirname(__FILE__).'/../lib/vendor/symfony/lib/plugins/').'/';
+    $bad_plugins=Array('sfCompat10Plugin','sfDoctrinePlugin');
+    $excludes=Array();
+    foreach($bad_plugins as $plugin)
+    {
+        if(file_exists($plugin_path.$plugin))
+            $excludes[]=$plugin;
+    }
+
+    $this->enableAllPluginsExcept($excludes);
+
+    // fix for dumb PEAR
     set_include_path(get_include_path().PATH_SEPARATOR.$this->getRootDir().DIRECTORY_SEPARATOR.'lib');
   }
 
