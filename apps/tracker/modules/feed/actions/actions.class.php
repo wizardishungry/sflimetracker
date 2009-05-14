@@ -11,7 +11,7 @@ class feedActions extends sfActions
 
   public function executeFeed($request)
   {
-    $feed = new sfRss201Feed();
+    $feed = new sfRss201PodcastFeed();
 
     $link = '@homepage';
 
