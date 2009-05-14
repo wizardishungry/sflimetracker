@@ -33,9 +33,7 @@ class feedActions extends sfActions
     $format=$request->getParameter('format'); // not "content format" but "delivery method enclosure format"
 
     $feed->initialize(array(
-        'title'       => $podcast->getTitle().
-            (!$podcast_feed||$podcast_feed->getTitle()=='default'?'':'['.$podcast_feed->getTitle().']').
-            ($format=='web'?'':" - via $format"),
+        'title'       => $podcast->getTitle(),
         'link'=>$link,
         'authorEmail' => $podcast->getEmail(),
         'authorName'  => $podcast->getAuthor(),
