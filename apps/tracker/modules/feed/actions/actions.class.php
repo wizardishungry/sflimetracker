@@ -37,6 +37,7 @@ class feedActions extends sfActions
         'link'=>$link,
         'authorEmail' => $podcast->getEmail(),
         'authorName'  => $podcast->getAuthor(),
+        'description' => $podcast->getDescription(),
     ));
 
     $pager=$this->getPager($request);
