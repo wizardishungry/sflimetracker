@@ -249,8 +249,15 @@ class Torrent extends BaseTorrent
 
     public function getTitle() // convenience method for sfFeed2Plugin
     {
-        return $this->getEpisode()?$this->getEpisode()->getTitle():'';
+        return $this->getEpisodeId()?$this->getEpisode()->getTitle():'';
     }
+
+
+    public function getDescription() // convenience method for sfFeed2Plugin
+    {
+        return $this->getEpisodeId()?$this->getEpisode()->getDescription():'';
+    }
+
 
     public function getPodcast()
     {
@@ -283,4 +290,5 @@ class Torrent extends BaseTorrent
 
         return strtr(implode('-',$parts),' /','__');
     }
+
 }
