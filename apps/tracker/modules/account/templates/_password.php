@@ -26,7 +26,7 @@
       <td>&nbsp;</td>
       <td><input type="submit" value="Change password" />
       <?php
-        echo button_to('Wait, I remember!',"account/login")
+        echo button_to('Cancel',"account/login")
       ?></td>
     </tr>
   </table>
