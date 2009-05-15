@@ -145,13 +145,13 @@ class accountActions extends sfActions
   public function executeRestore($request)
   {
     if($request->getMethod () != sfRequest::POST)
-        return sfView::ERROR;
+        return $this->redirect('account/settings');
 
     $form = $this->form = new RestoreForm();
     $form->bind($request->getPostParameters(),$request->getFiles());
 
     if(!$form->isValid())
-        return sfView::ERROR;
+        return $this->redirect('account/settings');
 
     $data=$this->data=new sfPropelData();
     try {
