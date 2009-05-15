@@ -40,7 +40,7 @@ class feedActions extends sfActions
         'description' => $podcast->getDescription(),
     ));
 
-    $pager=$this->getPager($request);
+    $pager=$this->getPager($podcast_feed->getId());
     $pager->init();
 
 
@@ -63,16 +63,17 @@ class feedActions extends sfActions
         
   }
 
-  protected function getPager($request)
+  protected function getPager($feed_id)
   {
     $pager = new sfPropelPager('Torrent', 20);
     $pager->setPeerMethod('doSelectJoinAll');
     $c = new Criteria();
     $c->addAscendingOrderByColumn(TorrentPeer::UPDATED_AT);
     $c->addAscendingOrderByColumn(TorrentPeer::CREATED_AT);
+    // todo exclude future
 
-    if($request->hasParameter('id'))
-      $c->add(TorrentPeer::FEED_ID, $request->getParameter('id'));
+    if($feed_id)
+      $c->add(TorrentPeer::FEED_ID, $feed_id);
 
     $pager->setCriteria($c);
     $pager->setPage(1);
