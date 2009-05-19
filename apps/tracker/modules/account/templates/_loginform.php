@@ -1,34 +1,22 @@
-<div class="form-wrapper login">
-  <form action="<?php echo url_for('account/login') ?>" method="POST">
-    <table>
-        <tr>
-            <th><?php echo $form['password']->renderLabel() ?>:</th>
-            <td>
-            <?php echo $form['_csrf_token']; ?>
-            <?php echo $form['password']->renderError() ?>
-            <?php echo $form['password'] ?>
-            </td>
-        </tr>
-        <tr>
-            <td>
-            <?php echo $form['remember_me']->renderError() ?>
-            <?php echo $form['remember_me'] ?>
-            </td>
-            <td><?php echo $form['remember_me']->renderLabel() ?></td>
-        </tr>
+<form action="<?php echo url_for('account/login') ?>" method="POST">
+  <div id="password_field">
+    <?php echo $form['password']->renderLabel() ?>:
+    <?php echo $form['_csrf_token']; ?>
+    <?php echo $form['password'] ?>
+    <?php echo $form['password']->renderError() ?>
+  </div>
 
-      <tr>
-        <td>&nbsp;</td>
-        <td><?php
-          echo link_to('Change',"account/password"),
-          ' ',
-          link_to('I forget',"http://limecast.com/tracker/reset-password");
-        ?></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td><input type="submit" value="Sign in" /></td>
-      </tr>
-    </table>
-  </form>
-</div>
+  <div id="remember_field">
+    <?php echo $form['remember_me'] ?>
+    <?php echo $form['remember_me']->renderLabel(null, array('id' => 'remember_label')) ?>
+    <?php echo $form['remember_me']->renderError() ?>
+  </div>
+
+  <div class="links">
+    <?php echo link_to('Change',"account/password"); ?>
+    &middot;
+    <?php echo link_to('I forget',"http://limecast.com/tracker/reset-password"); ?>
+  </div>
+
+  <input type="submit" class="submit" value="Sign in" />
+</form>

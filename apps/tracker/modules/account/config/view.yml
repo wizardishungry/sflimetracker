@@ -1,0 +1,12 @@
+firstrunSuccess:
+  layout: login
+  stylesheets: [-main, login]
+firstrunError:
+  layout: login
+  stylesheets: [-main, login]
+loginSuccess:
+  layout: login
+  stylesheets: [-main, login]
+loginError:
+  layout: login
+  stylesheets: [-main, login]
