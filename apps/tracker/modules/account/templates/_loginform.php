@@ -2,7 +2,7 @@
   <form action="<?php echo url_for('account/login') ?>" method="POST">
     <table>
         <tr>
-            <th><?php echo $form['password']->renderLabel() ?>:</th>
+            <th><?php echo $form['password']->renderLabel() ?></th>
             <td>
             <?php echo $form['_csrf_token']; ?>
             <?php echo $form['password']->renderError() ?>
@@ -27,7 +27,7 @@
       </tr>
       <tr>
         <td>&nbsp;</td>
-        <td><input type="submit" value="Sign in" /></td>
+        <td><input type="submit" value="Sign In" /></td>
       </tr>
     </table>
   </form>

@@ -34,7 +34,7 @@
 	<td>
 		<div class="form-field">
 			<?php echo $form['length'] ?>
-			<p>Duration of the episode, like: 25:14 (which equals 25 minutes, 14 seconds)</p>
+			<p>Episode duration in hours, minutes and seconds like: 0:40:27</p>
 			<?php echo $form['length']->renderError() ?>
 		</div>
 		<div class="value">
