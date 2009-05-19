@@ -34,10 +34,17 @@ class feedActions extends sfActions
 
     $feed->initialize(array(
         'title'       => $podcast->getTitle(),
-        'link'=>$link,
+        'link'        => $link,
         'authorEmail' => $podcast->getEmail(),
         'authorName'  => $podcast->getAuthor(),
         'description' => $podcast->getDescription(),
+        'image'       => new sfFeedImage(array(
+            "image"  => $podcast->getImageUrl(),
+            //"imageX" => (int)$feedXml->channel[0]->image->width,
+            //"imageY" => (int)$feedXml->channel[0]->image->height,
+            //"link"   => (string)$feedXml->channel[0]->image->link,
+            //"title"  => (string)$feedXml->channel[0]->image->title
+        )),
     ));
 
     $pager=$this->getPager($podcast_feed->getId());
