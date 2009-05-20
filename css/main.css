@@ -403,6 +403,25 @@ div.progress .spinner {
 /**
  * Podcast
  **/
+.podcasts .podcast {
+  color: #DDD;
+  background-color: #333;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  width: 450px;
+  min-height: 80px;
+  padding: 10px;
+  margin-bottom: 10px;
+  clear: both;
+}
+.podcasts .podcast a {
+  color: #DDD;
+}
+.podcasts .podcast img.cover {
+  float: left;
+  margin-right: 10px;
+}
+
 .podcasts h3 {
   margin: 0;
 }
@@ -414,6 +433,7 @@ img.cover {
   width: 80px;
   height: 80px;
   z-index: 30;
+  background: url('../images/grass.png');
 }
 
 /**
@@ -430,6 +450,7 @@ div.torrent_file ul.links {
   color: #FFF;
   margin-bottom: 2px !important;
   -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
   position: relative;
   max-width: 400px;
 }
