@@ -155,6 +155,10 @@ div#title div {
   padding: 10px 15px 0 0;
   text-align: right;
 }
+div#title div a {
+  color: #FFF;
+  text-decoration: none;
+}
 div#header div.version {
   display: inline;
   margin-left: 20px;

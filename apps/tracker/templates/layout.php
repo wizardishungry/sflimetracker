@@ -20,7 +20,7 @@
 
     <div id="title">
         <div>
-          <?php echo sfConfig::get('app_version_name'); ?>
+            <?php echo link_to(sfConfig::get('app_version_name'), '@homepage'); ?>
         </div> 
     </div>
 
