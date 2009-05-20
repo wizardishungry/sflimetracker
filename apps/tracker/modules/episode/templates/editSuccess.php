@@ -1,4 +1,4 @@
-<h2><?php echo link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId()) ?></h2>
+<?php echo link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId()) ?>
 <?php page_title($episode->getTitle()); ?>
 
 <div class="delete-form-wrapper">
@@ -59,7 +59,7 @@
     <tr>
     <td>&nbsp;</td>
     <td>
-        <input type="submit" value="Add"/>
+        <input type="submit" value="Save"/>
     </td>
     <td>
 

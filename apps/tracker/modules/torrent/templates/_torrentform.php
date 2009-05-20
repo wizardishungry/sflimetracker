@@ -12,7 +12,7 @@
     </td>
 </tr>
 <tr>
-	<th><?php echo $form['web_url']->renderLabel() ?>:</th>
+	<th><?php echo $form['web_url']->renderLabel() ?></th>
 	<td>
 	<?php echo $form['web_url']->renderError() ?>
 	<?php echo $form['web_url'] ?>

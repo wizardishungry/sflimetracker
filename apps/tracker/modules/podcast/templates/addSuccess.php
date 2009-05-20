@@ -6,7 +6,7 @@
       <tr>
         <td>&nbsp;</td>
         <td colspan="2">
-          <input type="submit" value="Add Podcast"/>
+          <input type="submit" value="Save"/>
         </td>
       </tr>
     </table>

@@ -48,7 +48,7 @@
 	<td>
 		<div class="form-field">
 			<?php echo $form['created_at'] ?>
-			<p>Creation date, like: 2008-12-25 13:34:00</p>
+			<p>Episode date and time, like: 2008-12-25 13:34:00, blank for now</p>
 			<?php echo $form['created_at']->renderError() ?>
 		</div>
 		<div class="value">
