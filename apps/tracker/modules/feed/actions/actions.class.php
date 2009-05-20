@@ -35,6 +35,7 @@ class feedActions extends sfActions
     $feed->initialize(array(
         'title'       => $podcast->getTitle(),
         'link'        => $link,
+        'generator'   => sfConfig::get('app_version_url'),
         'authorEmail' => $podcast->getEmail(),
         'authorName'  => $podcast->getAuthor(),
         'description' => $podcast->getDescription(),
