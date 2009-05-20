@@ -1,5 +1,7 @@
-<?php if($form['image_url']->getValue())
-    echo image_tag($form['image_url']->getValue()),'<br>' ?>
+<?php if($form['image_url']->getValue()) ?>
+   <a href="<?php echo $form['image_url']->getValue(); ?>">
+     <?php echo image_tag($form['image_url']->getValue(), array('class' => 'cover')) ?>
+   </a>
 <?php page_title($podcast->getTitle()) ?>
 
 <div class="delete-form-wrapper">
