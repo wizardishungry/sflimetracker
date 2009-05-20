@@ -18,18 +18,24 @@
 <div id="document">
   <div id="layout">
 
+    <div id="title">
+        <div>
+          <?php echo sfConfig::get('app_version_name'); ?>
+        </div> 
+    </div>
+
     <div id="header_wrapper">
-      <div id="header">
+      <div id="header" class="clearfix">
         
-        <div class="version">
+    <!--     <div class="version">
           <?php echo '<span title="'.sfConfig::get('app_version_comment').
             '" class="version_rev">',sfConfig::get('app_version_rev'),'</span>',
             '; <span class="runtime_version">Symfony ',SYMFONY_VERSION,'</span>';
-          ?>
-        </div>
+          ?> 
+        </div> -->
         
         <div id="account_bar">      
-          <ul>
+          <ul class="clearfix">
           <?php if($sf_user->isAuthenticated()) { ?>
             <li class="">
               <?php echo link_to_with_icon('Home', 'house', '@homepage'); ?>
@@ -41,7 +47,7 @@
             <li class="">
               <?php echo link_to_with_icon('Help', 'help', 'http://limecast.com/tracker'); ?>
             </li>
-            <li class="signup">
+            <li class="signup last">
               <?php
 	        if($sf_user->isAuthenticated()) {
                   echo link_to_with_icon('Sign Out', 'user', 'account/logout');
@@ -67,11 +73,7 @@
         </div>
       </div>
     </div>
-    <div id="title">
-        <span>
-          <?php echo sfConfig::get('app_version_name'); ?>
-        </span> 
-    </div>
+
     <div id="body_wrapper">
 
         <?php if ($sf_user->hasFlash('notice')): ?>

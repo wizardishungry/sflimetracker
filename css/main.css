@@ -74,7 +74,7 @@ h1, h2, h3, h4, h5 {
   font-weight: normal;
   margin: 0 0 14px 0;
 }
-h1 { font-size: 2.2em; }
+h1 { font-size: 2.6em; }
 h1.heading { font-size: 1.6em; } /* effectively h2 */
 h2 { font-size: 1.6em; }
 h3 { font-size: 1.3em; }
@@ -129,32 +129,31 @@ h1.icon {
 * Header
 **/
 div#header_wrapper {
-  position: relative;
-  width: 100%;
-  background: #333;
-  border-bottom: 1px solid #bbb;
-  overflow: auto;
+  margin: 0 30px;
+  background: url('../images/banner-corner-right.png') top right no-repeat;
 }
-div#header {
-  position: relative;
-  width: 100%;
-  color: #DDD;
-  margin: 0 auto;
-  padding: 10px 0;
-}
+
 div#header a {
   color: #DDD;
 }
-div#header div#title {
-  padding: 12px 0 0 10px;
-  display: inline;
+div#title {
+  background-color: #a1bb66;
+  padding: 15px 5px;
+  margin: 40px 30px 0 30px;
+}
+div#header {
+  background: url('../images/banner-corner-left.png') top left no-repeat;
 }
 
-div#header div#title {
-  display: inline;
-  padding: 0 0 0 2px;
-  margin: 12px 0 0;
-  font-size: 12px;
+div#title div {
+  color: #FFF;
+  border-top: 5px solid #FFF;
+  border-bottom: 5px solid #FFF;
+  font-family: Helvetica,Arial,sans-serif;
+  font-size: 4em;
+  font-weight: normal;
+  padding: 10px 15px 0 0;
+  text-align: right;
 }
 div#header div.version {
   display: inline;
@@ -163,49 +162,29 @@ div#header div.version {
   font-size: 0.9em;
 }
 div#header div#account_bar {
-  top: 0;
-  right: 10px;
-  position: absolute;
-  z-index: 1;
+  background: #222 url('../images/striped.png') top left;
+  margin-left: 25px;
+  float: left;
+  border-top: 1px solid #222;
+  -moz-border-radius: 0px 0px 5px 5px;
 }
 div#header div#account_bar ul li {
-  margin: 0 0 0 10px;
-  padding: 10px 0 0 0;
-  float: left;
-}
-div#header div#account_bar ul li.search {
-  width: 210px;
-  padding: 5px 0 0 0;
-  position: relative;
-  margin-right: -20px;
-}
-div#header div#account_bar ul li.search input.text {
-  width: 146px;
-  height: 15px;
-  padding: 4px 31px 4px 5px;
-  top: 5px;
-  left: 0;
-  position: absolute;
-  overflow: hidden;
   display: block;
+  float: left;
+  width: 100px;
 }
-div#header div#account_bar ul li.search input.image_button {
-  top: 5px;
-  right: 26px;
-  position: absolute;
+div#header div#account_bar ul li a {
+  padding: 5px 10px;
+  display: block;
+  width: 80px;
+  text-align: center;
+  border-right: 1px solid #555;
 }
-
-/**
-* Title
-**/
-div#title {
-  color: #333;
-  position: relative;
-  font-family: Helvetica,Arial,sans-serif;
-  font-size: 3em;
-  font-weight: bold;
-  margin: -3px 0 0 18px;
-  z-index: 2;
+div#header div#account_bar ul li.last a {
+  border-right: 0;
+}
+div#header div#account_bar ul li a:hover {
+  color: #FFF;
 }
 
 /**
@@ -229,7 +208,7 @@ div#body_wrapper {
 }
 div#body div#full_width {
   margin: 0 auto;
-  padding: 30px 160px;
+  padding: 30px 40px;
   
   pasition: relative;
   *height: 0.01%;
@@ -448,6 +427,7 @@ width: 120px;
 text-align: right;
 vertical-align: top;
 padding-right: 10px;
+padding-top: 3px;
 }
 .content table tr td {
 padding: 0 0 14px 0;
@@ -463,11 +443,11 @@ padding: 0 0 14px 0;
 }
 
 .content div.form-wrapper {
-margin-left: -130px;
+margin-left: -5px;
+margin-right: -5px;
 margin-bottom: 10px;
 }
 .content div.open-form table {
-margin-bottom: -38px;
 }
 
 div.form-wrapper.open-form {
@@ -475,6 +455,7 @@ div.form-wrapper.open-form {
     border-bottom: 5px solid #AAA;
     padding: 10px 0px;
     margin-bottom: 20px;
+    background-color: #F0F0F0;
 }
 
 /* Expand/contract behavior */
@@ -501,7 +482,7 @@ div.delete-form-wrapper {
 table textarea,
 table iframe
 {
-    width: 100% !important;
+    width: 90% !important;
 }
 table input[type="button"],
 table input[type="checkbox"],
