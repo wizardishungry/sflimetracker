@@ -25,7 +25,7 @@ h1, h2, h3, h4, h5 {
   padding: 0;
 }
 h3 { /* 14px HACK!! */
-  padding-top: 2px;
+padding-top: 2px;
 }
 #header ul, #header li {
   list-style: none;
@@ -75,9 +75,9 @@ h1, h2, h3, h4, h5 {
   margin: 0 0 14px 0;
 }
 h1 { font-size: 2.6em; }
-h1.heading { font-size: 1.6em; } /* effectively h2 */
-h2 { font-size: 1.6em; }
-h3 { font-size: 1.3em; }
+h1.heading { font-size: 1.1em; } /* effectively h2 */
+h2 { font-size: 1.1em; }
+h3 { font-size: 1.1em; font-weight: bold; }
 div#document {
   font-size: 1.1em;
   min-height: 100%;
@@ -201,7 +201,7 @@ div#body_wrapper {
   width: 100%;
   height: auto;
 /*  min-height: 660px; */
-  *width: 99.8%;
+*width: 99.8%;
 }
 * html div#body_wrapper {
   height: 660px;
@@ -228,66 +228,13 @@ div#body div#sidebar {
   width: 160px;
   float: right;
 }
-div#body h1.title.page {
-  color: #97ce2e; 
-}
 div#body p {
   line-height: 17px;
   margin: 0 0 14px 0;
 }
 div#body span.notice {
   color: #ABABAB;
-}*/
-
-/** Buttons **/
-div#body a.button {
-  background: url("../images/content/button_bg_left.png") no-repeat left top;
-  color: #383838 !important;
-  height: 33px;
-  padding: 0 0 0 5px;
-  display: block;
-  float: left;
 }
-div#body a.button span {
-  background: url("../images/content/button_bg_right.png") no-repeat right top;
-  height: 14px;
-  padding: 7px 10px 12px 5px;
-  display: block;
-  cursor: pointer;
-}
-div#body a.button:hover {
-  background-position: left bottom;
-  color: #212121 !important;
-}
-div#body a.button:hover span {
-  background-position: right bottom;
-}
-div#body a.action_button {
-  background: url("../images/content/action_button_bg_left.png") no-repeat left top;
-  text-transform: uppercase;
-  font-size: 0.9em;
-  color: #306A0F !important;
-  height: 32px;
-  padding: 0 0 0 15px;
-  display: block;
-  float: left;
-}
-div#body a.action_button span {
-  background: url("../images/content/action_button_bg_right.png") no-repeat right top;
-  height: 14px;
-  padding: 6px 15px 12px 0;
-  display: block;
-  cursor: pointer;
-}
-div#body a.action_button:hover {
-  background-position: left bottom;
-  color: #20460A !important;
-}
-div#body a.action_button:hover span {
-  background-position: right bottom;
-}
-* html div#body a.button span { height: auto; }
-* html div#body a.action_button span { height: auto; }
 
 /**
 * Definition Lists
@@ -305,32 +252,6 @@ dl dt {
 dl dd {
   padding: 0 0 5px 0;
 }
-
-/* Namespace */
-dl.namespace {
-  margin: 0 0 0 -130px;
-  overflow: auto;
-}
-dl.namespace dt {
-  width: 120px;
-  padding: 2px 10px 3px 0;
-  text-align: right;
-}
-
-/* Linkspace */
-dl.linkspace {
-  margin: 0 0 0 -30px;
-  overflow: auto;
-}
-dl.linkspace dt {
-  width: 20px;
-  padding: 0 10px 0 0;
-  overflow: auto;
-}
-dl.linkspace dd {
-  padding: 2px 0 7px 0;
-}
-
 
 /**
 * Icons
@@ -359,25 +280,9 @@ form div.field label {
   width: 80px;
   float: left;
 }
-form div.field div {
-  margin: 0 0 0 90px;
-}
-form div.align {
-  padding: 10px 10px 10px 135px;
-}
-form div.controls,
-form div.response_container {
-  padding: 14px 0 0 90px;
-}
 form input,
 form textarea {
   font: 1.0em Verdana, sans-serif;
-}
-form input.text,
-form textarea.text {
-  background: #F3F3F3 url("../images/content/input_bg.png") repeat-x left top;
-  color: #676767;
-  padding: 4px;
 }
 form input[type=text] {
   width: 276px;
@@ -388,74 +293,37 @@ form textarea {
 form input[type=submit] {
   width: auto;
 }
-form input.text.focus,
-form textarea.text.focus {
-  color: #212121;
-}
-form input.button {
-  background-color: #AEAEAE;
-  border: 1px solid #212121;
-  color: #383838;
-  padding: 4px;
-  cursor: pointer;
-}
-form input.button.hover {
-  background-color: #D7D7D7;
-}
-form input.button.focus {
-  background-color: #8E8E8E;
-}
-form input.image_button {
-  border: 1px solid #212121;
-  cursor: pointer;
-}
-form div.huge {
-  font-size: 1.5em;
-}
-form div.huge label {
-  display: none;
-}
-form div.huge div {
-  margin: 0 0 10px 0;
-  position: relative;
-}
-form div.huge div input.text {
-  width: 85%;
-}
+
 .content table tr th {
-width: 120px;
-text-align: right;
-vertical-align: top;
-padding-right: 10px;
-padding-top: 3px;
+  width: 120px;
+  text-align: right;
+  vertical-align: top;
+  padding-right: 10px;
+  padding-top: 3px;
 }
 .content table tr td {
-padding: 0 0 14px 0;
+  padding: 0 0 14px 0;
 }
-
-/**
- * Forms
- **/
 
 #body table
 {
-    width: 100%;
+  width: 100%;
 }
 
 .content div.form-wrapper {
-margin-left: -5px;
-margin-right: -5px;
-margin-bottom: 10px;
+  margin-left: -5px;
+  margin-right: -5px;
+  margin-bottom: 10px;
 }
 .content div.open-form table {
 }
 
 div.form-wrapper.open-form {
-    border-top: 5px solid #AAA;
-    border-bottom: 5px solid #AAA;
-    padding: 10px 0px;
-    margin-bottom: 20px;
-    background-color: #F0F0F0;
+  border-top: 5px solid #AAA;
+  border-bottom: 5px solid #AAA;
+  padding: 10px 0px;
+  margin-bottom: 20px;
+  background-color: #F0F0F0;
 }
 
 /* Expand/contract behavior */
@@ -476,45 +344,45 @@ div.form-wrapper.open-form tr.form-field {
 }
 
 div.delete-form-wrapper {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 
 table textarea,
 table iframe
 {
-    width: 90% !important;
+  width: 90% !important;
 }
 table input[type="button"],
 table input[type="checkbox"],
 table input[type="submit"]
 {
-    width: auto !important;
+  width: auto !important;
 }
 
 body.action_add tr#slug_row,
 body.action_edit tr#slug_row,
 body.action_add form .value 
 {
-    display: none;
+  display: none;
 }
 
 .open-form tr#slug_row
 {
-    display: table-row !important;
+  display: table-row !important;
 }
 
 form label
 {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 form table tr td:first-child
 {
-    text-align: right;
-    padding-right: 4px;
+  text-align: right;
+  padding-right: 4px;
 }
 form .perm-preview {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 /**
@@ -531,8 +399,8 @@ div.progress div.indicator {
   background-color: #222;
 }
 div.progress .spinner {
-    position: relative;
-    right: -20px;
+  position: relative;
+  right: -20px;
 }
 
 /**
@@ -542,7 +410,52 @@ div.progress .spinner {
   margin: 0;
 }
 iframe {
-    border: 0;
+  border: 0;
+}
+img.cover {
+  float: right;
+  width: 80px;
+  height: 80px;
+  z-index: 30;
+}
+
+/**
+ * Episode
+ **/
+div.torrent_file {
+  margin-bottom: 1em;
+}
+
+div.torrent_file ul.links {
+  padding: 8px 8px 8px 70px !important;
+  background-color: #333;
+  display: block;
+  color: #FFF;
+  margin-bottom: 0 !important;
+  -moz-border-radius: 5px;
+  position: relative;
+  max-width: 450px;
+}
+
+div.torrent_file ul.links span {
+  margin-left: -70px;
+  text-align: right;
+  display: block;
+  float: left;
+  width: 60px;
+}
+
+div.torrent_file ul.links .divider {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 65px;
+  border-right: 1px solid #444
+}
+
+div.torrent_file ul.links a:hover {
+  color: #DDD;
 }
 
 /**
@@ -551,12 +464,12 @@ iframe {
 
 body.module_account.action_settings #header
 {
-    display: block;
+  display: block;
 }
 
 body.module_podcast.action_edit #content ul li form
 {
-    display: inline;
+  display: inline;
 }
 
 /* Symfony Debug */

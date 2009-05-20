@@ -25,7 +25,6 @@
 </div>
 
 <h3>Files</h3>
-<ul>
   <?php foreach($feeds as $feed): ?>
     <?php if(isset($files[$feed->getId()])):
         $torrent=$files[$feed->getId()];
@@ -44,7 +43,6 @@
             </li>
     <?php endif; ?>
   <?php endforeach; ?>
-</ul>
 
 <h3>Add new format</h3>
 <div class="form-wrapper">
