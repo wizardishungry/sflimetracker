@@ -24,7 +24,7 @@
   </form>
 </div>
 
-<h3>Files</h3>
+<h3>Formats</h3>
   <?php foreach($feeds as $feed): ?>
     <?php if(isset($files[$feed->getId()])):
         $torrent=$files[$feed->getId()];
@@ -38,32 +38,36 @@
             'feed_id'=>$feed->getId(),
             ),Array());
         ?>
-            <li>
-                <?php include_partial('torrent/add',Array('feed'=>$feed,'form'=>$form)); ?>
-            </li>
+            
+        <?php include_partial('torrent/add',Array('feed'=>$feed,'form'=>$form)); ?>
+            
     <?php endif; ?>
   <?php endforeach; ?>
 
-<h3>Add new format</h3>
-<div class="form-wrapper">
-  <form action="<?php echo url_for('podcast_feed/add') ?>" method="POST" enctype="multipart/form-data" class=".form_feed">
-  <table>
-    <?php
-        // todo move to action
-        $fform =new FeedForm();
-        $fform->setDefault('podcast_id',$episode->getPodcastId());
-    ?>
-    <?php include_partial('podcast_feed/feedform', Array('form'=>$fform)); ?>
-    <tr>
-    <td>&nbsp;</td>
-    <td>
-        <input type="submit" value="Add"/>
-    </td>
-    <td>
+<a href="#" id="add-format-open">Add new format</a>
 
-    </td>
-    </tr>
+<div id="add-format" style="display: none;">
+  <h3>Add new format</h3>
+  <div class="form-wrapper open">
+    <form action="<?php echo url_for('podcast_feed/add') ?>" method="POST" enctype="multipart/form-data" class=".form_feed">
+    <table>
+      <?php
+          // todo move to action
+          $fform =new FeedForm();
+          $fform->setDefault('podcast_id',$episode->getPodcastId());
+      ?>
+      <?php include_partial('podcast_feed/feedform', Array('form'=>$fform)); ?>
+      <tr>
+      <td>&nbsp;</td>
+      <td>
+          <input type="submit" value="Add"/>
+      </td>
+      <td>
+
+      </td>
+      </tr>
  
- </table>
-  </form>
+   </table>
+    </form>
+  </div>
 </div>

@@ -44,5 +44,11 @@ document.observe("dom:loaded", function() {
 	click.element().up().hide();
       });
     });
+
+    $('add-format-open').observe('click', function(click) {
+      Event.stop(click);
+      this.hide();
+      $('add-format').show();
+    });
   }
 });
