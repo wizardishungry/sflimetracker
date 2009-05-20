@@ -4,7 +4,7 @@
 html { height: 100%; }
 body {
   background-color: #FFF;
-  font: 62.5% Verdana, sans-serif;
+  font: 62.5% Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
   height: 100%;
@@ -25,7 +25,7 @@ h1, h2, h3, h4, h5 {
   padding: 0;
 }
 h3 { /* 14px HACK!! */
-padding-top: 2px;
+  padding-top: 2px;
 }
 #header ul, #header li {
   list-style: none;
@@ -76,8 +76,8 @@ h1, h2, h3, h4, h5 {
 }
 h1 { font-size: 2.6em; }
 h1.heading { font-size: 1.1em; } /* effectively h2 */
-h2 { font-size: 1.1em; font-weight: bold; }
-h3 { font-size: 1.1em; font-weight: bold; }
+h2,h3,h4,h5 { font-size: 1.1em; font-weight: bold; }
+
 div#document {
   font-size: 1.1em;
   min-height: 100%;
@@ -201,7 +201,7 @@ div#body_wrapper {
   width: 100%;
   height: auto;
 /*  min-height: 660px; */
-*width: 99.8%;
+  *width: 99.8%;
 }
 * html div#body_wrapper {
   height: 660px;
@@ -282,7 +282,7 @@ form div.field label {
 }
 form input,
 form textarea {
-  font: 1.0em Verdana, sans-serif;
+  font: 1.0em Helvetica, Arial, sans-serif;
 }
 form input[type=text] {
   width: 276px;
@@ -295,34 +295,34 @@ form input[type=submit] {
 }
 
 .content table tr th {
-  width: 120px;
-  text-align: right;
-  vertical-align: top;
-  padding-right: 10px;
+width: 120px;
+text-align: right;
+vertical-align: top;
+padding-right: 10px;
   padding-top: 3px;
 }
 .content table tr td {
-  padding: 0 0 14px 0;
+padding: 0 0 14px 0;
 }
 
 #body table
 {
-  width: 100%;
+    width: 100%;
 }
 
 .content div.form-wrapper {
   margin-left: -5px;
   margin-right: -5px;
-  margin-bottom: 10px;
+margin-bottom: 10px;
 }
 .content div.open-form table {
 }
 
 div.form-wrapper.open-form {
-  border-top: 5px solid #AAA;
-  border-bottom: 5px solid #AAA;
-  padding: 10px 0px;
-  margin-bottom: 20px;
+    border-top: 5px solid #AAA;
+    border-bottom: 5px solid #AAA;
+    padding: 10px 0px;
+    margin-bottom: 20px;
   background-color: #F0F0F0;
 }
 
@@ -344,7 +344,7 @@ div.form-wrapper.open-form tr.form-field {
 }
 
 div.delete-form-wrapper {
-  margin-bottom: 1em;
+    margin-bottom: 1em;
 }
 
 table textarea,
@@ -356,19 +356,12 @@ table input[type="button"],
 table input[type="checkbox"],
 table input[type="submit"]
 {
-  width: auto !important;
+    width: auto !important;
 }
 
-body.action_add tr#slug_row,
-body.action_edit tr#slug_row,
 body.action_add form .value 
 {
-  display: none;
-}
-
-.open-form tr#slug_row
-{
-  display: table-row !important;
+    display: none;
 }
 
 form label
@@ -378,8 +371,8 @@ form label
 
 form table tr td:first-child
 {
-  text-align: right;
-  padding-right: 4px;
+    text-align: right;
+    padding-right: 4px;
 }
 form .perm-preview {
   font-weight: bold;
@@ -399,8 +392,8 @@ div.progress div.indicator {
   background-color: #222;
 }
 div.progress .spinner {
-  position: relative;
-  right: -20px;
+    position: relative;
+    right: -20px;
 }
 
 /**
@@ -410,7 +403,7 @@ div.progress .spinner {
   margin: 0;
 }
 iframe {
-  border: 0;
+    border: 0;
 }
 img.cover {
   float: right;
@@ -431,10 +424,10 @@ div.torrent_file ul.links {
   background-color: #333;
   display: block;
   color: #FFF;
-  margin-bottom: 0 !important;
+  margin-bottom: 2px !important;
   -moz-border-radius: 5px;
   position: relative;
-  max-width: 450px;
+  max-width: 400px;
 }
 
 div.torrent_file ul.links span {
@@ -464,12 +457,12 @@ div.torrent_file ul.links a:hover {
 
 body.module_account.action_settings #header
 {
-  display: block;
+    display: block;
 }
 
 body.module_podcast.action_edit #content ul li form
 {
-  display: inline;
+    display: inline;
 }
 
 /* Symfony Debug */
