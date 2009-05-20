@@ -44,7 +44,7 @@
             <li class="signup">
               <?php
 	        if($sf_user->isAuthenticated()) {
-                  echo link_to_with_icon('Sign Out', 'user', 'account/logout');
+                  echo link_to_with_icon('Sign out', 'user', 'account/logout');
 		  $logout_form = new LogoutForm();
 		  ?>
 		  <form style="display:none;" id="logout_form" action="<?php echo url_for('account/logout') ?>" method="POST">
