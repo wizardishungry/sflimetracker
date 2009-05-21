@@ -2,15 +2,18 @@
 
 <h3>BitTorrent Tracker</h3>
 
-<ul>
-    <li>Announce URL <tt><?php echo url_for('client/announce',true); ?></tt></li>
-    <li>Scrape URL <tt><?php echo url_for('client/scrape',true); ?></tt></li>
-</ul>
+<div class="settings_section">
+    Announce URL 
+    <code><?php echo url_for('client/announce',true); ?></code>
 
-<form action='<?php echo url_for('account/tracker') ?>' method="POST" enctype="multipart/form-data">
+    Scrape URL 
+    <code><?php echo url_for('client/scrape',true); ?></code>
+
+  <form action='<?php echo url_for('account/tracker') ?>' method="POST" enctype="multipart/form-data">
     <?php echo new TrackerForm(); ?>
     <input type='submit' value='Save'>
-</form>
+  </form>
+</div>
 
 <h3>Database</h3>
 
@@ -20,39 +23,33 @@
 
     $dsn=$db_params['dsn'];
 ?>
+<div class="settings_section">
+  <code><?php echo $dsn; ?></code>
 
-<p>
-    <blockquote>
-        <code><?php echo $dsn; ?></code>
-    </blockquote>
-</p>
-
-
-<ul>
-    <li>
     <form  action='<?php echo url_for('account/dump') ?>' method="POST">
         <?php echo new sfForm(); ?>
         <input type='submit' value='Export Data'>
     </form>
-    </li>
-    <li>
+
     <form action='<?php echo url_for('account/restore') ?>' method="POST" enctype="multipart/form-data">
         <?php echo new RestoreForm(); ?>
         <input type='submit' value='Import Data'>
     </form>
-    </li>
-</ul>
+</div>
 
 <h3>Setup</h3>
 
-<ul>
+<div class="settings_section">
+  <ul>
     <li><?php echo link_to('Change password','account/password') ?></li>
     <li><?php echo link_to('Delete everything and start over','account/blam') ?></li>
-</ul>
+  </ul>
+</div>
 
 <h3>Diagnostics</h3>
 <?php $url_prefix = 'http://'. $sf_request->getHost().$sf_request->getRelativeUrlRoot().'/'; ?>
-<ul>
+<div class="settings_section">
+  <ul>
     <li>
         Database
         <?php 
@@ -74,4 +71,5 @@
             echo link_to($url,$url);
         ?>
     </li>
-</ul>
+  </ul>
+</div>

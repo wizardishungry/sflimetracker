@@ -394,6 +394,7 @@ div.progress div.indicator {
   width: 0; 
   height: 1em; 
   background-color: #222;
+  float: left;
 }
 div.percentage {
   margin: 0 45px 0 20px;
@@ -442,11 +443,14 @@ img.cover {
 /**
  * Episode
  **/
-div.torrent_file {
+div.torrent_file,
+div.podcast_feed {
   margin-bottom: 1em;
 }
 
-div.torrent_file ul.links {
+div.torrent_file ul.links,
+div.podcast_feed ul.links,
+code {
   padding: 8px 8px 8px 70px !important;
   background-color: #333;
   display: block;
@@ -458,7 +462,8 @@ div.torrent_file ul.links {
   max-width: 400px;
 }
 
-div.torrent_file ul.links span {
+div.torrent_file ul.links span,
+div.podcast_feed ul.links span {
   margin-left: -70px;
   text-align: right;
   display: block;
@@ -466,7 +471,8 @@ div.torrent_file ul.links span {
   width: 60px;
 }
 
-div.torrent_file ul.links .divider {
+div.torrent_file ul.links .divider,
+div.podcast_feed ul.links .divider {
   position: absolute;
   top: 8px;
   bottom: 8px;
@@ -475,7 +481,8 @@ div.torrent_file ul.links .divider {
   border-right: 1px solid #444
 }
 
-div.torrent_file ul.links a:hover {
+div.torrent_file ul.links a:hover,
+div.podcast_feed ul.links a:hover {
   color: #DDD;
 }
 
@@ -491,6 +498,10 @@ body.module_account.action_settings #header
 body.module_podcast.action_edit #content ul li form
 {
     display: inline;
+}
+
+div.settings_section {
+  margin-bottom: 1em;
 }
 
 /* Symfony Debug */
