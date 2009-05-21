@@ -41,12 +41,14 @@
   </ul>
 </div>
     
+<div class="podcast_feeds">
 <?php foreach($feeds as $feed): ?>
   <div class='podcast_feed'>
     <?php 
        echo $feed->getTitle(), ' ',
        link_to('Edit','podcast_feed/edit?id='.$feed->getID())
     ?>
+    <?php echo count($feeds)>1?delete_form_for_object($feed,'podcast_feed/delete'):''; ?>
     <ul class="links">
       <div class="divider">&nbsp;</div>
       <?php foreach($feed->getUris() as $type => $uri): ?>
@@ -59,9 +61,9 @@
         </li>
       <?php endforeach; ?>
     </ul>
-    <?php echo count($feeds)>1?delete_form_for_object($feed,'podcast_feed/delete'):''; ?>
   </div>
 <?php endforeach; ?>
+</div>
 
 <h2>Episodes</h2>
 <ul>

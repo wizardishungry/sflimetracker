@@ -443,9 +443,17 @@ img.cover {
 /**
  * Episode
  **/
+div.podcast_feeds {
+  margin-bottom: 2em;
+}
+
 div.torrent_file,
 div.podcast_feed {
   margin-bottom: 1em;
+}
+
+div.podcast_feed .delete-form {
+  display: inline;
 }
 
 div.torrent_file ul.links,
