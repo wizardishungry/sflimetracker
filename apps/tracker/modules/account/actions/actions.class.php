@@ -39,7 +39,7 @@ class accountActions extends sfActions
         if($form->isValid())
         {
             $this->getUser()->setPassword($form->getValue('password'));
-            return $this->performLogin($request,false);
+            return $this->performLogin($request);
         }
         else
         {
@@ -214,7 +214,7 @@ class accountActions extends sfActions
     $this->redirect('@settings');
   }
 
-    public function performLogin($request,$allow_ref_redir=true)
+    public function performLogin($request)
     {
         $form=$this->form;
         $user=$this->getUser();
@@ -225,13 +225,6 @@ class accountActions extends sfActions
             $user->remember();
         }
 
-        if($request->getReferer() && $allow_ref_redir)
-        {
-            $this->redirect($request->getReferer());
-        }
-        else
-        {
-            $this->redirect('@homepage');
-        }
+        $this->redirect('@homepage');
     }
 }
