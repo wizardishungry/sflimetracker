@@ -1,4 +1,4 @@
-<h2><?php echo link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId()) ?></h2>
+<?php echo link_to($podcast->getTitle(),'podcast/edit?id='.$podcast->getId()) ?>
 <?php page_title($episode->getTitle()); ?>
 
 <div class="delete-form-wrapper">
@@ -39,7 +39,7 @@
             ),Array());
         ?>
             
-        <?php include_partial('torrent/add',Array('feed'=>$feed,'form'=>$form)); ?>
+                <?php include_partial('torrent/add',Array('feed'=>$feed,'form'=>$form)); ?>
             
     <?php endif; ?>
   <?php endforeach; ?>
@@ -47,27 +47,27 @@
 <a href="#" id="add-format-open">Add new format</a>
 
 <div id="add-format" style="display: none;">
-  <h3>Add new format</h3>
+<h3>Add new format</h3>
   <div class="form-wrapper open">
-    <form action="<?php echo url_for('podcast_feed/add') ?>" method="POST" enctype="multipart/form-data" class=".form_feed">
-    <table>
-      <?php
-          // todo move to action
-          $fform =new FeedForm();
-          $fform->setDefault('podcast_id',$episode->getPodcastId());
-      ?>
-      <?php include_partial('podcast_feed/feedform', Array('form'=>$fform)); ?>
-      <tr>
-      <td>&nbsp;</td>
-      <td>
-          <input type="submit" value="Add"/>
-      </td>
-      <td>
+  <form action="<?php echo url_for('podcast_feed/add') ?>" method="POST" enctype="multipart/form-data" class=".form_feed">
+  <table>
+    <?php
+        // todo move to action
+        $fform =new FeedForm();
+        $fform->setDefault('podcast_id',$episode->getPodcastId());
+    ?>
+    <?php include_partial('podcast_feed/feedform', Array('form'=>$fform)); ?>
+    <tr>
+    <td>&nbsp;</td>
+    <td>
+        <input type="submit" value="Save"/>
+    </td>
+    <td>
 
-      </td>
-      </tr>
+    </td>
+    </tr>
  
-   </table>
-    </form>
-  </div>
+ </table>
+  </form>
+</div>
 </div>

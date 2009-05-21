@@ -34,8 +34,6 @@
         </li>
       <?php endforeach; ?>
     </ul>
-  <?php else: ?>
-    <p><i>No episodes yet.</i></p>
   <?php endif; ?>
 <?php slot('feed');
 foreach($feeds as $feed)  foreach($feed->getUris() as $format => $uri) 

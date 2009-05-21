@@ -35,7 +35,7 @@
 		<div class="form-field">
 			<?php echo $form['image_url']->renderError() ?>
 			<?php echo $form['image_url'] ?>
-			<p>Podcast cover art.  Recommended size is at least 300x300.</p>
+			<p>Podcast cover art, URL to a image 300 pixels square or bigger</p>
 		</div>
 		<div class="value">
 			<?php echo $form['image_url']->getValue() ?>
@@ -91,7 +91,7 @@
 	<td>
 		<div class="form-field">
 			<?php echo $form['link'] ?>
-			<p>This contains an optional url that your podcast will link back to.</p>
+			<p>Your website for this podcast, like: http://www.example.com/theshow</p>
 			<?php echo $form['link']->renderError() ?>
 		</div>
 		<div class="value">

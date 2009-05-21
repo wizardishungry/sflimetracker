@@ -72,8 +72,6 @@
             ' - '.$episode->getTitle(),'episode', 'episode/edit?id='.$episode->getId()) ?>
         </li>
       <?php endforeach; ?>
-  <?php else: ?>
-    <p><i>No episodes yet.</i></p>
   <?php endif; ?>
   <?php
     if(true) // TODO add !Podcast->isFeedBased() here
