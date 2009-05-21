@@ -386,18 +386,21 @@ form .perm-preview {
  * Side-load
  **/
 div.progress {
-  width: 100%; 
   background:#DDD; 
   height: 1em; 
+  margin: 0 20px;
 }
 div.progress div.indicator {
   width: 0; 
   height: 1em; 
   background-color: #222;
 }
+div.percentage {
+  margin: 0 45px 0 20px;
+  line-height: 18px;
+}
 div.progress .spinner {
-    position: relative;
-    right: -20px;
+  vertical-align:center;
 }
 
 /**

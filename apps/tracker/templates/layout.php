@@ -58,7 +58,7 @@
 		  </form>
 		  <script type="text/javascript">
 		    $$('.signup a').first().observe('click', function(event) {
-   		      event.stop();
+   		      Event.stop(event);
 		      $('logout_form').submit();
 		    });
 		  </script>

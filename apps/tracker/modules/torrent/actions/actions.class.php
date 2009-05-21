@@ -136,7 +136,7 @@ class torrentActions extends sfActions
             $percent=0;
         $percent=round($percent,2); // 2 significant digits -- ie "31.33%"
 
-        $data = "{percent: '".$percent."', finished: '".$info['size_download']."', total: '".$info['download_content_length']."'}";
+        $data = "{'percent': '".$percent."', 'finished': '".$info['size_download']."', 'total': '".$info['download_content_length']."'}";
 
         $fp = fopen($path, "w");
         fwrite($fp, $data);

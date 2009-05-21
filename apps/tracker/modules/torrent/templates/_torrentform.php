@@ -1,4 +1,4 @@
-<tr>
+<tr class="progress-container" style="display: none;">
     <td colspan="2">
         <?php echo $form['episode_id'] ?>
         <?php echo $form['feed_id'] ?>
@@ -12,10 +12,10 @@
     </td>
 </tr>
 <tr>
-	<th><?php echo $form['web_url']->renderLabel() ?>:</th>
+	<th><?php echo $form['web_url']->renderLabel() ?></th>
 	<td>
 	<?php echo $form['web_url']->renderError() ?>
-	<?php echo $form['web_url'] ?>
+        <?php echo $form['web_url']->render(array('value' => '')) ?>
 	</td>
 </tr>
   <?php if ($form->hasGlobalErrors()): ?>

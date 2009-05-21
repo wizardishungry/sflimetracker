@@ -10,7 +10,7 @@ default:
 
   stylesheets:    [main]
 
-  javascripts:    [prototype,forms,generateSlug]
+  javascripts:    [prototype,forms,generateSlug,sideload]
 
   has_layout:     on
   layout:         layout
