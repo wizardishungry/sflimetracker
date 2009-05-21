@@ -38,8 +38,16 @@
             'feed_id'=>$feed->getId(),
             ),Array());
         ?>
-            
-                <?php include_partial('torrent/add',Array('feed'=>$feed,'form'=>$form)); ?>
+        <div class="torrent_file">
+          <?php if(isset($feed)): ?>
+            <?php echo $feed ?>
+          <?php endif; ?>
+
+          <a href="#" class="add-file-open">Choose file</a>
+          <div class="add-file" style="display: none;">
+            <?php include_partial('torrent/add',Array('feed'=>$feed,'form'=>$form)); ?>
+          </div>
+        </div>
             
     <?php endif; ?>
   <?php endforeach; ?>

@@ -50,5 +50,12 @@ document.observe("dom:loaded", function() {
       this.hide();
       $('add-format').show();
     });
+    $$('.add-file-open').each(function(link) {
+      link.observe('click', function(click) {
+	Event.stop(click);
+	this.hide();
+	$(this.up().getElementsByClassName('add-file')[0]).show();
+      });
+    });
   }
 });

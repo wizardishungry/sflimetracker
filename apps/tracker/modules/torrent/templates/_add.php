@@ -1,7 +1,3 @@
-<?php if(isset($feed)): ?>
-  <?php echo $feed ?>
-<?php endif; ?>
-
 <div class="form-wrapper open-form">
 
   <form id="torrent_<?php echo $form->getDefault('feed_id'); ?>" action="<?php echo url_for('torrent/add') ?>" method="POST" enctype="multipart/form-data">
