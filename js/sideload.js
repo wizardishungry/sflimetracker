@@ -18,7 +18,7 @@ function sideload(submit) {
 	var data = transport.responseText.evalJSON();
 	indicator.style.width = ""+parseInt(data.percent)+"%";
 	percentage.update(""+parseInt(data.percent)+"%, "+parseInt(data.finished/1024)+"KB / "+parseInt(data.total/1024)+"KB");
-	if(parseInt(data.percent) == 100) { window.location.reload(); }
+	if(parseInt(data.percent) >= 100) { window.location.reload(); }
       }
     });
   }, 0.3);
