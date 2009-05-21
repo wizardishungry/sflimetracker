@@ -5,7 +5,7 @@
       <?php if($podcast->getImageUrl()) { ?>
         <?php echo link_to(image_tag($podcast->getImageUrl(), array('class' => 'cover')), 'podcast/edit?id='.$podcast->getId()); ?>
       <?php } else { ?>
-        <img src="#" class="cover" />
+        <img class="cover" />
       <?php } ?>
       <h3>
           <?php echo link_to($podcast->getTitle(), 'podcast/edit?id='.$podcast->getId()); ?>
