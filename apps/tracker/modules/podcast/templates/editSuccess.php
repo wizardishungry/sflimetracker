@@ -33,29 +33,35 @@
 </div>
 
 <h2>Feeds</h2>
-<ul>
-  <li><?php echo link_to_with_icon($podcast->getTitle(),'web',$podcast->getUri()); ?></li>
-  <?php foreach($feeds as $feed): ?>
-    <li>
-      <?php 
-        echo $feed->getTitle(), ' ',
-        link_to('Edit','podcast_feed/edit?id='.$feed->getID()),
-        count($feeds)>1?delete_form_for_object($feed,'podcast_feed/delete'):'';
-        ?>
-        <ul>
-        <?php
-        foreach($feed->getUris() as $uri): ?>
-            <li>
-            <?php 
-                $url = url_for($uri,true);
-                echo link_to_with_icon($url, 'rss', $url);
-            ?>
-            </li>
-        <?php endforeach; ?>
-        </ul>
-    </li>
-  <?php endforeach; ?>
-</ul>
+<div class="podcast_feed">
+  <ul class="links">
+    <div class="divider">&nbsp;</div>
+    <span>combined</span>
+    <li><?php echo link_to_with_icon($podcast->getTitle(),'web',$podcast->getUri()); ?></li>
+  </ul>
+</div>
+    
+<?php foreach($feeds as $feed): ?>
+  <div class='podcast_feed'>
+    <?php 
+       echo $feed->getTitle(), ' ',
+       link_to('Edit','podcast_feed/edit?id='.$feed->getID())
+    ?>
+    <ul class="links">
+      <div class="divider">&nbsp;</div>
+      <?php foreach($feed->getUris() as $type => $uri): ?>
+        <li>
+	  <span><?php echo $type ?></span>
+          <?php 
+            $url = url_for($uri,true);
+            echo link_to_with_icon($url, 'rss', $url);
+          ?>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+    <?php echo count($feeds)>1?delete_form_for_object($feed,'podcast_feed/delete'):''; ?>
+  </div>
+<?php endforeach; ?>
 
 <h2>Episodes</h2>
 <ul>
