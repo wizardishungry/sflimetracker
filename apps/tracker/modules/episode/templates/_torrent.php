@@ -13,7 +13,7 @@
          <span>Torrent </span>
          <?php echo link_to($torrent->getUrl(true),$torrent->getUrl(true)) ?>
       </li>
-      <li>
+      <li class="clearfix">
          <span>Magnet </span>
          <?php echo '<a href="',$torrent->getMagnet(),'">',$torrent->getFileSha1(),'</a>'; ?> 
       </li>
