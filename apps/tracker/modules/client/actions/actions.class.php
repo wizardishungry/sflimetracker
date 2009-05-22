@@ -48,7 +48,7 @@ class clientActions extends sfActions
     $this->encoder= new File_Bittorrent2_Encode();
     try{
 
-      if(!SettingPeer::retrieveByKey'tracker_active']))
+      if(!SettingPeer::retrieveByKey('tracker_active'))
         throw new limeException('turn-on-tracker','Tracker not active');
 
       $response=$this->response_ok;
@@ -58,7 +58,7 @@ class clientActions extends sfActions
 
       if(!$this->form->isValid())
       {
-        return $this->doError(implode (';\n', $form->getValidatorSchema()->getMessages()) );
+        return $this->doError(implode (';\n', $this->form->getValidatorSchema()->getMessages()) );
       }
 
       $params=$request->getGetParameters();
