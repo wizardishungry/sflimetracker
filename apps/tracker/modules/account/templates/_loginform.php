@@ -1,15 +1,15 @@
   <form action="<?php echo url_for('account/login') ?>" method="POST">
+    <?php echo $form['_csrf_token']; ?>
   <div id="password_field">
-    <?php echo $form['password']->renderLabel() ?>:
-            <?php echo $form['_csrf_token']; ?>
-            <?php echo $form['password'] ?>
     <?php echo $form['password']->renderError() ?>
+    <?php echo $form['password']->renderLabel() ?>:
+    <?php echo $form['password'] ?>
   </div>
 
   <div id="remember_field">
-            <?php echo $form['remember_me'] ?>
-    <?php echo $form['remember_me']->renderLabel(null, array('id' => 'remember_label')) ?>
     <?php echo $form['remember_me']->renderError() ?>
+    <?php echo $form['remember_me'] ?>
+    <?php echo $form['remember_me']->renderLabel(null, array('id' => 'remember_label')) ?>
   </div>
 
   <div class="links">
