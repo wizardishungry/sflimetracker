@@ -20,7 +20,6 @@ class feedActions extends sfActions
       $podcast=CommonBehavior::retrieveBySlug('PodcastPeer',$request->getParameter('podcast_slug'));
 
       $c = new Criteria();
-      $c->add(EpisodePeer::PODCAST_ID,$podcast->getId());
       if(!$podcast)
         $this->forward404();
 
@@ -47,7 +46,6 @@ class feedActions extends sfActions
             //"title"  => (string)$feedXml->channel[0]->image->title
         )),
     ));
-
     $pager=$this->getPager($podcast_feed->getId());
     $pager->init();
 
