@@ -511,10 +511,3 @@ body.module_podcast.action_edit #content ul li form
 div.settings_section {
   margin-bottom: 1em;
 }
-
-/* Symfony Debug */
-body div#sfWebDebug div#sfWebDebugBar {
-  position: absolute;
-  top: 34px;
-  right: 0;
-}
