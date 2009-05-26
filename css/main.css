@@ -511,3 +511,7 @@ body.module_podcast.action_edit #content ul li form
 div.settings_section {
   margin-bottom: 1em;
 }
+
+#notice {
+    float: right;
+}
