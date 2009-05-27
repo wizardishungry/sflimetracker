@@ -17,7 +17,7 @@
             <?php echo $form['intent']->renderError() ?>
        <?php echo $form['intent'] ?>
             <label for="intent">
-                I will not use <?php echo sfConfig::get('app_version_name') ?> for copyright infringement.
+                I will not use <?php echo sfConfig::get('app_version_name') ?> for copyright infringement
             </label>
      </div>
 
