@@ -89,7 +89,6 @@ class accountActions extends sfActions
             $user->remember(true); // also known as "forget"
             $user->setAuthenticated(false);
             $this->redirect('@root');
-            // todo add flash
         }
     }
   }
@@ -104,7 +103,7 @@ class accountActions extends sfActions
       {
         $user->setPassword($form->getValue('password'));
         $user->setAuthenticated(false);
-        $user->setFlash('notice','Password changed');
+        //$user->setFlash('notice','Password changed');
         return $this->redirect('@homepage');
       }
     }
