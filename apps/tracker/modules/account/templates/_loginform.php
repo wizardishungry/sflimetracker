@@ -2,7 +2,7 @@
     <?php echo $form['_csrf_token']; ?>
   <div id="password_field">
     <?php echo $form['password']->renderError() ?>
-    <?php echo $form['password']->renderLabel() ?>:
+    <?php echo $form['password']->renderLabel() ?>
     <?php echo $form['password'] ?>
   </div>
 
