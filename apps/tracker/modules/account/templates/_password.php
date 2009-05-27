@@ -24,7 +24,7 @@
     </tr>
     <tr>
       <td>&nbsp;</td>
-      <td><input type="submit" value="Change password" />
+      <td><input type="submit" value="Save" />
       <?php
         echo button_to('Cancel',"account/login")
       ?></td>
