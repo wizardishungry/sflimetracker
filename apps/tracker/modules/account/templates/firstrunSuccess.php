@@ -1,16 +1,15 @@
-<?php page_title('Set Password and Login','h2') ?>
 <div class="form-wrapper login">
   <form action="<?php echo url_for('@first_run') ?>" method="POST">
             <?php echo $form['_csrf_token']; ?>
 
     <div id="password_field">
             <?php echo $form['password']->renderError() ?>
-      <?php echo $form['password']->renderLabel() ?>
+            Choose Password
             <?php echo $form['password'] ?>
      </div>
 
      <div id="password_confirm_field">
-       <?php echo $form['password_again']->renderLabel() ?>
+            Confirm Password
             <?php echo $form['password_again'] ?>
      </div>
 
