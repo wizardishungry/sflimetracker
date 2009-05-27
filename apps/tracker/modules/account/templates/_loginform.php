@@ -15,7 +15,7 @@
   <div class="links">
     <?php echo link_to('Change',"account/password"); ?>
     &middot;
-    <?php echo link_to('I forget',"http://limecast.com/tracker/reset-password"); ?>
+    <?php echo link_to('I forgot',"http://limecast.com/tracker/reset-password"); ?>
 </div>
 
   <input type="submit" class="submit" value="Sign in" />
