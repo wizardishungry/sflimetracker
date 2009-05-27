@@ -80,7 +80,7 @@ class episodeActions extends sfActions
 
     $this->episode=$episode=EpisodePeer::retrieveByPK($id);
     $this->forward404Unless($episode); 
-    $this->getUser()->setFlash('notice','Deleted episode'.$episode->getTitle());
+    //$this->getUser()->setFlash('notice','Deleted episode'.$episode->getTitle());
     $episode->delete();
     $this->redirect('podcast/edit?id='.$episode->getPodcastId());
   }

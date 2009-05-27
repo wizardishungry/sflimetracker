@@ -40,7 +40,7 @@ class podcast_feedActions extends sfActions
 
     $podcast_feed=FeedPeer::retrieveByPK($id);
     $this->forward404Unless($podcast_feed); 
-    $this->getUser()->setFlash('notice','Deleted feed '.$podcast_feed->getTitle());
+    //$this->getUser()->setFlash('notice','Deleted feed '.$podcast_feed->getTitle());
     $podcast_feed->delete();
     $this->redirect('podcast/edit?id='.$podcast_feed->getPodcastId());
   } 

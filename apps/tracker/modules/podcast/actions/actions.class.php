@@ -71,7 +71,7 @@ class podcastActions extends sfActions
 
     $podcast=PodcastPeer::retrieveByPK($id);
     $this->forward404Unless($podcast); 
-    $this->getUser()->setFlash('notice','Deleted podcast '.$podcast->getTitle());
+    //$this->getUser()->setFlash('notice','Deleted podcast '.$podcast->getTitle());
     
     $podcast->delete();
     $this->redirect('@homepage');
