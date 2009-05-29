@@ -2,6 +2,9 @@
 
 <div class="form-wrapper open-form">
   <form action="<?php echo url_for('podcast_feed/edit') ?>" method="POST" enctype="multipart/form-data">
+  <?php echo $form['id'] ?>
+  <?php echo $form['podcast_id'] ?>
+  <?php echo $form['_csrf_token'] ?>
   <table>
 <tr>
 	<th><?php echo $form['title']->renderLabel() ?></th>
@@ -43,6 +46,17 @@
 
     </td>
     </tr>
+  <?php if ($form->hasGlobalErrors()): ?>
+    <tr>
+      <td colspan="">
+        <ul class="error_list">
+          <?php foreach ($form->getGlobalErrors() as $name => $error): ?>
+            <li><?php echo $name.': '.$error ?></li>
+          <?php endforeach; ?>
+        </ul>
+      </td>
+    </tr>
+  <?php endif; ?>
   </table>
   </form>
 </div>

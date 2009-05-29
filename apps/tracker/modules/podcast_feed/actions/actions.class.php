@@ -24,8 +24,8 @@ class podcast_feedActions extends sfActions
         if($this->form->isValid())
         {
             $podcast_feed=$this->form->save();
-            //$this->redirect('podcast/edit?id='.$podcast_feed->getPodcastId());
-            $this->redirect($this->getRequest()->getReferer());
+            $this->redirect('podcast/edit?id='.$podcast_feed->getPodcastId());
+            //$this->redirect($this->getRequest()->getReferer());
         }
         else
             return sfView::ERROR;
