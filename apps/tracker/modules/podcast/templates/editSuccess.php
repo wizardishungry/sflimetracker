@@ -46,7 +46,7 @@
   <div class='podcast_feed'>
     <?php 
        echo $feed->getTitle(), ' ',
-       link_to('Edit','podcast_feed/edit?id='.$feed->getID())
+       (count($feeds)>1?link_to('Edit','podcast_feed/edit?id='.$feed->getID()):'')
     ?>
     <?php echo count($feeds)>1?delete_form_for_object($feed,'podcast_feed/delete'):''; ?>
     <ul class="links">
