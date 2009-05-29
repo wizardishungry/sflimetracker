@@ -17,7 +17,8 @@ function sideload(submit) {
       onSuccess: function(transport) {
 	var data = transport.responseText.evalJSON();
 	indicator.style.width = ""+parseInt(data.percent)+"%";
-	percentage.update(""+parseInt(data.percent)+"%, "+parseInt(data.finished/1024)+"KB / "+parseInt(data.total/1024)+"KB");
+	percentage.update(""+parseInt(data.percent)+"%, "+parseInt(data.finished/1024).toLocaleString()+"KB / "+
+        parseInt(data.total/1024).toLocaleString()+"KB");
 	if(parseInt(data.percent) >= 100) { window.location.reload(); }
       }
     });

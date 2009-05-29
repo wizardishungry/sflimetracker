@@ -138,8 +138,8 @@ class torrentActions extends sfActions
 
         $data = json_encode(Array(
             'percent'=>$percent,
-            'finished'=>$info['size_download'],
-            'total'=>$info['download_content_length'],
+            'finished'=>intval($info['size_download']),
+            'total'=>intval($info['download_content_length']),
         ));
 
         $fp = fopen($path, "w");
