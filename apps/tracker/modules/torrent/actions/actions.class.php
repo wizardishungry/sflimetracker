@@ -132,7 +132,7 @@ class torrentActions extends sfActions
 
         if($info['download_content_length'])
             $percent=$info['size_download']/$info['download_content_length'] *100.0;
-            else
+        else
             $percent=0;
         $percent=round($percent,2); // 2 significant digits -- ie "31.33%"
 
