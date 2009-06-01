@@ -1,0 +1,13 @@
+Index: lib/controller/sfWebController.class.php
+===================================================================
+--- lib/controller/sfWebController.class.php	(revision 18820)
++++ lib/controller/sfWebController.class.php	(working copy)
+@@ -31,7 +31,7 @@
+   public function genUrl($parameters = array(), $absolute = false)
+   {
+     // absolute URL or symfony URL?
+-    if (is_string($parameters) && preg_match('#^[a-z][a-z0-9\+.\-]*\://#i', $parameters))
++    if (is_string($parameters) && preg_match('#^[a-z][a-z0-9\+.\-]*\:(//)?#i', $parameters))
+     {
+       return $parameters;
+     }
