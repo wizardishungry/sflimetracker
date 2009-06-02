@@ -76,6 +76,14 @@ class accountActions extends sfActions
       }
     }
   }
+
+  public function executeSecure($request)
+  {
+    
+    $user = $this->getUser();
+    $form = $this->form = new LoginForm($user);
+    $this->setTemplate('login');
+  }
  
   public function executeLogout($request)
   {

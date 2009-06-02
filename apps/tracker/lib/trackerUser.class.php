@@ -55,7 +55,9 @@ class trackerUser extends sfBasicSecurityUser
 
     if(!$this->isAuthenticated())
     {
-      if($request->getPostParameter('password')=='' && $request->getCookie($this->cookie_name))
+      if($request->getPostParameter('password')=='' && $request->getCookie($this->cookie_name)!=''
+            && $request->getMethod () != sfRequest::POST
+        )
       {
         $params=Array();
         $params['password']=$request->getCookie($this->cookie_name);
