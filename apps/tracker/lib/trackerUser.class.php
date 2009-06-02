@@ -72,11 +72,6 @@ class trackerUser extends sfBasicSecurityUser
   {
     $response=sfContext::getInstance()->getResponse();
     $request=sfContext::getInstance()->getRequest();
-    if($request->getCookie($this->cookie_name) && !$cookie_eraser)
-    {
-      return;
-    }
-
     $path='/'; // should be symfony root fixme
 
     if($cookie_eraser)

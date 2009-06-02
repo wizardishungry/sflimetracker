@@ -219,10 +219,7 @@ class accountActions extends sfActions
         $user=$this->getUser();
         $user->setAuthenticated(true);
 
-        if($form->getValue('remember_me'))
-        {
-            $user->remember();
-        }
+        $user->remember(!$form->getValue('remember_me')); // this means "forget"
 
         $this->redirect('@homepage');
     }
