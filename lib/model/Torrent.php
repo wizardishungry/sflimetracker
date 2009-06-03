@@ -107,10 +107,10 @@ class Torrent extends BaseTorrent
 
     public function getMagnet()
     {
-      // TODO: add web sources to magnets
         return 'magnet:?xt=urn:sha1:'.$this->getFileSha1().
-        '&dn='.urlencode($this->getFile());
-        // fixme this should return webloc not local path REGRESSION
+        '&dn='.urlencode($this->getFile()).
+        '&as='.urlencode($this->getWebUrl()).
+        '&xl='.$this->getSize();
     }
 
 
