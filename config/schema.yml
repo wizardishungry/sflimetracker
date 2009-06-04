@@ -134,7 +134,6 @@ propel:
     title:            longvarchar
     description:      longvarchar
     author:           longvarchar
-    name:             longvarchar
     email:            longvarchar
     link:             longvarchar
     itunes_id:        longvarchar

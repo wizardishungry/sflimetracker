@@ -58,20 +58,7 @@
 		</div>
 	</td>
 </tr>
-<tr id="name_row">
-	<th><?php echo $form['name']->renderLabel() ?></th>
-	<td>
-		<div class="form-field">
-			<?php echo $form['name'] ?>
-			<p>Your real name, put in RSS feeds but not shown in iTunes</p>
-			<?php echo $form['name']->renderError() ?>
-		</div>
-		<div class="value">
-			<?php echo $form['name']->getValue() ?>
-			<a href="#" class="edit-button">edit</a>
-		</div>
-	</td>
-</tr>
+
 <tr id="email_row">
 	<th><?php echo $form['email']->renderLabel() ?></th>
 	<td>
