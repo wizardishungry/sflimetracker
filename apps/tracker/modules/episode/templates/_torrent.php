@@ -19,5 +19,5 @@
       </li>
     </ul>
     
-    <?php if(@$delete): ?><?php echo delete_form_for_object($torrent); ?><?php endif; ?>
+    <?php if(@$delete): ?><?php echo delete_form_for_object($torrent,null,'file'); ?><?php endif; ?>
 </div>
