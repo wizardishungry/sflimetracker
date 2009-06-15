@@ -160,6 +160,8 @@ class trackerUser extends sfBasicSecurityUser
   }
   public function testSideload()
   {
+    if(!function_exists('curl_init'))
+        throw new limeException('curl','CURL support is not compiled/loaded in PHP.');
 
     $request = sfContext::getInstance()->getRequest();
     $url = 'http://'. $request->getHost().$request->getRelativeUrlRoot().'/'.'robots.txt'; // fixme
