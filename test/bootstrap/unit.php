@@ -27,7 +27,7 @@ $autoload->addDirectory($sf_root_dir.'/lib');
 $autoload->register();
 
 // Commenting this out because it seems to be breaking stuff right now
-$app_config=$configuration->getApplicationConfiguration('tracker','dev',true/*,$sf_root_dir*/);
+$app_config=$configuration->getApplicationConfiguration('tracker','test',true/*,$sf_root_dir*/);
 
 $databaseManager = new sfDatabaseManager($app_config);
 //$databaseManager->loadConfiguration();
