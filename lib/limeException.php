@@ -15,7 +15,7 @@ class limeException extends sfException
         return $exception;
     }
     
-    function __construct(string $token,string $message)
+    function __construct($token,$message)
     {
         $this->token=@$token;
         parent::__construct($message. (@$token?" - [$token]\n":''));
