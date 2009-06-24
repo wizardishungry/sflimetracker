@@ -30,7 +30,7 @@ class sfValidatedFileFromUrl extends sfValidatedFile
     }
     catch(Exception $e)
     {
-        throw limeException::createFromException('curl',$e);
+        throw limeException::createFromException($e,'curl');
     }
     
     if($b->isRunning()) throw new limeException('curl','still running');

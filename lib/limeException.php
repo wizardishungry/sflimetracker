@@ -7,7 +7,7 @@ class limeException extends sfException
     const HELP_BASE="http://limecast.com/tracker/help/"; // should this be in GH pages?
     const HELP_HOME="http://limecast.com/tracker";
     protected $token;
-    static public function createFromException($token,Exception $e)
+    static public function createFromException(Exception $e,$token=null)
     {
         $exception = new limeException($token,(sprintf('Wrapped %s: %s', get_class($e), $e->getMessage())));
         $exception->setWrappedException($e);
