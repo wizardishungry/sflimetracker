@@ -19,7 +19,9 @@
       <?php echo '<span title="'.sfConfig::get('app_version_comment').
                  '" class="version_rev">',sfConfig::get('app_version_rev'),'</span>',
                  '; <span class="runtime_version">Symfony ',SYMFONY_VERSION,'</span>';
-      ?> 
+      ?>
+      &middot;
+      <a href="http://limecast.com/tracker">http://limecast.com/tracker</a>
     </div>
 
     <div id="towers-wrapper">

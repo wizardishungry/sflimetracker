@@ -139,7 +139,7 @@ div#header a {
 div#title {
   background-color: #a1bb66;
   padding: 15px 5px;
-  margin: 40px 30px 0 30px;
+  margin: 0 30px;
 }
 div#header {
   background: url('../images/banner-corner-left.png') top left no-repeat;
@@ -159,12 +159,13 @@ div#title div a {
   color: #FFF;
   text-decoration: none;
 }
-div#header div.version {
-  display: inline;
-  margin-left: 8px;
-  line-height: 2em;
-  color: #888;
+div.version {
   font-size: 0.9em;
+  text-align: right;
+  margin: 40px 30px 0;
+}
+div#header div.version a {
+  color: #666;
 }
 div#header div#account_bar {
   background: #222 url('../images/striped.png') top left;

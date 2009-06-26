@@ -18,6 +18,14 @@
 <div id="document">
   <div id="layout">
 
+    <div class="version">
+      <?php echo '<span title="'.sfConfig::get('app_version_comment').
+                 '" class="version_rev">',sfConfig::get('app_version_rev'),'</span>',
+                 '; <span class="runtime_version">Symfony ',SYMFONY_VERSION,'</span>';
+      ?> 
+      &middot;
+      <a href="http://limecast.com/tracker">http://limecast.com/tracker</a>
+    </div>
     <div id="title">
         <div>
             <?php echo link_to(sfConfig::get('app_version_name'), '@homepage'); ?>
@@ -26,13 +34,6 @@
 
     <div id="header_wrapper">
       <div id="header" class="clearfix">
-        
-        <div class="version">
-          <?php echo '<span title="'.sfConfig::get('app_version_comment').
-            '" class="version_rev">',sfConfig::get('app_version_rev'),'</span>',
-            '; <span class="runtime_version">Symfony ',SYMFONY_VERSION,'</span>';
-          ?> 
-        </div>
         
         <div id="account_bar">      
           <ul class="clearfix">

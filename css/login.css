@@ -9,8 +9,12 @@ div.version {
   background-color: #a1bb66;
   position: absolute;
   top: 3px;
-  right: 3px;
+  right: 40px;
   display: inline;
+}
+
+div.version a {
+  font-size: 1em;
 }
 
 #towers-wrapper {
