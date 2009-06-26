@@ -411,10 +411,9 @@ div.progress .spinner {
  **/
 .podcasts .podcast {
   color: #DDD;
-  background-color: #333;
+  background-color: #555;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
-  width: 450px;
   min-height: 80px;
   padding: 10px;
   margin-bottom: 10px;
@@ -462,14 +461,17 @@ div.torrent_file ul.links,
 div.podcast_feed ul.links,
 code {
   padding: 8px 8px 8px 70px !important;
-  background-color: #333;
+  background-color: #555;
   display: block;
   color: #FFF;
   margin-bottom: 2px !important;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   position: relative;
-  max-width: 400px;
+}
+
+ul.links a {
+  color: #DDD;
 }
 
 div.torrent_file ul.links span,
