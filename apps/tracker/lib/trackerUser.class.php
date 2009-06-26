@@ -172,7 +172,7 @@ class trackerUser extends sfBasicSecurityUser
     }
     catch(Exception $e)
     {
-        throw limeException::createFromException('sideload',$e);
+        throw limeException::createFromException($e,'sideload');
     }
   }
   public function resetPasswordCheck()
