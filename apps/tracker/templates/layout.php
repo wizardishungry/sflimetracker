@@ -27,12 +27,12 @@
     <div id="header_wrapper">
       <div id="header" class="clearfix">
         
-    <!--     <div class="version">
+        <div class="version">
           <?php echo '<span title="'.sfConfig::get('app_version_comment').
             '" class="version_rev">',sfConfig::get('app_version_rev'),'</span>',
             '; <span class="runtime_version">Symfony ',SYMFONY_VERSION,'</span>';
           ?> 
-        </div> -->
+        </div>
         
         <div id="account_bar">      
           <ul class="clearfix">
