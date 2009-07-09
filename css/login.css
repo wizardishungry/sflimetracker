@@ -4,6 +4,19 @@ body {
   font-size: 1em;
 }
 
+div.version {
+  color: #FFF;
+  background-color: #a1bb66;
+  position: absolute;
+  top: 3px;
+  right: 40px;
+  display: inline;
+}
+
+div.version a {
+  font-size: 1em;
+}
+
 #towers-wrapper {
   width: 100%;
   height: 100%;
@@ -24,7 +37,7 @@ body {
 
 #login {
   color: #FFF;
-  margin-top: 200px;
+  margin-top: 180px;
   border-top: 4px solid #FFF;
   border-bottom: 4px solid #FFF;
   padding-bottom: 20px;
