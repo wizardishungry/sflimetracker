@@ -17,3 +17,6 @@
 [submodule "plugins/sfFeed2Plugin"]
 	path = plugins/sfFeed2Plugin
 	url = git://github.com/WIZARDISHUNGRY/sfFeed2Plugin.git
+[submodule "plugins/sfDomFeedPlugin"]
+	path = plugins/sfDomFeedPlugin
+	url = git://github.com/WIZARDISHUNGRY/sfDomFeedPlugin.git
