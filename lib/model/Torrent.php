@@ -8,7 +8,7 @@
  * @package lib.model
  */
 
-sfApplicationConfiguration::loadHelpers(Array('Asset','Url'));
+sfContext::getInstance()->getConfiguration()->loadHelpers(Array('Asset','Url'));
 
 class Torrent extends BaseTorrent
 {
