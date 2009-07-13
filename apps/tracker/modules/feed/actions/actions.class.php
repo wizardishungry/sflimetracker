@@ -11,7 +11,7 @@ class feedActions extends sfActions
 
   public function executeFeed($request)
   {
-    $feed = new sfRss201PodcastFeed();
+    $feed = new sfRssDomFeed();
 
     $link = '@homepage';
 
@@ -66,7 +66,6 @@ class feedActions extends sfActions
     $feed->addItems($torrent_items);
 
     $this->feed = $feed;
-        
   }
 
   protected function getPager($feed_id)
