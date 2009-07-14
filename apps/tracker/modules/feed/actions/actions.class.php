@@ -52,18 +52,15 @@ class feedActions extends sfActions
 
     $result_set=$pager->getResults();
 
+    $objects = Array(); // temporary until we port convertObjectsToItems into sfDomFeed
+
     foreach($result_set as $torrent)
     {
         $torrent->setFeedEnclosure($format);
+        $objects[] = new sfDomFeedItem($torrent);
     }
 
-    $torrent_items = sfFeedPeer::convertObjectsToItems($result_set);
-    
-    foreach($torrent_items as $item)
-    {
-    }
-
-    $feed->addItems($torrent_items);
+    $feed->addItems($objects);
 
     $this->feed = $feed;
   }
