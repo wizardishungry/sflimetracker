@@ -49,6 +49,7 @@ class trackerUser extends sfBasicSecurityUser
     $this->checkPermissions();
     $this->resetPasswordCheck(); // here?
     $this->checkDatabase();
+    $this->checkHtaccess();
     $this->performTests();
 
     $request=sfContext::getInstance()->getRequest();
@@ -89,6 +90,19 @@ class trackerUser extends sfBasicSecurityUser
     $response->setCookie($this->cookie_name,$value,$expire,$path,'',false);
   }
 
+  public function checkHtaccess()
+  {
+    $root=sfContext::getInstance()->getConfiguration()->getRootDir();
+    $path=$root.'/.htaccess';
+    if( !file_exists($path) )
+    {
+        throw new limeException('htaccess', 'Your .htaccess file is missing');
+    }    
+    if( !is_readable($path) )
+    {
+        throw new limeException('htaccess', 'Your .htaccess file is unreadable');
+    }    
+  }
   public function checkPermissions()
   {
     // fixme array is hardcoded
