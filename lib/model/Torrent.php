@@ -167,8 +167,8 @@ class Torrent extends BaseTorrent
         $components = Array();
         if($podcast=$this->getPodcast())
         {
-            $components[]=$podcast->getGuid();
-            // insert guid from feed here
+            //$components[]=$podcast->getGuid();
+            // todo podcast needs a getguid
         }
         else
         {
