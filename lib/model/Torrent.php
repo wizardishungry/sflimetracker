@@ -290,4 +290,10 @@ class Torrent extends BaseTorrent
         return strtr(implode('-',$parts),' /','__');
     }
 
+
+    public function getLink()
+    {
+      // temporary method until sfDomFeed knows how to figure this stuff out by itself
+      return $this->getUri();
+    }
 }
