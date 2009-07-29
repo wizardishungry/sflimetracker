@@ -46,11 +46,16 @@ class trackerUser extends sfBasicSecurityUser
 
     parent::initialize($dispatcher,$storage, $options);
 
-    $this->checkPermissions();
-    $this->resetPasswordCheck(); // here?
-    $this->checkDatabase();
-    $this->checkHtaccess();
-    $this->performTests();
+    $env=sfContext::getInstance()->getConfiguration()->getEnvironment();
+
+    if($env!='test')
+    {
+      $this->checkPermissions();
+      $this->resetPasswordCheck(); // here?
+      $this->checkDatabase();
+      $this->checkHtaccess();
+      $this->performTests();
+    }
 
     $request=sfContext::getInstance()->getRequest();
 
