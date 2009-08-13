@@ -150,6 +150,7 @@ EOF;
       'lib/vendor/symfony/test',
       'plugins/*/test',
       'plugins/.*',
+      'plugins/sfFeed2Plugin', // I have a copy of this in my directory for -stable
       'plugins/File_Bittorrent2', // added via symlinks in lib
       'test',       // tests don't bleong in an end user release
       'tracker_dev.php*', // no debugging
