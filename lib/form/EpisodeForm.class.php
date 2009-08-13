@@ -22,11 +22,12 @@ class EpisodeForm extends BaseEpisodeForm
 
     $this->setValidators(array(
         'id' => new sfValidatorInteger(array('required' => false)),
-        'created_at' => new sfValidatorDateTime(array('required' => false)),
+        'created_at' => new sfValidatorDateTime(array('required' => true),
+          Array('invalid'=>'Invalid date','required'=>'Please enter a date')),
         'podcast_id' => new sfValidatorInteger(array('required' => true)),
         'title' => new sfValidatorString(array('required' => true)),
         'slug' => new sfValidatorString(array('required' => false)),
-        'length' => new sfValidatorRegex(array('pattern' => '/^\d+(:\d+)?(:\d+)?$/')),
+        'length' => new sfValidatorRegex(array('pattern' => '/^\d+(:\d+)?(:\d+)?$/'),Array('invalid'=>'Invalid duration')),
         'description' => new sfValidatorString(array('required' => false)),
     ));
     
