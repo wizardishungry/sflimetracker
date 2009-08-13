@@ -45,6 +45,7 @@ class feedActions extends sfActions
             //"link"   => (string)$feedXml->channel[0]->image->link,
             //"title"  => (string)$feedXml->channel[0]->image->title
         )),
+
     ));
     $pager=$this->getPager($podcast_feed->getId());
     $pager->init();
@@ -57,7 +58,7 @@ class feedActions extends sfActions
     foreach($result_set as $torrent)
     {
         $torrent->setFeedEnclosure($format);
-        $objects[] = new sfDomFeedItem($torrent);
+        $objects[] = new sfDomFeedItem($torrent,Array('enclosure'=>new sfDomFeedEnclosure(null,Array('url'=>$torrent->getUrl()))));
     }
 
     $feed->addItems($objects);
