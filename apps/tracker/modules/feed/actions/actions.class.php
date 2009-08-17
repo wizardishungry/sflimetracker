@@ -58,7 +58,7 @@ class feedActions extends sfActions
     foreach($result_set as $torrent)
     {
         $torrent->setFeedEnclosure($format);
-        $objects[] = new sfDomFeedItem($torrent,Array('enclosure'=>new sfDomFeedEnclosure(null,Array('url'=>$torrent->getUrl()))));
+        $objects[] = new sfDomFeedItem($torrent,Array('enclosure'=>new sfDomFeedEnclosure($torrent)));
     }
 
     $feed->addItems($objects);
